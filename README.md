@@ -27,6 +27,8 @@ python -m scoring_engine run --ledger examples/ledger.csv --customers examples/c
 # 2. Run it on your own ledger
 python -m scoring_engine run --ledger my_ledger.csv --customers my_customers.csv --out out
 
+# open out/dashboard.html in a browser to explore the results
+
 # optional: install the `credit-score` command
 pip install -e .
 credit-score run --ledger my_ledger.csv --customers my_customers.csv --config my_policy.json
@@ -138,6 +140,7 @@ Disputed balances add *"resolve dispute"* to the action.
 | `collections_worklist.csv` | Overdue customers in work order, with tier, overdue split, priority score and action |
 | `portfolio_summary.md` | Management summary: headline KPIs, ageing profile, grade distribution, largest exposures, top of worklist, limit changes |
 | `portfolio_summary.json` | The same KPIs in machine-readable form, for dashboards and month-on-month tracking |
+| `dashboard.html` | Interactive dashboard (open in any browser, no install): risk map, grade mix, ageing, searchable customer table with drill-down, collections worklist with tick-off, limit recommendations, and a **Policy** tab that re-scores the ledger live as you move the sliders and exports the resulting `--config` JSON |
 
 ## Tuning the policy
 

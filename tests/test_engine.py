@@ -235,6 +235,10 @@ class EndToEndTests(unittest.TestCase):
             ageing_total = sum(summary["ageing"].values())
             self.assertAlmostEqual(ageing_total, summary["total_outstanding"], places=0)
             self.assertTrue((d / "out" / "collections_worklist.csv").exists())
+            page = (d / "out" / "dashboard.html").read_text()
+            self.assertTrue(page.startswith("<!doctype html>"))
+            self.assertNotIn("__PAYLOAD__", page)
+            self.assertIn('"customers":[', page)
 
     def test_run_reports_bad_input(self):
         with tempfile.TemporaryDirectory() as d:

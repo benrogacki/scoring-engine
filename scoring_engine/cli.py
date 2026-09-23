@@ -9,6 +9,7 @@ from typing import List, Optional
 
 from . import engine
 from .config import load_config
+from .dashboard import write_dashboard
 from .loader import LedgerError, merge_customers, parse_date, read_customers, read_ledger
 from .report import write_outputs
 from .sample_data import generate
@@ -37,6 +38,8 @@ def build_parser() -> argparse.ArgumentParser:
     run.add_argument("--as-of", type=_date_arg, default=date.today(), help="Scoring date (default: today)")
     run.add_argument("--config", type=Path, help="JSON config overriding default weights/policies")
     run.add_argument("--out", type=Path, default=Path("out"), help="Output directory (default: ./out)")
+    run.add_argument("--currency", default="", help="Currency symbol for the dashboard, e.g. '£'")
+    run.add_argument("--label", help="Data source label shown on the dashboard (default: ledger filename)")
 
     sample = sub.add_parser("sample", help="Generate a synthetic ledger to try the engine")
     sample.add_argument("--out", type=Path, default=Path("examples"), help="Directory for sample CSVs")
@@ -63,6 +66,9 @@ def main(argv: Optional[List[str]] = None) -> int:
 
     result = engine.run(invoices, customers, args.as_of, config)
     paths = write_outputs(result, config, args.out)
+    paths["dashboard"] = write_dashboard(
+        result, config, args.out / "dashboard.html", source=args.label or args.ledger.name, currency=args.currency
+    )
     sm = result.summary
     print(f"Scored {sm['customers']} customers as at {args.as_of.isoformat()}")
     print(f"  Receivables {sm['total_outstanding']:,.0f}  overdue {sm['total_overdue']:,.0f} ({sm['overdue_pct']:.1%})")
