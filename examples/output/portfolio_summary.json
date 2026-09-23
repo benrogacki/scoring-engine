@@ -1,0 +1,55 @@
+{
+  "as_of": "2026-09-30",
+  "customers": 36,
+  "customers_with_balance": 35,
+  "total_outstanding": 1804429.62,
+  "total_overdue": 464448.49,
+  "overdue_pct": 0.2574,
+  "ageing": {
+    "current": 1339981.13,
+    "1_30": 207790.43,
+    "31_60": 71544.14,
+    "61_90": 49114.85,
+    "90_plus": 135999.07
+  },
+  "by_grade": {
+    "A": {
+      "customers": 15,
+      "outstanding": 368396.76
+    },
+    "B": {
+      "customers": 4,
+      "outstanding": 770958.67
+    },
+    "C": {
+      "customers": 11,
+      "outstanding": 357881.51
+    },
+    "D": {
+      "customers": 1,
+      "outstanding": 29692.93
+    },
+    "E": {
+      "customers": 5,
+      "outstanding": 277499.75
+    }
+  },
+  "ar_weighted_score": 67.2,
+  "hhi": 1037.0,
+  "top10_share": 0.6703,
+  "over_limit_customers": 17,
+  "limit_actions": {
+    "Increase": 13,
+    "Maintain": 8,
+    "Maintain (concentration cap)": 2,
+    "Reduce": 5,
+    "Set limit": 3,
+    "Suspend credit (cash with order)": 5
+  },
+  "collection_tiers": {
+    "P1": 5,
+    "P2": 2,
+    "P3": 3,
+    "P4": 9
+  }
+}

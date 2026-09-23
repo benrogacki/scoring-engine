@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "scoring-engine"
+version = "0.1.0"
+description = "Credit-risk and customer scoring engine for debtor ledgers: payment history, ageing, concentration, credit limits and collection priority."
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = []
+
+[project.scripts]
+credit-score = "scoring_engine.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["scoring_engine*"]
