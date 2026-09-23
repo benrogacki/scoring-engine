@@ -4,8 +4,8 @@ A scoring workflow for finance teams, built on the debtor ledger. It scores each
 **payment history**, **ageing** and **concentration/exposure**. From those scores it assigns a risk
 grade, recommends a **credit limit** and produces a ranked **collections worklist**.
 
-It has no dependencies beyond the Python standard library (3.9+). Inputs are plain CSV exports from
-any ERP or accounting system. Outputs are CSV and Markdown, ready for Excel, Power BI or an email to
+It has no dependencies beyond the Python standard library (3.9+); the optional Databricks connector
+is the only extra. Inputs come from CSV exports, **NetSuite** (SuiteQL) or **Databricks** tables. Outputs are CSV and Markdown, ready for Excel, Power BI or an email to
 the credit controller.
 
 ```
@@ -33,6 +33,20 @@ python -m scoring_engine run --ledger my_ledger.csv --customers my_customers.csv
 pip install -e .
 credit-score run --ledger my_ledger.csv --customers my_customers.csv --config my_policy.json
 ```
+
+### Pulling live data
+
+```bash
+# straight from NetSuite (SuiteQL + token-based auth; credentials in env vars)
+credit-score run --source netsuite --out out/
+
+# from Databricks, writing results back as Delta tables
+credit-score run --source databricks --invoices-table main.finance.credit_ar_invoices \
+       --customers-table main.finance.credit_customers --write-table-prefix main.finance.credit_risk
+```
+
+Setup steps, required permissions, the default queries and a scheduled Databricks job are in
+[`docs/integrations.md`](docs/integrations.md).
 
 Worked outputs from the sample ledger are in [`examples/output/`](examples/output/). Start with
 [`portfolio_summary.md`](examples/output/portfolio_summary.md).
@@ -175,7 +189,8 @@ python -m unittest discover -s tests -v
 ```
 
 The code lives in the `scoring_engine/` package:
-- `loader.py`: CSV parsing and column aliases
+- `loader.py`: row validation and column aliases, shared by every source
+- `sources/`: NetSuite (SuiteQL, OAuth 1.0a) and Databricks (SQL connector, Spark, write-back), plus the default queries
 - `features.py`: per-customer measurements
 - `scoring.py`: sub-scores, grades, overrides and explanations
 - `limits.py`: credit limit recommendations

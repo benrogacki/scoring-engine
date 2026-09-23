@@ -87,11 +87,14 @@ def _deep_merge(base: Dict[str, Any], override: Dict[str, Any]) -> Dict[str, Any
     return result
 
 
-def load_config(path: Optional[Path] = None) -> Dict[str, Any]:
+def load_config(path: Optional[Path] = None, overrides: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    """Defaults, then a JSON file, then in-memory overrides (e.g. from a job parameter)."""
     config = copy.deepcopy(DEFAULT_CONFIG)
     if path is not None:
         with open(path, encoding="utf-8") as fh:
             config = _deep_merge(config, json.load(fh))
+    if overrides:
+        config = _deep_merge(config, overrides)
     validate_config(config)
     return config
 

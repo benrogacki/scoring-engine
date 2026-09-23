@@ -10,6 +10,9 @@ readme = "README.md"
 requires-python = ">=3.9"
 dependencies = []
 
+[project.optional-dependencies]
+databricks = ["databricks-sql-connector>=3.0"]
+
 [project.scripts]
 credit-score = "scoring_engine.cli:main"
 
@@ -17,4 +20,4 @@ credit-score = "scoring_engine.cli:main"
 include = ["scoring_engine*"]
 
 [tool.setuptools.package-data]
-scoring_engine = ["templates/*.html"]
+scoring_engine = ["templates/*.html", "sources/queries/*.sql"]
