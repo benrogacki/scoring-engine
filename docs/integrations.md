@@ -109,17 +109,58 @@ credit-score run --source databricks \
 
 The account needs `SELECT` on the source views and `CREATE TABLE`/`MODIFY` on the target schema.
 
-### Option B: a scheduled Databricks job (no tokens)
+### Option B: a scheduled Databricks job run from this repo (recommended)
 
-`databricks/credit_scoring_job.py` is a Databricks notebook. It reads the tables with Spark, scores
-them, writes the Delta tables and saves the reports and `dashboard.html` to a Unity Catalog Volume.
+`databricks/credit_scoring_job.py` is a Databricks notebook. It reads the two views with Spark,
+scores the ledger, writes the Delta tables and saves the reports and `dashboard.html` to a Unity
+Catalog Volume. The job pulls the notebook **straight from GitHub on every run** (a *Git source*), so
+production always runs what's on `main`. There's no copy in the workspace to drift out of date, and
+nothing to install because the engine is pure Python.
 
-1. Add this repo to the workspace as a **Git folder** (*Workspace → Create → Git folder*). The
-   engine is pure Python, so there's nothing to install.
-2. Open `databricks/credit_scoring_job.py` and fill in the widgets. Run it once by hand.
-3. Go to *Workflows → Create job*, add a notebook task pointing at the file, pass the same
-   parameters, and schedule it (e.g. 06:00 on the 2nd of each month, after month-end close).
-4. Optional: use `policy_json` to pass a policy exported from the dashboard's Policy tab.
+**One-off setup**
+
+1. **Git credentials.** The repo is private, so the job's owner, or the service principal it runs
+   as, needs a GitHub credential in Databricks: *Settings → Linked accounts → Git integration →
+   GitHub*.
+2. **Unity Catalog objects.** Create the two input views (below). Also create the output schema and
+   a Volume for reports, e.g. `CREATE VOLUME main.finance.reports`. The job's identity needs:
+   - `SELECT` on the views
+   - `USE SCHEMA`, `CREATE TABLE` and `MODIFY` on the output schema
+   - `READ VOLUME` and `WRITE VOLUME` on the Volume
+3. **Create the job.** Go to *Workflows → Create job*, then open the **⋮** menu and choose *Edit as
+   JSON*/*YAML*, and paste in [`databricks/credit_scoring_job.json`](../databricks/credit_scoring_job.json).
+   Or create it from the CLI: `databricks jobs create --json @databricks/credit_scoring_job.json`.
+   Before saving:
+   - Set `base_parameters` to your catalog, schema and view names.
+   - Change the `on_failure` email.
+   - Choose compute. The file has none, so it runs on **serverless** where that's enabled.
+     Otherwise add a `job_cluster_key` or `existing_cluster_id` to the task. A single-node cluster
+     is plenty.
+4. **Run it once by hand** (*Run now*, or *Run now with different parameters* for a past `as_of`).
+   Check the tables and the Volume folder. Then **unpause the schedule**. It ships paused, set to
+   07:00 UK time on the 3rd of each month. Move it to after your month-end close.
+
+**Parameters**
+
+| Parameter | Default | Notes |
+|---|---|---|
+| `invoices_table` / `customers_table` | `main.finance.credit_ar_invoices` / `…credit_customers` | The views described below |
+| `output_prefix` | `main.finance.credit_risk` | Writes `<prefix>_scorecard` and `<prefix>_worklist` |
+| `output_volume` | `/Volumes/main/finance/reports/credit_scoring` | Reports go in a `<as_of>/` sub-folder |
+| `as_of` | blank | Blank means the **last day of the previous month**. `today` scores as of today; `YYYY-MM-DD` re-runs a past month |
+| `policy_json` | blank | Policy overrides, e.g. the JSON exported from the dashboard's Policy tab |
+| `lookback_months` | `15` | Months of invoices to read |
+| `currency` | `£` | Symbol shown on the dashboard |
+
+**What a run does**
+
+- **Fails on an empty ledger.** If the view returns no invoices, the run fails and triggers the
+  failure email. It does not overwrite that month with nothing.
+- **Re-runs are safe.** Rows for the same `as_of` are replaced, not duplicated.
+- **Reports its headline figures.** Customer count, balance, overdue %, grade mix and tier counts are
+  the task's output, visible on the run page.
+- **Releases by merge.** A merge to `main` is picked up by the next run. To pin a release, change
+  `git_branch` to `git_tag` in the job.
 
 ### The curated views the defaults expect
 

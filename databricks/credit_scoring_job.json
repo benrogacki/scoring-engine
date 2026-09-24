@@ -1,0 +1,40 @@
+{
+  "name": "credit-risk-scoring-monthly",
+  "description": "Scores the debtor ledger, writes credit_risk_scorecard / credit_risk_worklist tables and the dashboard. Code: github.com/benrogacki/scoring-engine",
+  "git_source": {
+    "git_url": "https://github.com/benrogacki/scoring-engine",
+    "git_provider": "gitHub",
+    "git_branch": "main"
+  },
+  "tasks": [
+    {
+      "task_key": "score_ledger",
+      "notebook_task": {
+        "notebook_path": "databricks/credit_scoring_job",
+        "source": "GIT",
+        "base_parameters": {
+          "invoices_table": "main.finance.credit_ar_invoices",
+          "customers_table": "main.finance.credit_customers",
+          "output_prefix": "main.finance.credit_risk",
+          "output_volume": "/Volumes/main/finance/reports/credit_scoring",
+          "as_of": "",
+          "policy_json": "",
+          "lookback_months": "15",
+          "currency": "£"
+        }
+      },
+      "timeout_seconds": 3600,
+      "max_retries": 1,
+      "min_retry_interval_millis": 600000
+    }
+  ],
+  "schedule": {
+    "quartz_cron_expression": "0 0 7 3 * ?",
+    "timezone_id": "Europe/London",
+    "pause_status": "PAUSED"
+  },
+  "email_notifications": {
+    "on_failure": ["finance-systems@example.com"]
+  },
+  "max_concurrent_runs": 1
+}
