@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Freight Nowcast</title>
+<style>
+:root {
+  color-scheme: light;
+  --surface-0: #f4f3f0; --surface-1: #fcfcfb; --border: #e2e0da; --grid: #ebe9e4;
+  --text-primary: #0b0b0b; --text-secondary: #52514e; --text-muted: #7a7974;
+  --series-1: #2a78d6; --band: #ecebe7;
+  --pos: #2a78d6; --neg: #e34948; --neutral: #f0efec;
+  --good: #008300; --warning: #b77a00; --critical: #c93636;
+  --banner-bg: #fff4d6; --banner-ink: #6b4a00;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --surface-0: #121211; --surface-1: #1a1a19; --border: #33332f; --grid: #2a2a27;
+    --text-primary: #ffffff; --text-secondary: #c3c2b7; --text-muted: #8f8e86;
+    --series-1: #3987e5; --band: #262624;
+    --pos: #3987e5; --neg: #e66767; --neutral: #383835;
+    --good: #3fae3f; --warning: #d9a21b; --critical: #e66767;
+    --banner-bg: #3a3014; --banner-ink: #f3d68a;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --surface-0: #121211; --surface-1: #1a1a19; --border: #33332f; --grid: #2a2a27;
+  --text-primary: #ffffff; --text-secondary: #c3c2b7; --text-muted: #8f8e86;
+  --series-1: #3987e5; --band: #262624;
+  --pos: #3987e5; --neg: #e66767; --neutral: #383835;
+  --good: #3fae3f; --warning: #d9a21b; --critical: #e66767;
+  --banner-bg: #3a3014; --banner-ink: #f3d68a;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--surface-0); color: var(--text-primary);
+  font: 14px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+main { max-width: 1120px; margin: 0 auto; padding: 20px 16px 48px; }
+h1 { font-size: 20px; margin: 0 0 2px; }
+h2 { font-size: 15px; margin: 0 0 10px; }
+.sub { color: var(--text-secondary); margin: 0 0 16px; }
+.banner { background: var(--banner-bg); color: var(--banner-ink); padding: 8px 12px; border-radius: 8px; margin-bottom: 16px; font-weight: 600; }
+.banner.live { background: var(--surface-1); color: var(--text-secondary); border: 1px solid var(--border); font-weight: 500; }
+.card { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin-bottom: 16px; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin-bottom: 16px; }
+.tile { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
+.tile .k { color: var(--text-secondary); font-size: 12px; }
+.tile .v { font-size: clamp(20px, 5vw, 26px); overflow-wrap: anywhere; font-weight: 650; font-variant-numeric: tabular-nums; }
+.tile .n { color: var(--text-muted); font-size: 12px; }
+.row { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+.seg button { border: 1px solid var(--border); background: var(--surface-1); color: var(--text-secondary); padding: 4px 10px; font: inherit; font-size: 12px; cursor: pointer; }
+.seg button:first-child { border-radius: 6px 0 0 6px; } .seg button:last-child { border-radius: 0 6px 6px 0; }
+.seg button[aria-pressed="true"] { background: var(--text-primary); color: var(--surface-1); }
+.chart { position: relative; }
+.chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+.axis text { fill: var(--text-muted); font-size: 11px; }
+.grid line { stroke: var(--grid); }
+.zero { stroke: var(--text-muted); stroke-width: 1; }
+.tip { position: absolute; pointer-events: none; background: var(--surface-1); border: 1px solid var(--border);
+  border-radius: 8px; padding: 6px 9px; font-size: 12px; box-shadow: 0 4px 14px rgba(0,0,0,.12); white-space: nowrap; display: none; }
+.multiples { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
+.legend { color: var(--text-secondary); font-size: 12px; display: flex; gap: 14px; flex-wrap: wrap; }
+.legend i { display: inline-block; width: 12px; height: 10px; vertical-align: -1px; margin-right: 4px; border-radius: 2px; }
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+#validation td:first-child { white-space: normal; min-width: 220px; }
+th { color: var(--text-secondary); font-weight: 600; font-size: 12px; }
+td.num, th.num { text-align: right; }
+.badge { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; }
+.badge::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+.b-good { color: var(--good); } .b-warn { color: var(--warning); } .b-bad { color: var(--critical); } .b-na { color: var(--text-muted); }
+li, .tile .n { overflow-wrap: anywhere; }
+.note { color: var(--text-muted); font-size: 12px; margin-top: 8px; }
+.tilt-row { display: grid; grid-template-columns: 170px 1fr 52px; align-items: center; gap: 8px; margin: 3px 0; }
+.tilt-track { position: relative; height: 14px; background: var(--neutral); border-radius: 3px; }
+.tilt-bar { position: absolute; top: 0; height: 14px; border-radius: 3px; }
+.tilt-mid { position: absolute; left: 50%; top: -3px; bottom: -3px; width: 1px; background: var(--text-muted); }
+@media (max-width: 560px) { .tilt-row { grid-template-columns: 110px 1fr 44px; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>Freight nowcast</h1>
+  <p class="sub" id="sub"></p>
+  <div id="banner"></div>
+  <div class="tiles" id="tiles"></div>
+
+  <section class="card">
+    <div class="row">
+      <h2>Composite real-economy momentum (z)</h2>
+      <div class="seg" id="range" role="group" aria-label="Time range">
+        <button data-y="5">5Y</button><button data-y="10" aria-pressed="true">10Y</button><button data-y="0">All</button>
+      </div>
+    </div>
+    <div class="legend"><span><i style="background:var(--band)"></i>Contraction phase</span>
+      <span>▲ trough · ▼ peak (hollow = provisional)</span><span>dashed = provisional reading</span></div>
+    <div class="chart" id="main-chart"></div>
+  </section>
+
+  <section class="card">
+    <h2>By geography</h2>
+    <div class="multiples" id="multiples"></div>
+  </section>
+
+  <section class="card">
+    <h2>Evidence: does each signal track what it claims to lead?</h2>
+    <div class="table-wrap"><table id="validation"></table></div>
+    <p class="note">Evidenced = significant in-sample link (Newey-West t) with the expected sign <b>and</b> a better pseudo real-time nowcast than the target's own lag (RMSE ratio &lt; 1, Diebold-Mariano p &lt; 0.10). Publication lead = days the indicator is out before the target.</p>
+  </section>
+
+  <section class="card">
+    <h2>Indicators, latest</h2>
+    <div class="table-wrap"><table id="indicators"></table></div>
+  </section>
+
+  <section class="card">
+    <h2>Tier 2: cycle / sector tilt</h2>
+    <p class="sub" id="tilt-sub"></p>
+    <div id="tilt"></div>
+    <p class="note">Directional tilts in [−1, 1] for the capstone to size; scaled by conviction. Blue = overweight, red = underweight.</p>
+  </section>
+
+  <section class="card">
+    <h2>Data</h2>
+    <div class="table-wrap"><table id="vintages"></table></div>
+  </section>
+
+  <section class="card" id="warn-card" hidden>
+    <h2>Data warnings</h2>
+    <ul id="warnings"></ul>
+  </section>
+</main>
+<script>
+const D = {"as_of": "2026-10-01", "synthetic": false, "data_updated_at": "2026-10-01T09:52:13+00:00", "vintages": [{"id": "de_toll_mileage", "label": "Truck toll mileage index (sa)", "role": "indicator", "last": "2026-09-26", "fetched": "2026-10-01T09:52:02+00:00", "origin": "genesis"}, {"id": "de_port_calls", "label": "Port calls, Germany (IMF PortWatch, AIS)", "role": "indicator", "last": "2026-09-25", "fetched": "2026-10-01T09:52:08+00:00", "origin": "portwatch"}, {"id": "ea_port_calls", "label": "Port calls, euro-area ports (IMF PortWatch, AIS)", "role": "indicator", "last": "2026-09-25", "fetched": "2026-10-01T09:52:08+00:00", "origin": "portwatch"}, {"id": "world_port_calls", "label": "Port calls, world (IMF PortWatch, AIS)", "role": "indicator", "last": "2026-09-25", "fetched": "2026-10-01T09:52:09+00:00", "origin": "portwatch"}, {"id": "de_manufacturing_production", "label": "Manufacturing production, Germany (sca)", "role": "target", "last": "2026-07-01", "fetched": "2026-10-01T09:52:10+00:00", "origin": "sdmx"}, {"id": "ea_manufacturing_production", "label": "Manufacturing production, euro area (sca)", "role": "target", "last": "2026-07-01", "fetched": "2026-10-01T09:52:10+00:00", "origin": "sdmx"}], "composite": [["2021-12", 0.764, 0], ["2022-01", 0.912, 0], ["2022-02", 0.559, 0], ["2022-03", 0.078, 0], ["2022-04", -0.135, 0], ["2022-05", 0.246, 0], ["2022-06", 0.084, 0], ["2022-07", 0.163, 0], ["2022-08", 0.315, 0], ["2022-09", 0.197, 0], ["2022-10", 0.389, 0], ["2022-11", -0.288, 0], ["2022-12", -0.23, 0], ["2023-01", -0.533, 0], ["2023-02", -0.127, 0], ["2023-03", -0.311, 0], ["2023-04", -0.109, 0], ["2023-05", -0.28, 0], ["2023-06", -0.129, 0], ["2023-07", -0.28, 0], ["2023-08", -0.629, 0], ["2023-09", -0.086, 0], ["2023-10", -0.536, 0], ["2023-11", -0.609, 0], ["2023-12", -0.675, 0], ["2024-01", -0.227, 0], ["2024-02", -0.452, 0], ["2024-03", 0.024, 0], ["2024-04", 0.358, 0], ["2024-05", 0.099, 0], ["2024-06", -0.075, 0], ["2024-07", 0.049, 0], ["2024-08", -0.434, 0], ["2024-09", -0.559, 0], ["2024-10", 0.025, 0], ["2024-11", 0.218, 0], ["2024-12", -0.244, 0], ["2025-01", -0.417, 0], ["2025-02", -0.041, 0], ["2025-03", -0.139, 0], ["2025-04", -0.612, 0], ["2025-05", -0.456, 0], ["2025-06", -0.468, 0], ["2025-07", -0.525, 0], ["2025-08", 0.036, 0], ["2025-09", -0.186, 0], ["2025-10", -0.954, 0], ["2025-11", -0.366, 0], ["2025-12", -0.147, 0], ["2026-01", -1.135, 0], ["2026-02", -0.636, 0], ["2026-03", -0.51, 0], ["2026-04", -0.265, 0], ["2026-05", 0.267, 0], ["2026-06", -0.063, 0], ["2026-07", -0.218, 0], ["2026-08", -0.553, 0], ["2026-09", -0.11, 1]], "phases": {"2022-03": "Slowdown", "2022-04": "Contraction", "2022-05": "Slowdown", "2022-06": "Expansion", "2022-07": "Expansion", "2022-08": "Expansion", "2022-09": "Expansion", "2022-10": "Expansion", "2022-11": "Contraction", "2022-12": "Contraction", "2023-01": "Contraction", "2023-02": "Recovery", "2023-03": "Contraction", "2023-04": "Recovery", "2023-05": "Contraction", "2023-06": "Recovery", "2023-07": "Contraction", "2023-08": "Contraction", "2023-09": "Recovery", "2023-10": "Contraction", "2023-11": "Recovery", "2023-12": "Contraction", "2024-01": "Recovery", "2024-02": "Recovery", "2024-03": "Expansion", "2024-04": "Expansion", "2024-05": "Expansion", "2024-06": "Contraction", "2024-07": "Slowdown", "2024-08": "Contraction", "2024-09": "Contraction", "2024-10": "Slowdown", "2024-11": "Expansion", "2024-12": "Recovery", "2025-01": "Contraction", "2025-02": "Contraction", "2025-03": "Recovery", "2025-04": "Contraction", "2025-05": "Contraction", "2025-06": "Contraction", "2025-07": "Recovery", "2025-08": "Expansion", "2025-09": "Recovery", "2025-10": "Contraction", "2025-11": "Contraction", "2025-12": "Recovery", "2026-01": "Contraction", "2026-02": "Contraction", "2026-03": "Contraction", "2026-04": "Recovery", "2026-05": "Expansion", "2026-06": "Recovery", "2026-07": "Recovery", "2026-08": "Contraction", "2026-09": "Contraction"}, "turns": [{"month": "2024-04", "kind": "peak", "status": "confirmed", "value": 0.358, "detected": "2024-09"}, {"month": "2026-01", "kind": "trough", "status": "confirmed", "value": -1.135, "detected": "2026-06"}], "geos": [{"code": "DE", "label": "Germany", "line": [["2010-05", 1.363, 1], ["2010-06", 1.53, 1], ["2010-07", 1.014, 1], ["2010-08", 0.453, 1], ["2010-09", 0.381, 1], ["2010-10", 0.437, 1], ["2010-11", 0.494, 1], ["2010-12", 0.996, 1], ["2011-01", 1.269, 1], ["2011-02", 1.582, 1], ["2011-03", 0.614, 1], ["2011-04", 0.088, 1], ["2011-05", -0.553, 1], ["2011-06", -0.048, 1], ["2011-07", -0.013, 1], ["2011-08", 0.444, 1], ["2011-09", 0.054, 1], ["2011-10", 0.188, 1], ["2011-11", 0.085, 1], ["2011-12", 0.664, 1], ["2012-01", 0.798, 1], ["2012-02", 0.38, 1], ["2012-03", -0.444, 1], ["2012-04", -0.933, 1], ["2012-05", -0.35, 1], ["2012-06", -0.045, 1], ["2012-07", 0.215, 1], ["2012-08", -0.131, 1], ["2012-09", 0.039, 1], ["2012-10", 0.024, 1], ["2012-11", -0.0, 1], ["2012-12", -0.491, 1], ["2013-01", -0.368, 1], ["2013-02", -0.341, 1], ["2013-03", 0.484, 1], ["2013-04", 0.436, 1], ["2013-05", 0.776, 1], ["2013-06", 0.384, 1], ["2013-07", 0.715, 1], ["2013-08", 0.467, 1], ["2013-09", 0.725, 1], ["2013-10", 0.415, 1], ["2013-11", 0.332, 1], ["2013-12", -0.303, 1], ["2014-01", -0.424, 1], ["2014-02", -0.18, 1], ["2014-03", 0.841, 1], ["2014-04", 1.427, 1], ["2014-05", 0.43, 1], ["2014-06", 0.107, 1], ["2014-07", -0.483, 1], ["2014-08", 0.28, 1], ["2014-09", -0.475, 1], ["2014-10", -0.746, 1], ["2014-11", -0.87, 1], ["2014-12", -0.799, 1], ["2015-01", -0.427, 1], ["2015-02", -0.237, 1], ["2015-03", 0.707, 1], ["2015-04", 1.054, 1], ["2015-05", 1.115, 1], ["2015-06", 0.543, 1], ["2015-07", 0.668, 1], ["2015-08", 0.58, 1], ["2015-09", 0.663, 1], ["2015-10", 0.283, 1], ["2015-11", 0.157, 1], ["2015-12", 0.787, 1], ["2016-01", 0.905, 1], ["2016-02", 1.305, 1], ["2016-03", 0.62, 1], ["2016-04", 0.543, 1], ["2016-05", 0.594, 1], ["2016-06", -0.22, 1], ["2016-07", -0.33, 1], ["2016-08", -1.065, 1], ["2016-09", 0.204, 1], ["2016-10", 0.813, 1], ["2016-11", 1.395, 1], ["2016-12", 2.091, 1], ["2017-01", 1.868, 1], ["2017-02", 1.89, 1], ["2017-03", -0.238, 1], ["2017-04", -0.633, 1], ["2017-05", -0.966, 1], ["2017-06", 0.396, 1], ["2017-07", 0.14, 1], ["2017-08", 0.381, 1], ["2017-09", -0.151, 1], ["2017-10", 0.405, 1], ["2017-11", 0.92, 1], ["2017-12", 1.286, 1], ["2018-01", 1.458, 1], ["2018-02", -0.248, 1], ["2018-03", -1.298, 1], ["2018-04", -2.393, 1], ["2018-05", -1.414, 1], ["2018-06", -0.497, 1], ["2018-07", -0.024, 1], ["2018-08", -0.656, 1], ["2018-09", -1.04, 1], ["2018-10", -0.336, 1], ["2018-11", 0.73, 1], ["2018-12", 0.138, 1], ["2019-01", -0.939, 1], ["2019-02", -1.675, 1], ["2019-03", -0.211, 1], ["2019-04", 0.357, 1], ["2019-05", -0.639, 1], ["2019-06", -1.659, 1], ["2019-07", -2.051, 1], ["2019-08", -1.402, 1], ["2019-09", -1.618, 1], ["2019-10", -1.594, 1], ["2019-11", -1.261, 1], ["2019-12", -2.013, 1], ["2020-01", -1.681, 1], ["2020-02", -1.083, 1], ["2020-03", 0.731, 1], ["2020-04", -2.844, 1], ["2020-05", -4.0, 1], ["2020-06", -4.0, 1], ["2020-07", 0.078, 1], ["2020-08", 3.654, 1], ["2020-09", 4.0, 1], ["2020-10", 2.032, 1], ["2020-11", 1.021, 1], ["2020-12", 0.757, 1], ["2021-01", 0.34, 1], ["2021-02", -0.247, 1], ["2021-03", -0.177, 1], ["2021-04", 0.34, 1], ["2021-05", 1.297, 1], ["2021-06", 0.684, 1], ["2021-07", -0.265, 1], ["2021-08", -1.22, 1], ["2021-09", -1.303, 1], ["2021-10", -0.971, 1], ["2021-11", -0.457, 1], ["2021-12", 0.468, 0], ["2022-01", 0.772, 0], ["2022-02", 0.717, 0], ["2022-03", 0.205, 0], ["2022-04", -0.26, 0], ["2022-05", -0.362, 0], ["2022-06", -0.433, 0], ["2022-07", -0.869, 0], ["2022-08", -0.313, 0], ["2022-09", -0.524, 0], ["2022-10", -0.25, 0], ["2022-11", -0.37, 0], ["2022-12", -0.501, 0], ["2023-01", -0.44, 0], ["2023-02", -0.519, 0], ["2023-03", -0.711, 0], ["2023-04", -0.42, 0], ["2023-05", -0.573, 0], ["2023-06", -0.387, 0], ["2023-07", -0.151, 0], ["2023-08", -0.556, 0], ["2023-09", -0.345, 0], ["2023-10", -0.609, 0], ["2023-11", -0.472, 0], ["2023-12", -0.398, 0], ["2024-01", -0.389, 0], ["2024-02", -0.023, 0], ["2024-03", 0.181, 0], ["2024-04", 0.37, 0], ["2024-05", 0.236, 0], ["2024-06", 0.232, 0], ["2024-07", 0.003, 0], ["2024-08", -0.127, 0], ["2024-09", 0.007, 0], ["2024-10", 0.327, 0], ["2024-11", 0.465, 0], ["2024-12", -0.293, 0], ["2025-01", 0.095, 0], ["2025-02", -0.208, 0], ["2025-03", 0.45, 0], ["2025-04", 0.027, 0], ["2025-05", 0.365, 0], ["2025-06", -0.06, 0], ["2025-07", 0.173, 0], ["2025-08", 0.243, 0], ["2025-09", -0.245, 0], ["2025-10", -0.388, 0], ["2025-11", -0.366, 0], ["2025-12", 0.213, 0], ["2026-01", -0.491, 0], ["2026-02", 0.104, 0], ["2026-03", 0.443, 0], ["2026-04", 1.142, 0], ["2026-05", 1.266, 0], ["2026-06", 1.063, 0], ["2026-07", 0.557, 0], ["2026-08", 0.501, 0], ["2026-09", 1.069, 1]], "turns": [{"month": "2012-12", "kind": "trough", "status": "confirmed", "value": -0.491, "detected": "2013-05"}, {"month": "2013-05", "kind": "peak", "status": "confirmed", "value": 0.776, "detected": "2013-10"}, {"month": "2014-11", "kind": "trough", "status": "confirmed", "value": -0.87, "detected": "2015-04"}, {"month": "2015-05", "kind": "peak", "status": "confirmed", "value": 1.115, "detected": "2015-10"}, {"month": "2017-05", "kind": "trough", "status": "confirmed", "value": -0.966, "detected": "2017-10"}, {"month": "2018-11", "kind": "peak", "status": "confirmed", "value": 0.73, "detected": "2019-04"}, {"month": "2019-07", "kind": "trough", "status": "confirmed", "value": -2.051, "detected": "2019-12"}, {"month": "2020-09", "kind": "peak", "status": "confirmed", "value": 4.0, "detected": "2021-02"}, {"month": "2023-10", "kind": "trough", "status": "confirmed", "value": -0.609, "detected": "2024-03"}]}, {"code": "EA", "label": "Euro area", "line": [["2021-12", 0.781, 0], ["2022-01", 0.925, 0], ["2022-02", 0.309, 0], ["2022-03", 0.168, 0], ["2022-04", -0.07, 0], ["2022-05", 0.759, 0], ["2022-06", 0.403, 0], ["2022-07", 0.656, 0], ["2022-08", 0.39, 0], ["2022-09", 0.233, 0], ["2022-10", 0.246, 0], ["2022-11", -0.614, 0], ["2022-12", -0.176, 0], ["2023-01", -0.913, 0], ["2023-02", -0.067, 0], ["2023-03", -0.734, 0], ["2023-04", -0.156, 0], ["2023-05", -0.512, 0], ["2023-06", -0.275, 0], ["2023-07", -0.912, 0], ["2023-08", -0.812, 0], ["2023-09", -0.329, 0], ["2023-10", -0.581, 0], ["2023-11", -0.768, 0], ["2023-12", -0.956, 0], ["2024-01", -0.116, 0], ["2024-02", -0.443, 0], ["2024-03", 0.189, 0], ["2024-04", 0.512, 0], ["2024-05", 0.098, 0], ["2024-06", -0.096, 0], ["2024-07", 0.733, 0], ["2024-08", 0.118, 0], ["2024-09", -0.301, 0], ["2024-10", 0.435, 0], ["2024-11", 0.763, 0], ["2024-12", -0.098, 0], ["2025-01", -0.311, 0], ["2025-02", 0.943, 0], ["2025-03", 0.299, 0], ["2025-04", -0.548, 0], ["2025-05", -0.501, 0], ["2025-06", -0.455, 0], ["2025-07", -0.71, 0], ["2025-08", -0.503, 0], ["2025-09", 0.069, 0], ["2025-10", -1.165, 0], ["2025-11", 0.017, 0], ["2025-12", 0.638, 0], ["2026-01", -1.706, 0], ["2026-02", -1.239, 0], ["2026-03", -0.387, 0], ["2026-04", -0.488, 0], ["2026-05", 0.374, 0], ["2026-06", -0.22, 0], ["2026-07", -0.298, 0], ["2026-08", -0.179, 0], ["2026-09", 0.094, 1]], "turns": [{"month": "2023-12", "kind": "trough", "status": "confirmed", "value": -0.956, "detected": "2024-05"}, {"month": "2025-02", "kind": "peak", "status": "confirmed", "value": 0.943, "detected": "2025-07"}, {"month": "2026-01", "kind": "trough", "status": "confirmed", "value": -1.706, "detected": "2026-06"}]}, {"code": "WORLD", "label": "World sea trade", "line": [["2021-12", 1.14, 0], ["2022-01", 1.085, 0], ["2022-02", 0.597, 0], ["2022-03", -0.183, 0], ["2022-04", -0.031, 0], ["2022-05", 0.544, 0], ["2022-06", 0.456, 0], ["2022-07", 1.047, 0], ["2022-08", 1.078, 0], ["2022-09", 1.122, 0], ["2022-10", 1.385, 0], ["2022-11", 0.147, 0], ["2022-12", 0.077, 0], ["2023-01", -0.277, 0], ["2023-02", 0.335, 0], ["2023-03", 0.647, 0], ["2023-04", 0.354, 0], ["2023-05", 0.343, 0], ["2023-06", 0.36, 0], ["2023-07", 0.18, 0], ["2023-08", -0.542, 0], ["2023-09", 0.503, 0], ["2023-10", -0.392, 0], ["2023-11", -0.634, 0], ["2023-12", -0.765, 0], ["2024-01", -0.123, 0], ["2024-02", -1.031, 0], ["2024-03", -0.35, 0], ["2024-04", 0.187, 0], ["2024-05", -0.084, 0], ["2024-06", -0.463, 0], ["2024-07", -0.574, 0], ["2024-08", -1.396, 0], ["2024-09", -1.571, 0], ["2024-10", -0.79, 0], ["2024-11", -0.656, 0], ["2024-12", -0.325, 0], ["2025-01", -1.205, 0], ["2025-02", -0.803, 0], ["2025-03", -1.361, 0], ["2025-04", -1.526, 0], ["2025-05", -1.508, 0], ["2025-06", -1.025, 0], ["2025-07", -1.271, 0], ["2025-08", 0.3, 0], ["2025-09", -0.363, 0], ["2025-10", -1.496, 0], ["2025-11", -0.749, 0], ["2025-12", -1.411, 0], ["2026-01", -1.423, 0], ["2026-02", -1.019, 0], ["2026-03", -1.902, 0], ["2026-04", -1.919, 0], ["2026-05", -1.174, 0], ["2026-06", -1.407, 0], ["2026-07", -1.17, 0], ["2026-08", -2.334, 0], ["2026-09", -1.886, 1]], "turns": [{"month": "2023-09", "kind": "peak", "status": "confirmed", "value": 0.503, "detected": "2024-02"}]}], "indicators": [{"id": "de_toll_mileage", "label": "Truck toll mileage index (sa)", "geo": "DE", "mode": "road", "transform": "3m3m", "last": "2026-09-26", "z": 1.26, "momentum": 4.29}, {"id": "de_port_calls", "label": "Port calls, Germany (IMF PortWatch, AIS)", "geo": "DE", "mode": "sea", "transform": "yoy", "last": "2026-09-25", "z": 0.69, "momentum": 1.61}, {"id": "ea_port_calls", "label": "Port calls, euro-area ports (IMF PortWatch, AIS)", "geo": "EA", "mode": "sea", "transform": "yoy", "last": "2026-09-25", "z": 0.09, "momentum": -0.64}, {"id": "world_port_calls", "label": "Port calls, world (IMF PortWatch, AIS)", "geo": "WORLD", "mode": "sea", "transform": "yoy", "last": "2026-09-25", "z": -1.89, "momentum": -6.42}], "validation": [{"indicator": "de_toll_mileage", "target": "de_manufacturing_production", "transform": "mom", "n": 222, "first": "2008-02", "last": "2026-07", "lead_profile": {"-3": -0.042, "-2": -0.09, "-1": 0.129, "0": 0.516, "1": 0.13, "2": -0.254, "3": -0.014}, "best_lead": 0, "best_corr": 0.5161, "beta": 0.7667, "beta_t": 2.1283, "beta_p": 0.0333, "r2": 0.2664, "oos_n": 185, "rmse_model": 2.5732, "rmse_benchmark": 3.0576, "rmse_ratio": 0.8416, "dm_stat": -1.1923, "dm_p": 0.1166, "hit_rate": 0.8162, "timing_advantage_days": 29, "verdict": "partial", "notes": ["significant in sample but no reliable out-of-sample gain"]}, {"indicator": "de_port_calls", "target": "de_exports", "transform": "yoy", "n": 0, "first": "", "last": "", "lead_profile": {}, "best_lead": null, "best_corr": null, "beta": null, "beta_t": null, "beta_p": null, "r2": null, "oos_n": 0, "rmse_model": null, "rmse_benchmark": null, "rmse_ratio": null, "dm_stat": null, "dm_p": null, "hit_rate": null, "timing_advantage_days": null, "verdict": "not run", "notes": ["missing data for de_exports"]}, {"indicator": "ea_port_calls", "target": "ea_manufacturing_production", "transform": "yoy", "n": 79, "first": "2020-01", "last": "2026-07", "lead_profile": {"-3": 0.455, "-2": 0.597, "-1": 0.736, "0": 0.722, "1": 0.561, "2": 0.411, "3": 0.271}, "best_lead": 0, "best_corr": 0.7219, "beta": 1.7589, "beta_t": 4.0493, "beta_p": 0.0001, "r2": 0.5212, "oos_n": 43, "rmse_model": 2.6726, "rmse_benchmark": 1.8511, "rmse_ratio": 1.4437, "dm_stat": 2.3009, "dm_p": 0.9893, "hit_rate": 0.6047, "timing_advantage_days": 35, "verdict": "partial", "notes": ["significant in sample but no reliable out-of-sample gain"]}, {"indicator": "world_port_calls", "target": "world_trade_volume", "transform": "yoy", "n": 0, "first": "", "last": "", "lead_profile": {}, "best_lead": null, "best_corr": null, "beta": null, "beta_t": null, "beta_p": null, "r2": null, "oos_n": 0, "rmse_model": null, "rmse_benchmark": null, "rmse_ratio": null, "dm_stat": null, "dm_p": null, "hit_rate": null, "timing_advantage_days": null, "verdict": "not run", "notes": ["missing data for world_trade_volume"]}, {"indicator": "baltic_dry", "target": "world_trade_volume", "transform": "yoy", "n": 0, "first": "", "last": "", "lead_profile": {}, "best_lead": null, "best_corr": null, "beta": null, "beta_t": null, "beta_p": null, "r2": null, "oos_n": 0, "rmse_model": null, "rmse_benchmark": null, "rmse_ratio": null, "dm_stat": null, "dm_p": null, "hit_rate": null, "timing_advantage_days": null, "verdict": "not run", "notes": ["missing data for baltic_dry, world_trade_volume"]}], "feed": {"schema": "freight_nowcast/capstone_feed@1", "generated_at": "2026-10-01T09:52:13+00:00", "as_of": "2026-10-01", "data_mode": "live", "data_updated_at": "2026-10-01T09:52:13+00:00", "tier1": {"signal": "real_economy_momentum", "read_alongside": "yield_curve", "units": "z-score of freight momentum vs trailing history; 0 = normal pace", "label": "Composite", "latest_month": "2026-09", "composite_z": -0.11, "change_3m": -0.047, "direction": "falling", "phase": "Contraction", "provisional": true, "coverage": 1.0, "turning_point": {"month": "2026-01", "kind": "trough", "status": "confirmed", "value": -1.135, "detected": "2026-06"}, "evidence": {"de_toll_mileage->de_manufacturing_production": "partial", "de_port_calls->de_exports": "not run", "ea_port_calls->ea_manufacturing_production": "partial", "world_port_calls->world_trade_volume": "not run"}, "evidenced_weight_share": 0.0, "conviction": "low", "by_geography": {"DE": {"label": "Germany", "latest_month": "2026-09", "composite_z": 1.069, "change_3m": 0.006, "direction": "rising", "phase": "Expansion", "provisional": true, "coverage": 1.0, "turning_point": null, "evidence": {"de_toll_mileage->de_manufacturing_production": "partial", "de_port_calls->de_exports": "not run"}, "evidenced_weight_share": 0.0, "conviction": "low"}, "EA": {"label": "Euro area", "latest_month": "2026-09", "composite_z": 0.094, "change_3m": 0.314, "direction": "rising", "phase": "Expansion", "provisional": true, "coverage": 1.0, "turning_point": {"month": "2026-01", "kind": "trough", "status": "confirmed", "value": -1.706, "detected": "2026-06"}, "evidence": {"ea_port_calls->ea_manufacturing_production": "partial"}, "evidenced_weight_share": 0.0, "conviction": "low"}, "WORLD": {"label": "World sea trade", "latest_month": "2026-09", "composite_z": -1.886, "change_3m": -0.479, "direction": "falling", "phase": "Contraction", "provisional": true, "coverage": 1.0, "turning_point": null, "evidence": {"world_port_calls->world_trade_volume": "not run"}, "evidenced_weight_share": 0.0, "conviction": "low"}}}, "tier2": {"cycle_phase": "Contraction", "conviction": "low", "tilt": {"sectors": {"industrials": -0.33, "materials": -0.33, "transport_logistics": -0.33, "consumer_discretionary": -0.33, "financials": -0.17, "technology": -0.17, "energy": -0.17, "healthcare": 0.33, "consumer_staples": 0.33, "utilities": 0.33}, "cyclical_minus_defensive": -0.66}, "by_geography": {"DE": {"phase": "Expansion", "conviction": "low", "tilt": {"sectors": {"industrials": 0.17, "materials": 0.17, "transport_logistics": 0.17, "consumer_discretionary": 0.17, "financials": 0.17, "technology": 0.17, "energy": 0.33, "healthcare": -0.17, "consumer_staples": -0.17, "utilities": -0.17}, "cyclical_minus_defensive": 0.34}}, "EA": {"phase": "Expansion", "conviction": "low", "tilt": {"sectors": {"industrials": 0.17, "materials": 0.17, "transport_logistics": 0.17, "consumer_discretionary": 0.17, "financials": 0.17, "technology": 0.17, "energy": 0.33, "healthcare": -0.17, "consumer_staples": -0.17, "utilities": -0.17}, "cyclical_minus_defensive": 0.34}}, "WORLD": {"phase": "Contraction", "conviction": "low", "tilt": {"sectors": {"industrials": -0.33, "materials": -0.33, "transport_logistics": -0.33, "consumer_discretionary": -0.33, "financials": -0.17, "technology": -0.17, "energy": -0.17, "healthcare": 0.33, "consumer_staples": 0.33, "utilities": 0.33}, "cyclical_minus_defensive": -0.66}}}, "note": "Directional tilts in [-1, 1] scaled by conviction; the capstone sizes them."}, "validation": [{"indicator": "de_toll_mileage", "target": "de_manufacturing_production", "transform": "mom", "n": 222, "first": "2008-02", "last": "2026-07", "lead_profile": {"-3": -0.042, "-2": -0.09, "-1": 0.129, "0": 0.516, "1": 0.13, "2": -0.254, "3": -0.014}, "best_lead": 0, "best_corr": 0.5161, "beta": 0.7667, "beta_t": 2.1283, "beta_p": 0.0333, "r2": 0.2664, "oos_n": 185, "rmse_model": 2.5732, "rmse_benchmark": 3.0576, "rmse_ratio": 0.8416, "dm_stat": -1.1923, "dm_p": 0.1166, "hit_rate": 0.8162, "timing_advantage_days": 29, "verdict": "partial", "notes": ["significant in sample but no reliable out-of-sample gain"]}, {"indicator": "de_port_calls", "target": "de_exports", "transform": "yoy", "n": 0, "first": "", "last": "", "lead_profile": {}, "best_lead": null, "best_corr": null, "beta": null, "beta_t": null, "beta_p": null, "r2": null, "oos_n": 0, "rmse_model": null, "rmse_benchmark": null, "rmse_ratio": null, "dm_stat": null, "dm_p": null, "hit_rate": null, "timing_advantage_days": null, "verdict": "not run", "notes": ["missing data for de_exports"]}, {"indicator": "ea_port_calls", "target": "ea_manufacturing_production", "transform": "yoy", "n": 79, "first": "2020-01", "last": "2026-07", "lead_profile": {"-3": 0.455, "-2": 0.597, "-1": 0.736, "0": 0.722, "1": 0.561, "2": 0.411, "3": 0.271}, "best_lead": 0, "best_corr": 0.7219, "beta": 1.7589, "beta_t": 4.0493, "beta_p": 0.0001, "r2": 0.5212, "oos_n": 43, "rmse_model": 2.6726, "rmse_benchmark": 1.8511, "rmse_ratio": 1.4437, "dm_stat": 2.3009, "dm_p": 0.9893, "hit_rate": 0.6047, "timing_advantage_days": 35, "verdict": "partial", "notes": ["significant in sample but no reliable out-of-sample gain"]}, {"indicator": "world_port_calls", "target": "world_trade_volume", "transform": "yoy", "n": 0, "first": "", "last": "", "lead_profile": {}, "best_lead": null, "best_corr": null, "beta": null, "beta_t": null, "beta_p": null, "r2": null, "oos_n": 0, "rmse_model": null, "rmse_benchmark": null, "rmse_ratio": null, "dm_stat": null, "dm_p": null, "hit_rate": null, "timing_advantage_days": null, "verdict": "not run", "notes": ["missing data for world_trade_volume"]}, {"indicator": "baltic_dry", "target": "world_trade_volume", "transform": "yoy", "n": 0, "first": "", "last": "", "lead_profile": {}, "best_lead": null, "best_corr": null, "beta": null, "beta_t": null, "beta_p": null, "r2": null, "oos_n": 0, "rmse_model": null, "rmse_benchmark": null, "rmse_ratio": null, "dm_stat": null, "dm_p": null, "hit_rate": null, "timing_advantage_days": null, "verdict": "not run", "notes": ["missing data for baltic_dry, world_trade_volume"]}], "series": {"de_toll_mileage": {"label": "Truck toll mileage index (sa)", "role": "indicator", "mode": "road", "geography": "DE", "source": "genesis", "last_observation": "2026-09-26", "extended_by": "de_toll_mileage_daily", "latest_month_coverage": 0.867, "fetched_at": "2026-10-01T09:52:02+00:00"}, "de_port_calls": {"label": "Port calls, Germany (IMF PortWatch, AIS)", "role": "indicator", "mode": "sea", "geography": "DE", "source": "portwatch", "last_observation": "2026-09-25", "extended_by": null, "latest_month_coverage": 0.833, "fetched_at": "2026-10-01T09:52:08+00:00"}, "ea_port_calls": {"label": "Port calls, euro-area ports (IMF PortWatch, AIS)", "role": "indicator", "mode": "sea", "geography": "EA", "source": "portwatch", "last_observation": "2026-09-25", "extended_by": null, "latest_month_coverage": 0.833, "fetched_at": "2026-10-01T09:52:08+00:00"}, "world_port_calls": {"label": "Port calls, world (IMF PortWatch, AIS)", "role": "indicator", "mode": "sea", "geography": "WORLD", "source": "portwatch", "last_observation": "2026-09-25", "extended_by": null, "latest_month_coverage": 0.833, "fetched_at": "2026-10-01T09:52:09+00:00"}, "de_manufacturing_production": {"label": "Manufacturing production, Germany (sca)", "role": "target", "mode": "", "geography": "DE", "source": "sdmx", "last_observation": "2026-07-01", "extended_by": null, "latest_month_coverage": 1.0, "fetched_at": "2026-10-01T09:52:10+00:00"}, "ea_manufacturing_production": {"label": "Manufacturing production, euro area (sca)", "role": "target", "mode": "", "geography": "EA", "source": "sdmx", "last_observation": "2026-07-01", "extended_by": null, "latest_month_coverage": 1.0, "fetched_at": "2026-10-01T09:52:10+00:00"}}, "warnings": ["baltic_dry: optional, no data cached yet (skipped)", "de_ais_stationary: optional, no data cached yet (skipped)", "de_exports: optional, no data cached yet (skipped)", "world_trade_volume: optional, no data cached yet (skipped)"]}, "warnings": ["baltic_dry: optional, no data cached yet (skipped)", "de_ais_stationary: optional, no data cached yet (skipped)", "de_exports: optional, no data cached yet (skipped)", "world_trade_volume: optional, no data cached yet (skipped)"]};
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const f = (x, nd = 2, signed = true) => x == null ? "–" : (signed && x > 0 ? "+" : "") + Number(x).toFixed(nd).replace("-", "−");
+const t1 = D.feed.tier1, t2 = D.feed.tier2;
+
+$("sub").textContent = `As of ${D.as_of} · latest composite month ${t1.latest_month || "–"}`;
+$("banner").innerHTML = D.synthetic
+  ? '<div class="banner">Synthetic demo data — not real statistics.</div>'
+  : `<div class="banner live">Live data · fetched ${esc(D.data_updated_at || "n/a")}</div>`;
+
+const tp = t1.turning_point;
+$("tiles").innerHTML = [
+  ["Composite", f(t1.composite_z) + " z", `${t1.direction || ""} ${f(t1.change_3m)} over 3m${t1.provisional ? " · provisional" : ""}`],
+  ["Cycle phase", t1.phase || "–", "level vs trend × direction"],
+  ["Conviction", t1.conviction || "–", `${Math.round((t1.evidenced_weight_share || 0) * 100)}% of weight evidenced`],
+  ["Turning point", tp ? `${tp.kind}` : "none", tp ? `${tp.status}, ${tp.month} (flagged ${tp.detected})` : "within the last 6 months"],
+].map(([k, v, n]) => `<div class="tile"><div class="k">${k}</div><div class="v">${esc(v)}</div><div class="n">${esc(n)}</div></div>`).join("");
+
+function chart(el, line, turns, opts) {
+  const W = Math.max(280, el.clientWidth || opts.w || 1000), H = opts.h || 300, m = {l: 36, r: 12, t: 12, b: 24};
+  let pts = line;
+  if (opts.years) {
+    const last = pts.length ? pts[pts.length - 1][0] : "";
+    const cut = (parseInt(last.slice(0, 4)) - opts.years) + last.slice(4);
+    pts = pts.filter((p) => p[0] > cut);
+  }
+  if (!pts.length) { el.innerHTML = '<p class="note">No data.</p>'; return; }
+  const ys = pts.map((p) => p[1]);
+  const lo = Math.min(-1, Math.floor(Math.min(...ys))), hi = Math.max(1, Math.ceil(Math.max(...ys)));
+  const x = (i) => m.l + (pts.length === 1 ? 0 : i * (W - m.l - m.r) / (pts.length - 1));
+  const y = (v) => m.t + (hi - v) * (H - m.t - m.b) / (hi - lo);
+  const idx = Object.fromEntries(pts.map((p, i) => [p[0], i]));
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(opts.label)}">`;
+  if (opts.phases) {  // contraction bands
+    let start = null;
+    pts.forEach((p, i) => {
+      const c = opts.phases[p[0]] === "Contraction";
+      if (c && start === null) start = i;
+      if ((!c || i === pts.length - 1) && start !== null) {
+        const end = c ? i : i - 1;
+        s += `<rect x="${x(start) - 2}" y="${m.t}" width="${Math.max(4, x(end) - x(start) + 4)}" height="${H - m.t - m.b}" fill="var(--band)"/>`;
+        start = null;
+      }
+    });
+  }
+  s += '<g class="grid axis">';
+  const step = (hi - lo) > 6 ? 2 : 1;
+  for (let v = lo; v <= hi; v += step) s += `<line x1="${m.l}" x2="${W - m.r}" y1="${y(v)}" y2="${y(v)}"/><text x="${m.l - 6}" y="${y(v) + 4}" text-anchor="end">${f(v, 0)}</text>`;
+  const every = Math.max(1, Math.ceil(pts.length / Math.max(3, Math.floor(W / 90)) / 12) * 12);
+  pts.forEach((p, i) => { if (p[0].endsWith("-01") && (parseInt(p[0]) % (every / 12) === 0)) s += `<text x="${x(i)}" y="${H - 6}" text-anchor="middle">${p[0].slice(0, 4)}</text>`; });
+  s += `</g><line class="zero" x1="${m.l}" x2="${W - m.r}" y1="${y(0)}" y2="${y(0)}"/>`;
+  const firm = pts.map((p, i) => [i, p]).filter(([, p]) => !p[2]);
+  const provStart = pts.findIndex((p) => p[2]);
+  const path = (arr) => arr.map(([i, p], k) => `${k ? "L" : "M"}${x(i).toFixed(1)},${y(p[1]).toFixed(1)}`).join("");
+  s += `<path d="${path(firm.filter(([i]) => provStart < 0 || i <= provStart))}" fill="none" stroke="var(--series-1)" stroke-width="2" stroke-linejoin="round"/>`;
+  if (provStart >= 0) {
+    const tail = pts.map((p, i) => [i, p]).filter(([i]) => i >= Math.max(0, provStart - 1));
+    s += `<path d="${path(tail)}" fill="none" stroke="var(--series-1)" stroke-width="2" stroke-dasharray="4 3"/>`;
+  }
+  (turns || []).forEach((t) => {
+    const i = idx[t.month]; if (i == null) return;
+    const cx = x(i), cy = y(pts[i][1]), up = t.kind === "trough", d = up ? 12 : -12;
+    const tri = up ? `M${cx},${cy + d - 5} l5,9 l-10,0 z` : `M${cx},${cy + d + 5} l5,-9 l-10,0 z`;
+    const prov = t.status === "provisional";
+    s += `<path d="${tri}" fill="${prov ? "var(--surface-1)" : "var(--text-primary)"}" stroke="var(--text-primary)" stroke-width="1.5"><title>${t.status} ${t.kind} ${t.month}</title></path>`;
+  });
+  s += `<line id="${opts.id}-x" y1="${m.t}" y2="${H - m.b}" stroke="var(--text-muted)" stroke-width="1" visibility="hidden"/>`;
+  s += `<circle id="${opts.id}-dot" r="5" fill="var(--series-1)" stroke="var(--surface-1)" stroke-width="2" visibility="hidden"/>`;
+  s += `<rect x="${m.l}" y="0" width="${W - m.l - m.r}" height="${H}" fill="transparent" id="${opts.id}-hit"/></svg><div class="tip" id="${opts.id}-tip"></div>`;
+  el.innerHTML = s;
+  const svg = el.querySelector("svg"), tip = $(`${opts.id}-tip`), xl = $(`${opts.id}-x`), dot = $(`${opts.id}-dot`);
+  const move = (ev) => {
+    const r = svg.getBoundingClientRect();
+    const px = (ev.clientX - r.left) * W / r.width;
+    const i = Math.max(0, Math.min(pts.length - 1, Math.round((px - m.l) / ((W - m.l - m.r) / Math.max(1, pts.length - 1)))));
+    const p = pts[i];
+    xl.setAttribute("x1", x(i)); xl.setAttribute("x2", x(i)); xl.setAttribute("visibility", "visible");
+    dot.setAttribute("cx", x(i)); dot.setAttribute("cy", y(p[1])); dot.setAttribute("visibility", "visible");
+    tip.innerHTML = `<b>${p[0]}</b><br>${f(p[1])} z${opts.phases && opts.phases[p[0]] ? " · " + opts.phases[p[0]] : ""}${p[2] ? "<br><i>provisional</i>" : ""}` + (opts.extra ? opts.extra(p[0]) : "");
+    tip.style.display = "block";
+    const left = x(i) * r.width / W;
+    tip.style.left = Math.min(r.width - tip.offsetWidth, Math.max(0, left + 12)) + "px";
+    tip.style.top = "8px";
+  };
+  svg.addEventListener("pointermove", move);
+  svg.addEventListener("pointerleave", () => { tip.style.display = "none"; xl.setAttribute("visibility", "hidden"); dot.setAttribute("visibility", "hidden"); });
+}
+
+const geoAt = (mo) => D.geos.map((g) => { const p = g.line.find((q) => q[0] === mo); return p ? `<br>${esc(g.code)} ${f(p[1])}` : ""; }).join("");
+let years = 10;
+function draw() {
+  chart($("main-chart"), D.composite, D.turns, {id: "main", label: "Composite z-score over time", phases: D.phases, years, extra: geoAt});
+  $("multiples").innerHTML = D.geos.map((g) => `<div><div class="row"><b>${esc(g.label)}</b><span class="note">${esc(g.code)}</span></div><div class="chart" id="g-${g.code}"></div></div>`).join("");
+  D.geos.forEach((g) => chart($(`g-${g.code}`), g.line, g.turns, {id: "g" + g.code, label: g.label + " z-score", years, h: 200}));
+}
+document.querySelectorAll("#range button").forEach((b) => b.addEventListener("click", () => {
+  document.querySelectorAll("#range button").forEach((o) => o.setAttribute("aria-pressed", o === b));
+  years = parseInt(b.dataset.y); draw();
+}));
+draw();
+let rz; window.addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(draw, 150); });
+
+const badge = (v) => {
+  const cls = v === "evidenced" ? "b-good" : v === "partial" ? "b-warn" : v === "not evidenced" ? "b-bad" : "b-na";
+  return `<span class="badge ${cls}">${esc(v)}</span>`;
+};
+$("validation").innerHTML = "<tr><th>Indicator → target</th><th class=num>Months</th><th class=num>Best lead</th><th class=num>corr</th><th class=num>β</th><th class=num>HAC t</th><th class=num>R²</th><th class=num>OOS RMSE ratio</th><th class=num>DM p</th><th class=num>Hit rate</th><th class=num>Pub. lead</th><th>Verdict</th></tr>" +
+  D.validation.map((v) => `<tr><td>${esc(v.indicator)} → ${esc(v.target)} <span class="note">${esc(v.transform)}</span></td><td class=num>${v.n}</td><td class=num>${v.best_lead == null ? "–" : v.best_lead + "m"}</td><td class=num>${f(v.best_corr)}</td><td class=num>${f(v.beta)}</td><td class=num>${f(v.beta_t, 1)}</td><td class=num>${f(v.r2, 2, false)}</td><td class=num>${f(v.rmse_ratio, 2, false)}</td><td class=num>${f(v.dm_p, 3, false)}</td><td class=num>${v.hit_rate == null ? "–" : Math.round(v.hit_rate * 100) + "%"}</td><td class=num>${v.timing_advantage_days == null ? "–" : v.timing_advantage_days + "d"}</td><td>${badge(v.verdict)}</td></tr>`).join("");
+$("indicators").innerHTML = "<tr><th>Series</th><th>Geography</th><th>Mode</th><th>Last obs</th><th class=num>Momentum %</th><th>Transform</th><th class=num>z</th></tr>" +
+  D.indicators.map((s) => `<tr><td>${esc(s.label)}</td><td>${esc(s.geo)}</td><td>${esc(s.mode)}</td><td>${esc(s.last)}</td><td class=num>${f(s.momentum)}</td><td>${esc(s.transform)}</td><td class=num>${f(s.z)}</td></tr>`).join("");
+
+$("tilt-sub").textContent = t2.cycle_phase ? `Phase ${t2.cycle_phase}, conviction ${t2.conviction}; cyclicals minus defensives ${f(t2.tilt.cyclical_minus_defensive)}` : "No phase yet.";
+$("tilt").innerHTML = Object.entries(t2.tilt.sectors || {}).sort((a, b) => b[1] - a[1]).map(([k, v]) => {
+  const w = Math.abs(v) * 50, left = v >= 0 ? 50 : 50 - w;
+  return `<div class="tilt-row"><span>${esc(k.replace(/_/g, " "))}</span><div class="tilt-track" title="${f(v)}"><div class="tilt-bar" style="left:${left}%;width:${w}%;background:${v >= 0 ? "var(--pos)" : "var(--neg)"}"></div><div class="tilt-mid"></div></div><span class="num" style="text-align:right">${f(v)}</span></div>`;
+}).join("");
+$("vintages").innerHTML = "<tr><th>Series</th><th>Role</th><th>Last observation</th><th>Fetched</th><th>Origin</th></tr>" +
+  D.vintages.map((v) => `<tr><td>${esc(v.label)}</td><td>${esc(v.role)}</td><td>${esc(v.last)}</td><td>${esc(v.fetched || "–")}</td><td>${esc(v.origin)}</td></tr>`).join("");
+if (D.warnings.length) { $("warn-card").hidden = false; $("warnings").innerHTML = D.warnings.map((w) => `<li>${esc(w)}</li>`).join(""); }
+</script>
+</body>
+</html>
