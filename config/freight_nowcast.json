@@ -270,7 +270,8 @@
         "variant": "sum_only",
         "chunk": "year"
       },
-      "_note": "World totals of this field time out on the PortWatch server; the main dry-bulk exporters and importers carry the cycle."
+      "_note": "Off by default: the PortWatch server rejects sums of portcalls_dry_bulk (world, country-group, yearly and monthly all tested 2026-10-01) while plain portcalls works. Re-enable to retry; BDRY covers dry bulk meanwhile.",
+      "enabled": false
     },
     {
       "id": "baltic_dry",
