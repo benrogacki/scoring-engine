@@ -22,8 +22,11 @@ LAYER_URL = ("https://services9.arcgis.com/weJ1QsnbMYJlCHdG/ArcGIS/rest/services
              "Daily_Ports_Data/FeatureServer/0/query")
 
 
-def _where(countries: Optional[Sequence[str]], year: int, iso_field: str, year_field: str) -> str:
+def _where(countries: Optional[Sequence[str]], year: int, iso_field: str, year_field: str,
+           month: Optional[int] = None) -> str:
     clauses = [f"{year_field}={int(year)}"]
+    if month:
+        clauses.append(f"month={int(month)}")
     if countries:
         codes = ",".join("'" + c.replace("'", "") + "'" for c in countries)
         clauses.append(f"{iso_field} IN ({codes})")
@@ -31,11 +34,12 @@ def _where(countries: Optional[Sequence[str]], year: int, iso_field: str, year_f
 
 
 def build_query(countries: Optional[Sequence[str]], year: int, field: str = "portcalls",
-                iso_field: str = "ISO3", year_field: str = "year", layer_url: str = LAYER_URL) -> str:
+                iso_field: str = "ISO3", year_field: str = "year", layer_url: str = LAYER_URL,
+                month: Optional[int] = None) -> str:
     stats = [{"statisticType": "sum", "onStatisticField": field, "outStatisticFieldName": "total"},
              {"statisticType": "count", "onStatisticField": field, "outStatisticFieldName": "n_ports"}]
     params = {
-        "where": _where(countries, year, iso_field, year_field),
+        "where": _where(countries, year, iso_field, year_field, month),
         "groupByFieldsForStatistics": "year,month,day",
         "outStatistics": json.dumps(stats, separators=(",", ":")),
         "orderByFields": "year,month,day",
@@ -76,16 +80,26 @@ def fetch(series_id: str, frequency: str = "D", countries: Optional[Sequence[str
     getter = getter or get
     end_year = end_year or datetime.now(timezone.utc).year
     obs: Dict[date, float] = {}
-    for y in range(start_year, end_year + 1):
-        url = build_query(countries, y, field, layer_url=layer_url)
-        payload = json.loads(getter(url).decode("utf-8"))
-        try:
-            part = parse_response(payload)
-        except SourceError as exc:
-            raise SourceError(f"{exc}{_field_hint(layer_url, field, getter)}") from exc
+    def query(y: int, m: Optional[int] = None) -> Dict[date, float]:
+        payload = json.loads(getter(build_query(countries, y, field, layer_url=layer_url, month=m)).decode("utf-8"))
+        part = parse_response(payload)
         if payload.get("exceededTransferLimit"):
             raise SourceError(f"PortWatch truncated the {y} response; narrow the query")
-        obs.update(part)
+        return part
+
+    for y in range(start_year, end_year + 1):
+        try:
+            obs.update(query(y))
+        except SourceError:
+            # heavy aggregates (e.g. world totals of a per-vessel-type field) can time
+            # out server-side as one year; ask month by month instead
+            for m in range(1, 13):
+                try:
+                    obs.update(query(y, m))
+                except SourceError as exc:
+                    if y == end_year:
+                        break  # months not published yet
+                    raise SourceError(f"{exc}{_field_hint(layer_url, field, getter)}") from exc
     if not obs:
         raise SourceError(f"{series_id}: PortWatch returned no rows for {countries or 'world'}")
     days = sorted(obs)
