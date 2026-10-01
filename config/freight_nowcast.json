@@ -286,7 +286,6 @@
         "value_variable": "WERTAUS",
         "startyear": 2008
       },
-      "_verify": "GENESIS value variable; Eurostat fallback key",
       "fallback": [
         {
           "source": "eurostat_jsonstat",
@@ -295,7 +294,24 @@
             "flow": "ei_eteu27_2020_m",
             "dims": {
               "geo": "DE",
-              "stk_flow": "EXP"
+              "stk_flow": "EXP",
+              "partner": "WORLD",
+              "indic": "ET-T",
+              "unit": "IVOL-SA"
+            }
+          }
+        },
+        {
+          "source": "eurostat_jsonstat",
+          "frequency": "M",
+          "params": {
+            "flow": "ei_eteu27_2020_m",
+            "dims": {
+              "geo": "DE",
+              "stk_flow": "EXP",
+              "partner": "WORLD",
+              "indic": "ET-T",
+              "unit": "MIO-EUR-SA"
             }
           }
         }
