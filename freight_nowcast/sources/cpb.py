@@ -50,7 +50,8 @@ def parse_rows(rows: Sequence[Sequence[object]], row_match: Sequence[str] = DEFA
     labels = []
     want = [w.lower() for w in row_match]
     for row in rows[hdr_i + 1:]:
-        label = " ".join(str(c) for j, c in enumerate(row) if j < min(months) and c not in (None, "")).strip()
+        label = " ".join(str(c) for j, c in enumerate(row)
+                         if j < min(months) and isinstance(c, str) and c.strip()).strip()
         if not label:
             continue
         labels.append(label)

@@ -64,14 +64,10 @@ def _field_hint(layer_url: str, field: str, getter) -> str:
     """List the layer's numeric fields when a query fails (usually a wrong field name)."""
     try:
         meta = json.loads(getter(layer_url.rsplit("/query", 1)[0] + "?f=json").decode("utf-8"))
-        names = [f["name"] for f in meta.get("fields", [])
-                 if f.get("type") in ("esriFieldTypeDouble", "esriFieldTypeInteger", "esriFieldTypeSmallInteger",
-                                      "esriFieldTypeSingle", "esriFieldTypeBigInteger")]
-    except (SourceError, ValueError, KeyError):
-        return ""
-    if field in names:
-        return ""
-    return f" (field {field!r} not in layer; numeric fields: {names[:60]})"
+        fields = [f"{f['name']}:{f.get('type', '').replace('esriFieldType', '')}" for f in meta.get("fields", [])]
+    except (SourceError, ValueError, KeyError) as exc:
+        return f" (could not read layer fields: {exc})"
+    return f" (layer fields: {fields[:80]})"
 
 
 def fetch(series_id: str, frequency: str = "D", countries: Optional[Sequence[str]] = None,
