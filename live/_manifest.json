@@ -2,10 +2,10 @@
   "series": {
     "de_toll_mileage": {
       "source": "genesis",
-      "attempted_at": "2026-10-01T11:08:06+00:00",
+      "attempted_at": "2026-10-01T11:11:35+00:00",
       "optional": false,
       "status": "ok",
-      "fetched_at": "2026-10-01T11:08:06+00:00",
+      "fetched_at": "2026-10-01T11:11:35+00:00",
       "observations": 224,
       "first": "2008-01-01",
       "last": "2026-08-01",
@@ -20,10 +20,10 @@
     },
     "de_toll_mileage_daily": {
       "source": "destatis_daily",
-      "attempted_at": "2026-10-01T11:08:09+00:00",
+      "attempted_at": "2026-10-01T11:11:39+00:00",
       "optional": true,
       "status": "ok",
-      "fetched_at": "2026-10-01T11:08:09+00:00",
+      "fetched_at": "2026-10-01T11:11:39+00:00",
       "observations": 6844,
       "first": "2008-01-01",
       "last": "2026-09-26",
@@ -36,10 +36,10 @@
     },
     "de_port_calls": {
       "source": "portwatch",
-      "attempted_at": "2026-10-01T11:08:12+00:00",
+      "attempted_at": "2026-10-01T11:11:42+00:00",
       "optional": true,
       "status": "ok",
-      "fetched_at": "2026-10-01T11:08:12+00:00",
+      "fetched_at": "2026-10-01T11:11:42+00:00",
       "observations": 2825,
       "first": "2019-01-01",
       "last": "2026-09-25",
@@ -51,10 +51,10 @@
     },
     "ea_port_calls": {
       "source": "portwatch",
-      "attempted_at": "2026-10-01T11:08:13+00:00",
+      "attempted_at": "2026-10-01T11:11:43+00:00",
       "optional": true,
       "status": "ok",
-      "fetched_at": "2026-10-01T11:08:13+00:00",
+      "fetched_at": "2026-10-01T11:11:43+00:00",
       "observations": 2825,
       "first": "2019-01-01",
       "last": "2026-09-25",
@@ -66,10 +66,10 @@
     },
     "world_port_calls": {
       "source": "portwatch",
-      "attempted_at": "2026-10-01T11:08:14+00:00",
+      "attempted_at": "2026-10-01T11:11:44+00:00",
       "optional": true,
       "status": "ok",
-      "fetched_at": "2026-10-01T11:08:14+00:00",
+      "fetched_at": "2026-10-01T11:11:44+00:00",
       "observations": 2825,
       "first": "2019-01-01",
       "last": "2026-09-25",
@@ -91,7 +91,7 @@
     },
     "de_ais_stationary": {
       "source": "csv",
-      "attempted_at": "2026-10-01T11:09:11+00:00",
+      "attempted_at": "2026-10-01T11:12:40+00:00",
       "optional": true,
       "status": "failed",
       "error": "de_ais_stationary: file /home/runner/work/scoring-engine/scoring-engine/data/freight/ais_port_counts.csv not found (Written by `freight-nowcast ais-listen` (cron it daily). Enters the composite once it has 3 years of history.)",
@@ -101,10 +101,10 @@
     },
     "de_manufacturing_production": {
       "source": "sdmx",
-      "attempted_at": "2026-10-01T11:09:11+00:00",
+      "attempted_at": "2026-10-01T11:12:40+00:00",
       "optional": false,
       "status": "ok",
-      "fetched_at": "2026-10-01T11:09:11+00:00",
+      "fetched_at": "2026-10-01T11:12:40+00:00",
       "observations": 223,
       "first": "2008-01-01",
       "last": "2026-07-01",
@@ -115,10 +115,10 @@
     },
     "ea_manufacturing_production": {
       "source": "sdmx",
-      "attempted_at": "2026-10-01T11:09:12+00:00",
+      "attempted_at": "2026-10-01T11:12:41+00:00",
       "optional": false,
       "status": "ok",
-      "fetched_at": "2026-10-01T11:09:12+00:00",
+      "fetched_at": "2026-10-01T11:12:41+00:00",
       "observations": 223,
       "first": "2008-01-01",
       "last": "2026-07-01",
@@ -129,10 +129,10 @@
     },
     "de_exports": {
       "source": "genesis",
-      "attempted_at": "2026-10-01T11:09:12+00:00",
+      "attempted_at": "2026-10-01T11:12:41+00:00",
       "optional": true,
       "status": "ok",
-      "fetched_at": "2026-10-01T11:09:12+00:00",
+      "fetched_at": "2026-10-01T11:12:41+00:00",
       "observations": 294,
       "first": "2002-01-01",
       "last": "2026-06-01",
@@ -144,10 +144,10 @@
     },
     "world_trade_volume": {
       "source": "cpb",
-      "attempted_at": "2026-10-01T11:09:15+00:00",
+      "attempted_at": "2026-10-01T11:12:44+00:00",
       "optional": true,
       "status": "ok",
-      "fetched_at": "2026-10-01T11:09:15+00:00",
+      "fetched_at": "2026-10-01T11:12:44+00:00",
       "observations": 319,
       "first": "2000-01-01",
       "last": "2026-07-01",
@@ -155,34 +155,34 @@
       "details": {
         "url": "https://www.cpb.nl/system/files/cpbmedia/CPB-world-trade-monitor-july-2026.xlsx",
         "sheet": "trade_out",
-        "row": "World trade tgz_w1_qnmi_sn 21254.1206934855"
+        "row": "World trade tgz_w1_qnmi_sn"
       }
     },
     "dry_bulk_freight": {
       "source": "yahoo_chart",
-      "attempted_at": "2026-10-01T11:08:15+00:00",
+      "attempted_at": "2026-10-01T11:11:45+00:00",
       "optional": true,
       "status": "ok",
-      "fetched_at": "2026-10-01T11:08:15+00:00",
+      "fetched_at": "2026-10-01T11:11:45+00:00",
       "observations": 2143,
       "first": "2018-03-22",
       "last": "2026-09-30",
       "origin": "yahoo:BDRY",
       "details": {
-        "url": "https://query1.finance.yahoo.com/v8/finance/chart/BDRY?period1=946684800&period2=1790852895&interval=1d&includeAdjustedClose=true"
+        "url": "https://query1.finance.yahoo.com/v8/finance/chart/BDRY?period1=946684800&period2=1790853105&interval=1d&includeAdjustedClose=true"
       }
     },
     "world_dry_bulk_calls": {
       "source": "portwatch",
-      "attempted_at": "2026-10-01T11:08:15+00:00",
+      "attempted_at": "2026-10-01T11:11:45+00:00",
       "optional": true,
       "status": "failed",
-      "error": "PortWatch:  ['Unable to perform query. Please check your parameters.']",
+      "error": "PortWatch:  ['Unable to perform query. Please check your parameters.'] (layer fields: ['date:DateOnly', 'year:Integer', 'month:Integer', 'day:Integer', 'portid:String', 'portname:String', 'country:String', 'ISO3:String', 'portcalls_container:Integer', 'portcalls_dry_bulk:Integer', 'portcalls_general_cargo:Integer', 'portcalls_roro:Integer', 'portcalls_tanker:Integer', 'portcalls_cargo:Integer', 'portcalls:Integer', 'import_container:Integer', 'import_dry_bulk:Integer', 'import_general_cargo:Integer', 'import_roro:Integer', 'import_tanker:Integer', 'import_cargo:Integer', 'import:Integer', 'export_container:Integer', 'export_dry_bulk:Integer', 'export_general_cargo:Integer', 'export_roro:Integer', 'export_tanker:Integer', 'export_cargo:Integer', 'export:Integer', 'ObjectId:OID'])",
       "last_good_fetch": null,
       "last": null,
       "observations": null
     }
   },
-  "updated_at": "2026-10-01T11:09:19+00:00",
+  "updated_at": "2026-10-01T11:12:48+00:00",
   "mode": "live"
 }
