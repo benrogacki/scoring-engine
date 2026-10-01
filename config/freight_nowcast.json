@@ -275,7 +275,7 @@
     },
     {
       "id": "de_exports",
-      "label": "Exports, Germany (foreign trade statistics)",
+      "label": "Exports, Germany (foreign trade statistics; Eurostat volume index sa as fallback)",
       "role": "target",
       "geography": "DE",
       "frequency": "M",
@@ -296,7 +296,8 @@
             "geo": "DE",
             "partner": "WORLD",
             "sitc06": "TOTAL",
-            "stk_flow": "EXP"
+            "stk_flow": "EXP",
+            "indic_et": "IVOL_SCA"
           },
           "start": "2008-01"
         }
