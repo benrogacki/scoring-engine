@@ -1,0 +1,45 @@
+"""Self-contained HTML dashboard for a nowcast run (open in any browser, no install)."""
+from __future__ import annotations
+
+import json
+from pathlib import Path
+from typing import Any, Dict, Mapping
+
+from .engine import NowcastResult
+from .feed import build_feed
+from .series import month_str
+
+TEMPLATE = Path(__file__).with_name("templates") / "dashboard.html"
+
+
+def payload(r: NowcastResult, cfg: Mapping[str, Any]) -> Dict[str, Any]:
+    def line(x, prov):
+        return [[month_str(m), round(v, 3), int(bool(prov.get(m)))] for m, v in sorted(x.items())]
+
+    feed = build_feed(r, cfg)
+    return {
+        "as_of": r.as_of.isoformat(),
+        "synthetic": any("SYNTHETIC" in w for w in r.warnings),
+        "composite": line(r.composite.composite, r.composite.provisional),
+        "phases": {month_str(m): p for m, p in r.phases.items()},
+        "turns": [t.as_row() for t in r.composite.turning_points if t.kind in ("peak", "trough")],
+        "geos": [{"code": c, "label": g.label, "line": line(g.composite, g.provisional),
+                  "turns": [t.as_row() for t in g.turning_points if t.kind in ("peak", "trough")]}
+                 for c, g in r.geographies.items()],
+        "indicators": [{"id": s.id, "label": s.spec.get("label", s.id), "geo": s.spec.get("geography"),
+                        "mode": s.spec.get("mode", ""), "transform": s.spec.get("transform", "3m3m"),
+                        "last": r.series_meta[s.id]["last_observation"],
+                        "z": round(s.z[max(s.z)], 2), "momentum": round(s.momentum[max(s.z)], 2)}
+                       for s in r.signals],
+        "validation": [p.to_dict() for p in r.validation],
+        "feed": feed,
+        "warnings": r.warnings,
+    }
+
+
+def write_dashboard(r: NowcastResult, cfg: Mapping[str, Any], path: Path) -> Path:
+    data = json.dumps(payload(r, cfg)).replace("</", "<\\/")
+    html = TEMPLATE.read_text(encoding="utf-8").replace("/*__DATA__*/null", data)
+    Path(path).parent.mkdir(parents=True, exist_ok=True)
+    Path(path).write_text(html, encoding="utf-8")
+    return Path(path)

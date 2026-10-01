@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Freight Nowcast</title>
+<style>
+:root {
+  color-scheme: light;
+  --surface-0: #f4f3f0; --surface-1: #fcfcfb; --border: #e2e0da; --grid: #ebe9e4;
+  --text-primary: #0b0b0b; --text-secondary: #52514e; --text-muted: #7a7974;
+  --series-1: #2a78d6; --band: #ecebe7;
+  --pos: #2a78d6; --neg: #e34948; --neutral: #f0efec;
+  --good: #008300; --warning: #b77a00; --critical: #c93636;
+  --banner-bg: #fff4d6; --banner-ink: #6b4a00;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --surface-0: #121211; --surface-1: #1a1a19; --border: #33332f; --grid: #2a2a27;
+    --text-primary: #ffffff; --text-secondary: #c3c2b7; --text-muted: #8f8e86;
+    --series-1: #3987e5; --band: #262624;
+    --pos: #3987e5; --neg: #e66767; --neutral: #383835;
+    --good: #3fae3f; --warning: #d9a21b; --critical: #e66767;
+    --banner-bg: #3a3014; --banner-ink: #f3d68a;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --surface-0: #121211; --surface-1: #1a1a19; --border: #33332f; --grid: #2a2a27;
+  --text-primary: #ffffff; --text-secondary: #c3c2b7; --text-muted: #8f8e86;
+  --series-1: #3987e5; --band: #262624;
+  --pos: #3987e5; --neg: #e66767; --neutral: #383835;
+  --good: #3fae3f; --warning: #d9a21b; --critical: #e66767;
+  --banner-bg: #3a3014; --banner-ink: #f3d68a;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--surface-0); color: var(--text-primary);
+  font: 14px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+main { max-width: 1120px; margin: 0 auto; padding: 20px 16px 48px; }
+h1 { font-size: 20px; margin: 0 0 2px; }
+h2 { font-size: 15px; margin: 0 0 10px; }
+.sub { color: var(--text-secondary); margin: 0 0 16px; }
+.banner { background: var(--banner-bg); color: var(--banner-ink); padding: 8px 12px; border-radius: 8px; margin-bottom: 16px; font-weight: 600; }
+.card { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin-bottom: 16px; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin-bottom: 16px; }
+.tile { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
+.tile .k { color: var(--text-secondary); font-size: 12px; }
+.tile .v { font-size: clamp(20px, 5vw, 26px); overflow-wrap: anywhere; font-weight: 650; font-variant-numeric: tabular-nums; }
+.tile .n { color: var(--text-muted); font-size: 12px; }
+.row { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+.seg button { border: 1px solid var(--border); background: var(--surface-1); color: var(--text-secondary); padding: 4px 10px; font: inherit; font-size: 12px; cursor: pointer; }
+.seg button:first-child { border-radius: 6px 0 0 6px; } .seg button:last-child { border-radius: 0 6px 6px 0; }
+.seg button[aria-pressed="true"] { background: var(--text-primary); color: var(--surface-1); }
+.chart { position: relative; }
+.chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+.axis text { fill: var(--text-muted); font-size: 11px; }
+.grid line { stroke: var(--grid); }
+.zero { stroke: var(--text-muted); stroke-width: 1; }
+.tip { position: absolute; pointer-events: none; background: var(--surface-1); border: 1px solid var(--border);
+  border-radius: 8px; padding: 6px 9px; font-size: 12px; box-shadow: 0 4px 14px rgba(0,0,0,.12); white-space: nowrap; display: none; }
+.multiples { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
+.legend { color: var(--text-secondary); font-size: 12px; display: flex; gap: 14px; flex-wrap: wrap; }
+.legend i { display: inline-block; width: 12px; height: 10px; vertical-align: -1px; margin-right: 4px; border-radius: 2px; }
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+#validation td:first-child { white-space: normal; min-width: 220px; }
+th { color: var(--text-secondary); font-weight: 600; font-size: 12px; }
+td.num, th.num { text-align: right; }
+.badge { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; }
+.badge::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+.b-good { color: var(--good); } .b-warn { color: var(--warning); } .b-bad { color: var(--critical); } .b-na { color: var(--text-muted); }
+li, .tile .n { overflow-wrap: anywhere; }
+.note { color: var(--text-muted); font-size: 12px; margin-top: 8px; }
+.tilt-row { display: grid; grid-template-columns: 170px 1fr 52px; align-items: center; gap: 8px; margin: 3px 0; }
+.tilt-track { position: relative; height: 14px; background: var(--neutral); border-radius: 3px; }
+.tilt-bar { position: absolute; top: 0; height: 14px; border-radius: 3px; }
+.tilt-mid { position: absolute; left: 50%; top: -3px; bottom: -3px; width: 1px; background: var(--text-muted); }
+@media (max-width: 560px) { .tilt-row { grid-template-columns: 110px 1fr 44px; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>Freight nowcast</h1>
+  <p class="sub" id="sub"></p>
+  <div id="banner"></div>
+  <div class="tiles" id="tiles"></div>
+
+  <section class="card">
+    <div class="row">
+      <h2>Composite real-economy momentum (z)</h2>
+      <div class="seg" id="range" role="group" aria-label="Time range">
+        <button data-y="5">5Y</button><button data-y="10" aria-pressed="true">10Y</button><button data-y="0">All</button>
+      </div>
+    </div>
+    <div class="legend"><span><i style="background:var(--band)"></i>Contraction phase</span>
+      <span>▲ trough · ▼ peak (hollow = provisional)</span><span>dashed = provisional reading</span></div>
+    <div class="chart" id="main-chart"></div>
+  </section>
+
+  <section class="card">
+    <h2>By geography</h2>
+    <div class="multiples" id="multiples"></div>
+  </section>
+
+  <section class="card">
+    <h2>Evidence: does each signal track what it claims to lead?</h2>
+    <div class="table-wrap"><table id="validation"></table></div>
+    <p class="note">Evidenced = significant in-sample link (Newey-West t) with the expected sign <b>and</b> a better pseudo real-time nowcast than the target's own lag (RMSE ratio &lt; 1, Diebold-Mariano p &lt; 0.10). Publication lead = days the indicator is out before the target.</p>
+  </section>
+
+  <section class="card">
+    <h2>Indicators, latest</h2>
+    <div class="table-wrap"><table id="indicators"></table></div>
+  </section>
+
+  <section class="card">
+    <h2>Tier 2: cycle / sector tilt</h2>
+    <p class="sub" id="tilt-sub"></p>
+    <div id="tilt"></div>
+    <p class="note">Directional tilts in [−1, 1] for the capstone to size; scaled by conviction. Blue = overweight, red = underweight.</p>
+  </section>
+
+  <section class="card" id="warn-card" hidden>
+    <h2>Data warnings</h2>
+    <ul id="warnings"></ul>
+  </section>
+</main>
+<script>
+const D = /*__DATA__*/null;
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const f = (x, nd = 2, signed = true) => x == null ? "–" : (signed && x > 0 ? "+" : "") + Number(x).toFixed(nd).replace("-", "−");
+const t1 = D.feed.tier1, t2 = D.feed.tier2;
+
+$("sub").textContent = `As of ${D.as_of} · latest composite month ${t1.latest_month || "–"}`;
+if (D.synthetic) $("banner").innerHTML = '<div class="banner">Synthetic demo data — not real statistics.</div>';
+
+const tp = t1.turning_point;
+$("tiles").innerHTML = [
+  ["Composite", f(t1.composite_z) + " z", `${t1.direction || ""} ${f(t1.change_3m)} over 3m${t1.provisional ? " · provisional" : ""}`],
+  ["Cycle phase", t1.phase || "–", "level vs trend × direction"],
+  ["Conviction", t1.conviction || "–", `${Math.round((t1.evidenced_weight_share || 0) * 100)}% of weight evidenced`],
+  ["Turning point", tp ? `${tp.kind}` : "none", tp ? `${tp.status}, ${tp.month} (flagged ${tp.detected})` : "within the last 6 months"],
+].map(([k, v, n]) => `<div class="tile"><div class="k">${k}</div><div class="v">${esc(v)}</div><div class="n">${esc(n)}</div></div>`).join("");
+
+function chart(el, line, turns, opts) {
+  const W = Math.max(280, el.clientWidth || opts.w || 1000), H = opts.h || 300, m = {l: 36, r: 12, t: 12, b: 24};
+  let pts = line;
+  if (opts.years) {
+    const last = pts.length ? pts[pts.length - 1][0] : "";
+    const cut = (parseInt(last.slice(0, 4)) - opts.years) + last.slice(4);
+    pts = pts.filter((p) => p[0] > cut);
+  }
+  if (!pts.length) { el.innerHTML = '<p class="note">No data.</p>'; return; }
+  const ys = pts.map((p) => p[1]);
+  const lo = Math.min(-1, Math.floor(Math.min(...ys))), hi = Math.max(1, Math.ceil(Math.max(...ys)));
+  const x = (i) => m.l + (pts.length === 1 ? 0 : i * (W - m.l - m.r) / (pts.length - 1));
+  const y = (v) => m.t + (hi - v) * (H - m.t - m.b) / (hi - lo);
+  const idx = Object.fromEntries(pts.map((p, i) => [p[0], i]));
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(opts.label)}">`;
+  if (opts.phases) {  // contraction bands
+    let start = null;
+    pts.forEach((p, i) => {
+      const c = opts.phases[p[0]] === "Contraction";
+      if (c && start === null) start = i;
+      if ((!c || i === pts.length - 1) && start !== null) {
+        const end = c ? i : i - 1;
+        s += `<rect x="${x(start) - 2}" y="${m.t}" width="${Math.max(4, x(end) - x(start) + 4)}" height="${H - m.t - m.b}" fill="var(--band)"/>`;
+        start = null;
+      }
+    });
+  }
+  s += '<g class="grid axis">';
+  const step = (hi - lo) > 6 ? 2 : 1;
+  for (let v = lo; v <= hi; v += step) s += `<line x1="${m.l}" x2="${W - m.r}" y1="${y(v)}" y2="${y(v)}"/><text x="${m.l - 6}" y="${y(v) + 4}" text-anchor="end">${f(v, 0)}</text>`;
+  const every = Math.max(1, Math.ceil(pts.length / Math.max(3, Math.floor(W / 90)) / 12) * 12);
+  pts.forEach((p, i) => { if (p[0].endsWith("-01") && (parseInt(p[0]) % (every / 12) === 0)) s += `<text x="${x(i)}" y="${H - 6}" text-anchor="middle">${p[0].slice(0, 4)}</text>`; });
+  s += `</g><line class="zero" x1="${m.l}" x2="${W - m.r}" y1="${y(0)}" y2="${y(0)}"/>`;
+  const firm = pts.map((p, i) => [i, p]).filter(([, p]) => !p[2]);
+  const provStart = pts.findIndex((p) => p[2]);
+  const path = (arr) => arr.map(([i, p], k) => `${k ? "L" : "M"}${x(i).toFixed(1)},${y(p[1]).toFixed(1)}`).join("");
+  s += `<path d="${path(firm.filter(([i]) => provStart < 0 || i <= provStart))}" fill="none" stroke="var(--series-1)" stroke-width="2" stroke-linejoin="round"/>`;
+  if (provStart >= 0) {
+    const tail = pts.map((p, i) => [i, p]).filter(([i]) => i >= Math.max(0, provStart - 1));
+    s += `<path d="${path(tail)}" fill="none" stroke="var(--series-1)" stroke-width="2" stroke-dasharray="4 3"/>`;
+  }
+  (turns || []).forEach((t) => {
+    const i = idx[t.month]; if (i == null) return;
+    const cx = x(i), cy = y(pts[i][1]), up = t.kind === "trough", d = up ? 12 : -12;
+    const tri = up ? `M${cx},${cy + d - 5} l5,9 l-10,0 z` : `M${cx},${cy + d + 5} l5,-9 l-10,0 z`;
+    const prov = t.status === "provisional";
+    s += `<path d="${tri}" fill="${prov ? "var(--surface-1)" : "var(--text-primary)"}" stroke="var(--text-primary)" stroke-width="1.5"><title>${t.status} ${t.kind} ${t.month}</title></path>`;
+  });
+  s += `<line id="${opts.id}-x" y1="${m.t}" y2="${H - m.b}" stroke="var(--text-muted)" stroke-width="1" visibility="hidden"/>`;
+  s += `<circle id="${opts.id}-dot" r="5" fill="var(--series-1)" stroke="var(--surface-1)" stroke-width="2" visibility="hidden"/>`;
+  s += `<rect x="${m.l}" y="0" width="${W - m.l - m.r}" height="${H}" fill="transparent" id="${opts.id}-hit"/></svg><div class="tip" id="${opts.id}-tip"></div>`;
+  el.innerHTML = s;
+  const svg = el.querySelector("svg"), tip = $(`${opts.id}-tip`), xl = $(`${opts.id}-x`), dot = $(`${opts.id}-dot`);
+  const move = (ev) => {
+    const r = svg.getBoundingClientRect();
+    const px = (ev.clientX - r.left) * W / r.width;
+    const i = Math.max(0, Math.min(pts.length - 1, Math.round((px - m.l) / ((W - m.l - m.r) / Math.max(1, pts.length - 1)))));
+    const p = pts[i];
+    xl.setAttribute("x1", x(i)); xl.setAttribute("x2", x(i)); xl.setAttribute("visibility", "visible");
+    dot.setAttribute("cx", x(i)); dot.setAttribute("cy", y(p[1])); dot.setAttribute("visibility", "visible");
+    tip.innerHTML = `<b>${p[0]}</b><br>${f(p[1])} z${opts.phases && opts.phases[p[0]] ? " · " + opts.phases[p[0]] : ""}${p[2] ? "<br><i>provisional</i>" : ""}` + (opts.extra ? opts.extra(p[0]) : "");
+    tip.style.display = "block";
+    const left = x(i) * r.width / W;
+    tip.style.left = Math.min(r.width - tip.offsetWidth, Math.max(0, left + 12)) + "px";
+    tip.style.top = "8px";
+  };
+  svg.addEventListener("pointermove", move);
+  svg.addEventListener("pointerleave", () => { tip.style.display = "none"; xl.setAttribute("visibility", "hidden"); dot.setAttribute("visibility", "hidden"); });
+}
+
+const geoAt = (mo) => D.geos.map((g) => { const p = g.line.find((q) => q[0] === mo); return p ? `<br>${esc(g.code)} ${f(p[1])}` : ""; }).join("");
+let years = 10;
+function draw() {
+  chart($("main-chart"), D.composite, D.turns, {id: "main", label: "Composite z-score over time", phases: D.phases, years, extra: geoAt});
+  $("multiples").innerHTML = D.geos.map((g) => `<div><div class="row"><b>${esc(g.label)}</b><span class="note">${esc(g.code)}</span></div><div class="chart" id="g-${g.code}"></div></div>`).join("");
+  D.geos.forEach((g) => chart($(`g-${g.code}`), g.line, g.turns, {id: "g" + g.code, label: g.label + " z-score", years, h: 200}));
+}
+document.querySelectorAll("#range button").forEach((b) => b.addEventListener("click", () => {
+  document.querySelectorAll("#range button").forEach((o) => o.setAttribute("aria-pressed", o === b));
+  years = parseInt(b.dataset.y); draw();
+}));
+draw();
+let rz; window.addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(draw, 150); });
+
+const badge = (v) => {
+  const cls = v === "evidenced" ? "b-good" : v === "partial" ? "b-warn" : v === "not evidenced" ? "b-bad" : "b-na";
+  return `<span class="badge ${cls}">${esc(v)}</span>`;
+};
+$("validation").innerHTML = "<tr><th>Indicator → target</th><th class=num>Months</th><th class=num>Best lead</th><th class=num>corr</th><th class=num>β</th><th class=num>HAC t</th><th class=num>R²</th><th class=num>OOS RMSE ratio</th><th class=num>DM p</th><th class=num>Hit rate</th><th class=num>Pub. lead</th><th>Verdict</th></tr>" +
+  D.validation.map((v) => `<tr><td>${esc(v.indicator)} → ${esc(v.target)} <span class="note">${esc(v.transform)}</span></td><td class=num>${v.n}</td><td class=num>${v.best_lead == null ? "–" : v.best_lead + "m"}</td><td class=num>${f(v.best_corr)}</td><td class=num>${f(v.beta)}</td><td class=num>${f(v.beta_t, 1)}</td><td class=num>${f(v.r2, 2, false)}</td><td class=num>${f(v.rmse_ratio, 2, false)}</td><td class=num>${f(v.dm_p, 3, false)}</td><td class=num>${v.hit_rate == null ? "–" : Math.round(v.hit_rate * 100) + "%"}</td><td class=num>${v.timing_advantage_days == null ? "–" : v.timing_advantage_days + "d"}</td><td>${badge(v.verdict)}</td></tr>`).join("");
+$("indicators").innerHTML = "<tr><th>Series</th><th>Geography</th><th>Mode</th><th>Last obs</th><th class=num>Momentum %</th><th>Transform</th><th class=num>z</th></tr>" +
+  D.indicators.map((s) => `<tr><td>${esc(s.label)}</td><td>${esc(s.geo)}</td><td>${esc(s.mode)}</td><td>${esc(s.last)}</td><td class=num>${f(s.momentum)}</td><td>${esc(s.transform)}</td><td class=num>${f(s.z)}</td></tr>`).join("");
+
+$("tilt-sub").textContent = t2.cycle_phase ? `Phase ${t2.cycle_phase}, conviction ${t2.conviction}; cyclicals minus defensives ${f(t2.tilt.cyclical_minus_defensive)}` : "No phase yet.";
+$("tilt").innerHTML = Object.entries(t2.tilt.sectors || {}).sort((a, b) => b[1] - a[1]).map(([k, v]) => {
+  const w = Math.abs(v) * 50, left = v >= 0 ? 50 : 50 - w;
+  return `<div class="tilt-row"><span>${esc(k.replace(/_/g, " "))}</span><div class="tilt-track" title="${f(v)}"><div class="tilt-bar" style="left:${left}%;width:${w}%;background:${v >= 0 ? "var(--pos)" : "var(--neg)"}"></div><div class="tilt-mid"></div></div><span class="num" style="text-align:right">${f(v)}</span></div>`;
+}).join("");
+if (D.warnings.length) { $("warn-card").hidden = false; $("warnings").innerHTML = D.warnings.map((w) => `<li>${esc(w)}</li>`).join(""); }
+</script>
+</body>
+</html>

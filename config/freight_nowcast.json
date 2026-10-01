@@ -1,0 +1,114 @@
+{
+  "_comment": "Freight nowcaster catalog. Codes marked _verify were set from the publishers' documentation without live access; confirm them once with `freight-nowcast inspect` before the first production run.",
+  "cache_dir": "data/freight",
+  "zscore": {"window": 60, "min_periods": 24, "clip": 4.0},
+  "composite": {"min_coverage": 0.5, "phase_horizon": 3},
+  "turning_points": {"window": 5, "min_phase": 5, "min_cycle": 15, "min_amplitude": 0.5,
+                     "lookback": 12, "threshold": 0.5, "confirm_months": 2},
+  "geographies": {
+    "DE":    {"label": "Germany",          "weight": 0.4},
+    "EA":    {"label": "Euro area",        "weight": 0.3},
+    "WORLD": {"label": "World sea trade",  "weight": 0.3}
+  },
+  "series": [
+    {
+      "id": "de_toll_mileage", "label": "Truck toll mileage index (sa)", "role": "indicator",
+      "mode": "road", "geography": "DE", "frequency": "M", "transform": "3m3m", "weight": 1.0,
+      "publication_lag_days": 9,
+      "source": "genesis",
+      "params": {"table": "42191-0001", "filters": {"WERTE4": "X13JDKSB"}, "startyear": 2008},
+      "_verify": "filter code for the calendar- and seasonally-adjusted line"
+    },
+    {
+      "id": "de_toll_mileage_daily", "label": "Truck toll mileage index, working-daily", "role": "indicator",
+      "mode": "road", "geography": "DE", "frequency": "D", "extends": "de_toll_mileage", "optional": true,
+      "min_month_coverage": 0.25,
+      "source": "csv",
+      "params": {"path": "data/freight/raw/toll_daily.csv"},
+      "how_to_get": "Destatis experimental statistics: daily truck toll mileage index CSV (published in high-frequency periods). Columns date,value; anything with a date and an index column works."
+    },
+    {
+      "id": "de_port_calls", "label": "Port calls, Germany (OECD AIS)", "role": "indicator",
+      "mode": "sea", "geography": "DE", "frequency": "M", "transform": "yoy", "weight": 0.5,
+      "optional": true, "publication_lag_days": 7,
+      "source": "csv",
+      "params": {"path": "data/freight/raw/oecd_ais_port_calls_DEU.csv"},
+      "how_to_get": "OECD 'Monitoring maritime trade: the OECD AIS vessel tracking dashboard' -> country DEU -> port calls -> download CSV."
+    },
+    {
+      "id": "ea_port_calls", "label": "Port calls, euro-area ports (OECD AIS)", "role": "indicator",
+      "mode": "sea", "geography": "EA", "frequency": "M", "transform": "yoy", "weight": 1.0,
+      "optional": true, "publication_lag_days": 7,
+      "source": "csv",
+      "params": {"path": "data/freight/raw/oecd_ais_port_calls_EA.csv"},
+      "how_to_get": "OECD AIS dashboard export summed over euro-area countries (or the EU aggregate if offered)."
+    },
+    {
+      "id": "world_port_calls", "label": "Port calls, world (OECD AIS)", "role": "indicator",
+      "mode": "sea", "geography": "WORLD", "frequency": "M", "transform": "yoy", "weight": 1.0,
+      "optional": true, "publication_lag_days": 7,
+      "source": "csv",
+      "params": {"path": "data/freight/raw/oecd_ais_port_calls_WLD.csv"},
+      "how_to_get": "OECD AIS dashboard, world aggregate -> download CSV."
+    },
+    {
+      "id": "baltic_dry", "label": "Baltic Dry Index", "role": "indicator",
+      "mode": "sea", "geography": "WORLD", "frequency": "D", "transform": "yoy", "weight": 0.5,
+      "optional": true, "publication_lag_days": 1,
+      "source": "csv",
+      "params": {"path": "data/freight/raw/baltic_dry.csv"},
+      "how_to_get": "Baltic Exchange (licensed) or a market-data export with Date and Close/Price columns. For US-style dates add \"date_format\": \"%m/%d/%Y\"."
+    },
+    {
+      "id": "de_ais_stationary", "label": "Vessels in port, Hamburg/Bremerhaven (aisstream.io)", "role": "indicator",
+      "mode": "sea", "geography": "DE", "frequency": "D", "transform": "yoy", "weight": 0.25,
+      "optional": true,
+      "source": "csv",
+      "params": {"path": "data/freight/ais_port_counts.csv", "value_col": "stationary", "filters": {"port": "Hamburg"}},
+      "how_to_get": "Written by `freight-nowcast ais-listen` (cron it daily). Enters the composite once it has 3 years of history."
+    },
+    {
+      "id": "de_manufacturing_production", "label": "Manufacturing production, Germany (sca)", "role": "target",
+      "geography": "DE", "frequency": "M", "publication_lag_days": 38,
+      "source": "sdmx",
+      "params": {"agency": "eurostat", "flow": "sts_inpr_m", "key": "M.PRD.C.SCA.I21.DE", "start": "2008-01"},
+      "_verify": "Eurostat STS codes (indic_bt PRD, unit I21); GENESIS 42153-0001 is the national alternative"
+    },
+    {
+      "id": "ea_manufacturing_production", "label": "Manufacturing production, euro area (sca)", "role": "target",
+      "geography": "EA", "frequency": "M", "publication_lag_days": 45,
+      "source": "sdmx",
+      "params": {"agency": "eurostat", "flow": "sts_inpr_m", "key": "M.PRD.C.SCA.I21.EA20", "start": "2008-01"},
+      "_verify": "as above"
+    },
+    {
+      "id": "de_exports", "label": "Exports, Germany (foreign trade statistics)", "role": "target",
+      "geography": "DE", "frequency": "M", "publication_lag_days": 38,
+      "source": "genesis",
+      "params": {"table": "51000-0002", "value_variable": "WERTAUS", "startyear": 2008},
+      "_verify": "value variable code for exports"
+    },
+    {
+      "id": "world_trade_volume", "label": "World trade volume (CPB World Trade Monitor)", "role": "target",
+      "geography": "WORLD", "frequency": "M", "publication_lag_days": 55, "optional": true,
+      "source": "csv",
+      "params": {"path": "data/freight/raw/cpb_world_trade_volume.csv"},
+      "how_to_get": "CPB World Trade Monitor (cpb.nl) -> world trade volume, seasonally adjusted -> save as date,value CSV."
+    }
+  ],
+  "validation": [
+    {"indicator": "de_toll_mileage", "target": "de_manufacturing_production", "transform": "mom", "max_lag": 3},
+    {"indicator": "de_port_calls", "target": "de_exports", "transform": "yoy", "max_lag": 3},
+    {"indicator": "ea_port_calls", "target": "ea_manufacturing_production", "transform": "yoy", "max_lag": 3},
+    {"indicator": "world_port_calls", "target": "world_trade_volume", "transform": "yoy", "max_lag": 3},
+    {"indicator": "baltic_dry", "target": "world_trade_volume", "transform": "yoy", "max_lag": 6}
+  ],
+  "ais": {
+    "ports": {
+      "Hamburg":     [[53.50, 9.80], [53.56, 10.05]],
+      "Bremerhaven": [[53.52, 8.50], [53.62, 8.60]],
+      "Rotterdam":   [[51.88, 3.95], [51.99, 4.55]],
+      "Antwerp":     [[51.22, 4.20], [51.40, 4.42]]
+    }
+  }
+}
