@@ -43,8 +43,10 @@ def check_catalog(cfg: Dict[str, Any]) -> None:
             errors.append(f"{sid}: transform must be one of {sorted(TRANSFORMS)}")
         if s.get("role") == "indicator" and s.get("geography") not in geos:
             errors.append(f"{sid}: geography {s.get('geography')!r} is not in geographies")
-        if s.get("fallback") and s["fallback"].get("source") not in SOURCES:
-            errors.append(f"{sid}: fallback source must be one of {sorted(SOURCES)}")
+        fbs = s.get("fallback") or []
+        for fb in [fbs] if isinstance(fbs, dict) else fbs:
+            if fb.get("source") not in SOURCES:
+                errors.append(f"{sid}: fallback source must be one of {sorted(SOURCES)}")
         if s.get("source") not in SOURCES:
             errors.append(f"{sid}: source must be one of {sorted(SOURCES)}")
     for p in cfg.get("validation") or []:

@@ -177,18 +177,24 @@ def fetch_series(spec: Mapping[str, Any], base_dir: Path = Path(".")) -> Series:
     try:
         return _fetch_one(spec, base_dir)
     except SourceError as primary:
-        fb = spec.get("fallback")
-        if not fb:
+        fbs = spec.get("fallback") or []
+        if isinstance(fbs, dict):
+            fbs = [fbs]
+        if not fbs:
             raise
-        alt = {**fb, "id": spec["id"]}
-        try:
-            s = _fetch_one(alt, base_dir)
-        except SourceError as secondary:
-            raise SourceError(f"{primary}; fallback failed too: {secondary}") from secondary
-        if alt.get("frequency", "M") != spec.get("frequency", "M") and spec.get("frequency", "M") == "M":
-            s = monthly_average(s)
-        s.meta["fallback_used"] = f"{alt.get('source')} (primary failed: {str(primary)[:160]})"
-        return s
+        errors = [str(primary)]
+        for i, fb in enumerate(fbs, 1):
+            alt = {**fb, "id": spec["id"]}
+            try:
+                s = _fetch_one(alt, base_dir)
+            except SourceError as exc:
+                errors.append(f"fallback {i}: {exc}")
+                continue
+            if alt.get("frequency", "M") != spec.get("frequency", "M") and spec.get("frequency", "M") == "M":
+                s = monthly_average(s)
+            s.meta["fallback_used"] = f"{i}: {alt.get('source')} (primary failed: {str(primary)[:160]})"
+            return s
+        raise SourceError(" | ".join(errors))
 
 
 def _fetch_one(spec: Mapping[str, Any], base_dir: Path) -> Series:

@@ -275,7 +275,7 @@
     },
     {
       "id": "de_exports",
-      "label": "Exports, Germany (foreign trade statistics; Eurostat volume index sa as fallback)",
+      "label": "Exports, Germany (foreign trade statistics)",
       "role": "target",
       "geography": "DE",
       "frequency": "M",
@@ -287,21 +287,50 @@
         "startyear": 2008
       },
       "_verify": "GENESIS value variable; Eurostat fallback key",
-      "fallback": {
-        "source": "eurostat_jsonstat",
-        "frequency": "M",
-        "params": {
-          "flow": "ext_st_eu27_2020sitc",
-          "dims": {
-            "geo": "DE",
-            "partner": "WORLD",
-            "sitc06": "TOTAL",
-            "stk_flow": "EXP",
-            "indic_et": "IVOL_SCA"
-          },
-          "start": "2008-01"
+      "fallback": [
+        {
+          "source": "eurostat_jsonstat",
+          "frequency": "M",
+          "params": {
+            "flow": "ext_st_eu27_2020sitc",
+            "dims": {
+              "geo": "DE",
+              "partner": "WORLD",
+              "sitc06": "TOTAL",
+              "stk_flow": "EXP",
+              "indic_et": "IVOL_SCA"
+            }
+          }
+        },
+        {
+          "source": "eurostat_jsonstat",
+          "frequency": "M",
+          "params": {
+            "flow": "ext_st_eu27_2020sitc",
+            "dims": {
+              "geo": "DE",
+              "partner": "WORLD",
+              "sitc06": "TOTAL",
+              "stk_flow": "EXP",
+              "indic_et": "TRD_VAL_SCA"
+            }
+          }
+        },
+        {
+          "source": "eurostat_jsonstat",
+          "frequency": "M",
+          "params": {
+            "flow": "ext_st_eu27_2020sitc",
+            "dims": {
+              "geo": "DE",
+              "partner": "WORLD",
+              "sitc06": "TOTAL",
+              "stk_flow": "EXP",
+              "indic_et": "TRD_VAL"
+            }
+          }
         }
-      },
+      ],
       "optional": true
     },
     {
