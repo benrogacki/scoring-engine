@@ -197,9 +197,12 @@ through `capstone_feed.json`: the real-economy read next to the yield curve in T
 cycle/sector tilt in Tier 2.
 
 ```bash
-python -m freight_nowcast demo --as-of 2026-09-30 --out out/freight-demo   # synthetic, offline
-python -m freight_nowcast fetch && python -m freight_nowcast run --out out/freight
+python -m freight_nowcast live --out out/freight/live                      # real data: fetch + run
+python -m freight_nowcast demo --as-of 2026-09-30 --out out/freight-demo   # synthetic sandbox, offline
 ```
+
+A scheduled GitHub Actions job runs the live nowcast every weekday and publishes it to the
+`freight-live` branch.
 
 See [`docs/freight_nowcast.md`](docs/freight_nowcast.md) for sources, method, validation and the
 feed schema, and [`examples/freight/output/`](examples/freight/output/) for a demo run.

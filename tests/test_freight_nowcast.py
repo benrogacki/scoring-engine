@@ -302,5 +302,132 @@ class PipelineTests(unittest.TestCase):
             self.assertEqual(main(["run", "--cache", tmp, "--out", str(Path(tmp) / "out")]), 2)
 
 
+
+def make_xlsx(rows):
+    """Tiny xlsx writer for tests (inline strings and numbers)."""
+    import io
+    import zipfile
+    from xml.sax.saxutils import escape
+
+    def col(i):
+        s = ""
+        i += 1
+        while i:
+            i, r = divmod(i - 1, 26)
+            s = chr(65 + r) + s
+        return s
+
+    body = []
+    for ri, row in enumerate(rows, 1):
+        cells = []
+        for ci, v in enumerate(row):
+            ref = f"{col(ci)}{ri}"
+            if v is None:
+                continue
+            if isinstance(v, (int, float)):
+                cells.append(f'<c r="{ref}"><v>{v}</v></c>')
+            else:
+                cells.append(f'<c r="{ref}" t="inlineStr"><is><t>{escape(v)}</t></is></c>')
+        body.append(f'<row r="{ri}">{"".join(cells)}</row>')
+    sheet = ('<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetData>'
+             + "".join(body) + "</sheetData></worksheet>")
+    wb = ('<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" '
+          'xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">'
+          '<sheets><sheet name="Daten" sheetId="1" r:id="rId1"/></sheets></workbook>')
+    rels = ('<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+            '<Relationship Id="rId1" Target="worksheets/sheet1.xml" '
+            'Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet"/></Relationships>')
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w") as zf:
+        zf.writestr("xl/workbook.xml", wb)
+        zf.writestr("xl/_rels/workbook.xml.rels", rels)
+        zf.writestr("xl/worksheets/sheet1.xml", sheet)
+    return buf.getvalue()
+
+
+class LiveSourceTests(unittest.TestCase):
+    def test_destatis_daily_xlsx(self):
+        from freight_nowcast.sources import destatis_daily
+        data = make_xlsx([
+            ["Lkw-Maut-Fahrleistungsindex"],
+            [],
+            ["Datum", "Originalwert", "Kalender- und saisonbereinigt"],
+            [46265.0, 98.0, 101.5],      # Excel serial for 2026-08-31
+            ["01.09.2026", "97,0", "100,9"],
+        ])
+        page = '<a href="/DE/x/Lkw-Maut-Daten.xlsx?__blob=publicationFile">Download</a>'
+        urls = []
+
+        def getter(url):
+            urls.append(url)
+            return page.encode() if url.endswith(".html") else data
+
+        s = destatis_daily.fetch("toll_d", getter=getter)
+        self.assertEqual(urls[1], "https://www.destatis.de/DE/x/Lkw-Maut-Daten.xlsx?__blob=publicationFile")
+        self.assertEqual(s.observations, [(date(2026, 8, 31), 101.5), (date(2026, 9, 1), 100.9)])
+        self.assertIn("saison", s.meta["column"])
+
+    def test_portwatch_query_and_parse(self):
+        from freight_nowcast.sources import portwatch
+        url = portwatch.build_query(["DEU"], 2025)
+        self.assertIn("where=year%3D2025+AND+ISO3+IN+%28%27DEU%27%29", url)
+        self.assertIn("groupByFieldsForStatistics=year%2Cmonth%2Cday", url)
+
+        def getter(u):
+            year = 2025 if "2025" in u else 2026
+            return json.dumps({"features": [
+                {"attributes": {"year": year, "month": 1, "day": 1, "total": 40, "n_ports": 20}},
+                {"attributes": {"YEAR": year, "MONTH": 1, "DAY": 2, "TOTAL": 55, "N_PORTS": 20}},
+            ]}).encode()
+
+        s = portwatch.fetch("pc", countries=["DEU"], start_year=2025, end_year=2026, getter=getter)
+        self.assertEqual(len(s.observations), 4)
+        self.assertEqual(s.observations[-1], (date(2026, 1, 2), 55.0))
+        with self.assertRaisesRegex(SourceError, "Invalid query"):
+            portwatch.parse_response({"error": {"message": "Invalid query"}})
+
+    def test_genesis_guest_fallback(self):
+        import os
+        saved = {k: os.environ.pop(k, None) for k in ("DESTATIS_TOKEN", "DESTATIS_USERNAME", "DESTATIS_PASSWORD")}
+        try:
+            c = genesis.GenesisClient.from_env(transport=lambda *a: b"")
+            self.assertTrue(c.guest)
+            self.assertEqual(c.username, "GAST")
+        finally:
+            for k, v in saved.items():
+                if v is not None:
+                    os.environ[k] = v
+
+    def test_live_and_synthetic_caches_do_not_mix(self):
+        from freight_nowcast.demo import write_demo_cache
+        from freight_nowcast.live import fetch_all
+        with tempfile.TemporaryDirectory() as tmp:
+            write_demo_cache(Path(tmp), AS_OF)
+            with self.assertRaises(SourceError):
+                fetch_all(load_catalog(), Path(tmp), log=lambda *a: None)
+        with tempfile.TemporaryDirectory() as tmp:
+            (Path(tmp) / "_manifest.json").write_text("{}")
+            with self.assertRaises(ValueError):
+                write_demo_cache(Path(tmp), AS_OF)
+
+    def test_failed_fetch_keeps_last_good_copy(self):
+        from freight_nowcast.live import fetch_all, required_failures
+        with tempfile.TemporaryDirectory() as tmp:
+            raw = Path(tmp) / "bdi.csv"
+            raw.write_text("Date,Close\n2026-09-01,1500\n2026-09-02,1510\n")
+            cfg = {"_base_dir": tmp, "geographies": {"W": {}}, "series": [
+                {"id": "bdi", "role": "indicator", "geography": "W", "source": "csv", "frequency": "D",
+                 "params": {"path": "bdi.csv"}}]}
+            cache = Path(tmp) / "cache"
+            m = fetch_all(cfg, cache, log=lambda *a: None)
+            self.assertEqual(m["series"]["bdi"]["status"], "ok")
+            raw.unlink()
+            m = fetch_all(cfg, cache, log=lambda *a: None)
+            self.assertEqual(m["series"]["bdi"]["status"], "failed")
+            self.assertEqual(m["series"]["bdi"]["last"], "2026-09-02")
+            self.assertTrue((cache / "bdi.csv").exists())
+            self.assertEqual(required_failures(cfg, m), ["bdi"])
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -20,51 +20,83 @@ the stack is `capstone_feed.json`:
  Eurostat / GENESIS / CPB ── production & trade (validation targets) ─────────────────────────────────────►└─ nowcast_summary.md, dashboard.html
 ```
 
-## Quick start
+## Two modes: live and sandbox
+
+| | **Live** | **Sandbox (synthetic)** |
+|---|---|---|
+| Command | `freight-nowcast live` (= `fetch` + `run`) | `freight-nowcast demo` |
+| Data | fetched from Destatis, IMF PortWatch, Eurostat (plus any CSV exports you add) | generated from one latent cycle with known links |
+| Cache | `data/freight/live/` with `_manifest.json` (what was fetched, when, from where) | `out/freight-demo-cache/`, marked `_SYNTHETIC_DEMO_DATA` |
+| Outputs | `out/freight/live/`; the scheduled job also publishes them to the `freight-live` branch | `examples/freight/output/` |
+| Labelled | "Live data · fetched …" plus a per-series data table | "Synthetic demo data — not real statistics" everywhere |
+
+The two caches cannot be mixed. `fetch` refuses a cache that holds demo data, and `demo` refuses
+one that has a live manifest. The sandbox stays useful wherever there's no network: in tests, in
+this repository's examples, and as a check that the method finds a link that is known to exist.
+
+### Running live
 
 ```bash
-# offline trial on synthetic series (clearly labelled as such in every output)
-python -m freight_nowcast demo --as-of 2026-09-30 --out out/freight-demo
-
-# real data
-export DESTATIS_TOKEN=...                      # free GENESIS-Online account → API token
-python -m freight_nowcast inspect --genesis 42191-0001   # confirm filter codes once
-python -m freight_nowcast fetch                # → data/freight/<series>.csv
-python -m freight_nowcast run --out out/freight
+python -m freight_nowcast live --out out/freight/live         # fetch everything, then run
+python -m freight_nowcast probe                                # check each source, show GENESIS codes
+python -m freight_nowcast fetch --only de_toll_mileage         # refresh one series
+python -m freight_nowcast run --as-of 2026-09-30               # re-run from the cache, offline
 ```
 
-`fetch` and `run` are separate steps, so `run` is reproducible and works offline from the cache.
-Optional series with no data, such as CSV exports you haven't downloaded yet, are skipped with a warning.
-The composite is reweighted over whatever is available.
+If a publisher is down, the last good copy of that series stays in the cache. The manifest and the
+outputs record the failure as a warning. A required series that fails makes `fetch` (and
+`live --strict`) exit with code 1.
 
-Worked outputs from the synthetic demo are in [`examples/freight/output/`](../examples/freight/output/).
+**Scheduled live run.** [`.github/workflows/freight-nowcast.yml`](../.github/workflows/freight-nowcast.yml)
+runs the live nowcast on weekdays at 09:41 UTC, on demand (Actions → *Freight nowcast* → *Run
+workflow*), and on any push that changes the nowcaster. Each run:
+
+1. runs the unit tests and probes every source
+2. writes the summary to the job page and uploads the outputs and cache as an artifact
+3. on scheduled and manual runs, commits the outputs to the **`freight-live`** branch
+
+The Actions cache carries the data between runs. To use your own GENESIS account instead of the
+rate-limited guest login, add a repository secret `DESTATIS_TOKEN`.
+
+The sandbox:
+
+```bash
+python -m freight_nowcast demo --as-of 2026-09-30 --out out/freight-demo
+```
+
+Optional series with no data (CSV exports you haven't added) are skipped with a warning, and the
+composite is reweighted over whatever is available.
 
 ## Data sources
 
-| Series | Source | How it gets in |
-|---|---|---|
-| Truck toll mileage index, Germany (monthly, seasonally adjusted) | Destatis GENESIS table **42191-0001** | `genesis` connector (REST `genesisWS/rest/2020`, `data/tablefile`, flat-file CSV) |
-| Truck toll mileage index, working-daily | Destatis experimental statistics (published in high-frequency periods) | CSV, spliced onto the monthly index at the ragged edge (see below) |
-| Port calls: Germany, euro area, world | OECD AIS vessel-tracking dashboard | CSV export from the dashboard |
-| Baltic Dry Index | Baltic Exchange or any market-data export | CSV (`Date`, `Close`/`Price`) |
-| Vessels in port, a handful of ports | aisstream.io free WebSocket | `freight-nowcast ais-listen` → CSV |
-| Manufacturing production, DE and euro area | Eurostat `sts_inpr_m` (or GENESIS 42153-0001) | `sdmx` connector |
-| Exports, Germany | GENESIS 51000-0002 | `genesis` connector |
-| World trade volume | CPB World Trade Monitor | CSV |
+| Series | Source | How it gets in | Auto? |
+|---|---|---|---|
+| Truck toll mileage index, Germany (monthly, seasonally adjusted) | Destatis GENESIS table **42191-0001** | `genesis`: REST `genesisWS/rest/2020` `data/tablefile`, flat-file CSV; uses `DESTATIS_TOKEN`, otherwise the guest login | ✔ |
+| Truck toll mileage index, working-daily | Destatis experimental statistics (xlsx) | `destatis_daily`: follows the xlsx link on the table page and reads the seasonally adjusted column; spliced onto the monthly index at the ragged edge | ✔ |
+| Port calls: Germany, euro area (EA20), world | IMF PortWatch (UN Global Platform AIS) | `portwatch`: public ArcGIS API, summed by day on the server, no key | ✔ |
+| Port calls (alternative) | OECD AIS vessel-tracking dashboard | CSV export; `oecd_*` entries are in the catalog with `"enabled": false`, so you can switch them on in place of PortWatch | manual |
+| Baltic Dry Index | Baltic Exchange (licensed) or a market-data export | CSV (`Date`, `Close`/`Price`) | manual |
+| Vessels in port, a handful of ports | aisstream.io free WebSocket | `ais-listen` → CSV | cron |
+| Manufacturing production, DE and euro area | Eurostat `sts_inpr_m` | `sdmx` | ✔ |
+| Exports, Germany | GENESIS 51000-0002 | `genesis` | ✔ |
+| World trade volume | CPB World Trade Monitor | CSV | manual |
 
-**Before the first production run, check the codes.** This build was written without network
-access to the publishers, so I set the table codes, filter codes (`WERTE4: X13JDKSB`), value
-variables (`WERTAUS`) and Eurostat keys (`M.PRD.C.SCA.I21.DE`) from documentation. They have
-not been tested against live responses. Each one is marked `_verify` in
-[`config/freight_nowcast.json`](../config/freight_nowcast.json). Run `inspect` once per GENESIS
-table to list its variables and attribute codes. If a code is wrong, `fetch` fails with a message
-that tells you what to pin; it does not pick a series silently.
+Neither the Baltic Dry nor CPB world trade has a free, stable API. Drop an export at the path given
+in the catalog and it's picked up on the next run. Until then, their validation pairs show as not
+run.
+
+**Codes.** I set table codes, filters and keys from the publishers' documentation; the ones I
+haven't confirmed against a live response are marked `_verify` in
+[`config/freight_nowcast.json`](../config/freight_nowcast.json). `probe` prints what each source
+returns. For GENESIS tables it also prints the table's variables and attribute codes. A wrong code
+makes the fetch fail with a message saying what to pin; it never picks a series silently.
 
 ### GENESIS credentials
 
 The GENESIS API only accepts credentials in POST **headers**. Set `DESTATIS_TOKEN` (the token goes
-in `username`, with an empty `password`), or set `DESTATIS_USERNAME` and `DESTATIS_PASSWORD`. To
-override the endpoint, set `DESTATIS_GENESIS_URL`.
+in `username`, with an empty `password`), or set `DESTATIS_USERNAME` and `DESTATIS_PASSWORD`.
+Without either, the client uses the guest login. To override the endpoint, set
+`DESTATIS_GENESIS_URL`.
 
 ### Live AIS layer (optional)
 
@@ -190,8 +222,10 @@ for medium, ⅓ for low. The capstone decides how large the positions are.
 
 - `series.py`: monthly alignment, transforms, rolling z-scores
 - `stats.py`: OLS with Newey-West errors, Diebold-Mariano (standard library only)
-- `sources/`: `genesis.py` (Destatis REST + ffcsv parser + `inspect`), `sdmx.py` (OECD, Eurostat, ECB),
-  `ais.py` (aisstream.io port counter), and the CSV reader and cache in `__init__.py`
+- `sources/`: `genesis.py` (Destatis REST + ffcsv parser + `inspect`), `destatis_daily.py` + `xlsx.py`
+  (daily toll index), `portwatch.py` (IMF PortWatch), `sdmx.py` (OECD, Eurostat, ECB), `ais.py` (aisstream.io
+  port counter), and the CSV reader and cache in `__init__.py`
+- `live.py`: live fetch with manifest, `probe`
 - `composite.py`, `turning.py`, `validation.py`: the method
 - `engine.py`: the pipeline, including the daily→monthly splice
 - `feed.py`: the capstone contract
