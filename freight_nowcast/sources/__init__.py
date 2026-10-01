@@ -204,6 +204,9 @@ def _fetch_one(spec: Mapping[str, Any], base_dir: Path) -> Series:
     if kind == "portwatch":
         from . import portwatch
         return portwatch.fetch(sid, freq, **params)
+    if kind == "eurostat_jsonstat":
+        from . import sdmx
+        return sdmx.fetch_eurostat_jsonstat(sid, freq, **params)
     if kind == "sdmx":
         from . import sdmx
         return sdmx.fetch(sid, freq, **params)

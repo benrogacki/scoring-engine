@@ -423,6 +423,17 @@ class LiveSourceTests(unittest.TestCase):
             self.assertEqual(s.observations, [(date(2026, 7, 1), 100.0), (date(2026, 8, 1), 101.0)])
             self.assertIn("fallback_used", s.meta)
 
+    def test_eurostat_jsonstat(self):
+        payload = {"id": ["freq", "geo", "time"], "size": [1, 1, 3],
+                   "dimension": {"freq": {"category": {"index": {"M": 0}}}, "geo": {"category": {"index": {"DE": 0}}},
+                                 "time": {"category": {"index": {"2026-05": 0, "2026-06": 1, "2026-07": 2}}}},
+                   "value": {"0": 92.3, "2": 90.3}}
+        self.assertEqual(sdmx.parse_jsonstat(payload), [(date(2026, 5, 1), 92.3), (date(2026, 7, 1), 90.3)])
+        payload["size"][1] = 2
+        payload["dimension"]["geo"]["category"]["index"] = {"DE": 0, "FR": 1}
+        with self.assertRaisesRegex(SourceError, "geo"):
+            sdmx.parse_jsonstat(payload)
+
     def test_failed_fetch_keeps_last_good_copy(self):
         from freight_nowcast.live import fetch_all, required_failures
         with tempfile.TemporaryDirectory() as tmp:

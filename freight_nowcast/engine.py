@@ -124,7 +124,8 @@ def run(cfg: Mapping[str, Any], cache_dir: Path, as_of: Optional[date] = None,
         m, cov = s.to_monthly(as_of, spec.get("min_month_coverage", 0.25))
         monthly[sid] = m
         meta[sid] = {"label": spec.get("label", sid), "role": spec["role"], "mode": spec.get("mode", ""),
-                     "geography": spec.get("geography", ""), "source": s.source,
+                     "geography": spec.get("geography", ""),
+                     "source": manifest.get("series", {}).get(sid, {}).get("origin") or s.source,
                      "last_observation": s.meta.get("extended_to") or (s.last_date.isoformat() if s.last_date else None),
                      "extended_by": s.meta.get("extended_by"),
                      "latest_month_coverage": cov[max(cov)] if cov else None,

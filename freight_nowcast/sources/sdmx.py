@@ -9,6 +9,10 @@ agency shortcut with ``flow`` and ``key``:
 
 Dimensions left blank in the key come back as several series; pin them with
 ``filters`` (``{"geo": "DE"}``) or the fetch fails listing what came back.
+
+For Eurostat there is also ``eurostat_jsonstat``: dimensions are passed *by name*
+(``{"dims": {"geo": "DE", "unit": "I21", ...}}``), so no positional key to get
+wrong, and an incomplete query fails listing every dimension and its codes.
 """
 from __future__ import annotations
 
@@ -99,3 +103,46 @@ def fetch(series_id: str, frequency: str, agency: Optional[str] = None, flow: Op
     if not obs:
         raise SourceError(f"{series_id}: no observations from {full}")
     return Series(series_id, obs, frequency, f"sdmx:{agency or 'url'}", {"url": full})
+
+
+JSONSTAT_URL = "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/{flow}"
+
+
+def parse_jsonstat(payload: Dict, flow: str = "") -> List[Tuple[date, float]]:
+    """Parse a Eurostat JSON-stat 2.0 response that must hold exactly one series."""
+    if "error" in payload:
+        err = payload["error"]
+        err = err[0] if isinstance(err, list) and err else err
+        raise SourceError(f"Eurostat {flow}: {err.get('label') if isinstance(err, dict) else err}")
+    ids, sizes, dims = payload["id"], payload["size"], payload["dimension"]
+    time_dim = next((d for d in ids if d.lower() in ("time", "time_period")), ids[-1])
+    multi = {d: list(dims[d]["category"]["index"])[:10] for d, n in zip(ids, sizes) if n > 1 and d != time_dim}
+    if multi:
+        raise SourceError(f"Eurostat {flow}: pin these dimensions in dims: {multi}")
+    index = dims[time_dim]["category"]["index"]
+    positions = sorted(index, key=index.get) if isinstance(index, dict) else list(index)
+    values = payload.get("value", {})
+    out = []
+    for i, period in enumerate(positions):
+        v = values.get(str(i)) if isinstance(values, dict) else (values[i] if i < len(values) else None)
+        if v is not None:
+            out.append((parse_period(period), float(v)))
+    return out
+
+
+def fetch_eurostat_jsonstat(series_id: str, frequency: str, flow: str, dims: Mapping[str, str],
+                            start: Optional[str] = None, getter: Optional[Getter] = None) -> Series:
+    import json
+
+    query = [("format", "JSON"), ("lang", "EN")] + [(k, v) for k, v in dims.items()]
+    if start:
+        query.append(("sinceTimePeriod", start))
+    url = JSONSTAT_URL.format(flow=flow) + "?" + urllib.parse.urlencode(query)
+    try:
+        raw = (getter or _urllib_get)(url)
+    except SourceError as exc:
+        raise SourceError(f"{exc} (check dimension names with a query that pins nothing but geo)") from exc
+    obs = parse_jsonstat(json.loads(raw.decode("utf-8")), flow)
+    if not obs:
+        raise SourceError(f"{series_id}: no observations from {url}")
+    return Series(series_id, obs, frequency, "eurostat:jsonstat", {"url": url})

@@ -288,12 +288,14 @@
       },
       "_verify": "GENESIS value variable; Eurostat fallback key",
       "fallback": {
-        "source": "sdmx",
+        "source": "eurostat_jsonstat",
         "frequency": "M",
         "params": {
-          "agency": "eurostat",
           "flow": "ext_st_eu27_2020sitc",
-          "key": "M..TOTAL.WORLD.DE",
+          "dims": {
+            "geo": "DE",
+            "partner": "WORLD"
+          },
           "start": "2008-01"
         }
       },

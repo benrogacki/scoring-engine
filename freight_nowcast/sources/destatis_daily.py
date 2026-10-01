@@ -28,7 +28,7 @@ DEFAULT_MATCH = ("kalender- und saisonbereinigt", "saisonbereinigt", "seasonally
 
 def find_xlsx_link(page_html: str, base_url: str) -> str:
     hrefs = re.findall(r'href="([^"]+)"', page_html)
-    cands = [html.unescape(h) for h in hrefs if ".xlsx" in h.lower()]
+    cands = [html.unescape(html.unescape(h)) for h in hrefs if ".xlsx" in h.lower()]
     if not cands:
         raise SourceError(f"no .xlsx link on {base_url}")
     return urllib.parse.urljoin(base_url, cands[0])
@@ -55,7 +55,7 @@ def parse_rows(rows: Sequence[Sequence[object]], column_match: Sequence[str] = D
         if dcol is None or len([h for h in heads if h]) < 2:
             continue
         # headers can span two rows (measure on one row, variant on the next)
-        if hi + 1 < len(rows):
+        if hi + 1 < len(rows) and not any(isinstance(c, float) for c in rows[hi + 1]):
             nxt = [str(c or "").strip().lower() for c in rows[hi + 1]]
             low = [f"{a} {nxt[i] if i < len(nxt) else ''}".strip() for i, a in enumerate(low)]
         vcol = None
