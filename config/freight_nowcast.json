@@ -294,7 +294,9 @@
           "flow": "ext_st_eu27_2020sitc",
           "dims": {
             "geo": "DE",
-            "partner": "WORLD"
+            "partner": "WORLD",
+            "sitc06": "TOTAL",
+            "stk_flow": "EXP"
           },
           "start": "2008-01"
         }

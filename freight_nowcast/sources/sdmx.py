@@ -138,15 +138,26 @@ def fetch_eurostat_jsonstat(series_id: str, frequency: str, flow: str, dims: Map
     if start:
         query.append(("sinceTimePeriod", start))
     url = JSONSTAT_URL.format(flow=flow) + "?" + urllib.parse.urlencode(query)
-    try:
+    def _get(u: str) -> Dict:
         if getter:
-            raw = getter(url)
-        else:
-            from .http import get
-            raw = get(url, {"Accept": "application/json"})
+            return json.loads(getter(u).decode("utf-8"))
+        from .http import get
+        return json.loads(get(u, {"Accept": "application/json"}).decode("utf-8"))
+
+    try:
+        payload = _get(url)
     except SourceError as exc:
-        raise SourceError(f"{exc} (check dimension names with a query that pins nothing but geo)") from exc
-    obs = parse_jsonstat(json.loads(raw.decode("utf-8")), flow)
+        if "413" not in str(exc):
+            raise
+        # too big: ask for one period only, which is small, and report the open dimensions
+        probe_url = JSONSTAT_URL.format(flow=flow) + "?" + urllib.parse.urlencode(
+            [("format", "JSON"), ("lang", "EN")] + list(dims.items()) + [("lastTimePeriod", "1")])
+        try:
+            parse_jsonstat(_get(probe_url), flow)
+        except SourceError as detail:
+            raise SourceError(f"query too big; {detail}") from exc
+        raise
+    obs = parse_jsonstat(payload, flow)
     if not obs:
         raise SourceError(f"{series_id}: no observations from {url}")
     return Series(series_id, obs, frequency, "eurostat:jsonstat", {"url": url})
