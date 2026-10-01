@@ -15,7 +15,7 @@ the stack is `capstone_feed.json`:
 ```
  Destatis GENESIS ── truck toll mileage (monthly, + working-daily) ─┐
  OECD AIS dashboard ─ port calls (DE / euro area / world) ──────────┤   per series:        per geography:     ┌─ capstone_feed.json (Tier 1 / Tier 2)
- Baltic Dry ───────── dry-bulk freight rates ───────────────────────┼─► momentum → z ─► weighted z ─► phase ─┼─ composite.csv, turning_points.csv
+ BDRY ETF / PortWatch  dry-bulk freight rates and volume ───────────┼─► momentum → z ─► weighted z ─► phase ─┼─ composite.csv, turning_points.csv
  aisstream.io ─────── vessels in port, a few ports (optional) ──────┘   (no look-ahead)    + turning points   ├─ validation.json  (evidence)
  Eurostat / GENESIS / CPB ── production & trade (validation targets) ─────────────────────────────────────►└─ nowcast_summary.md, dashboard.html
 ```
@@ -55,7 +55,12 @@ workflow*), and on any push that changes the nowcaster. Each run:
 2. writes the summary to the job page and uploads the outputs and cache as an artifact
 3. on scheduled and manual runs, commits the outputs to the **`freight-live`** branch
 
-The Actions cache carries the data between runs. To use your own GENESIS account instead of the
+The Actions cache carries the data between runs.
+
+**Dashboard on the web.** The workflow also builds the dashboard as a GitHub Pages site. To switch
+it on, set Settings → Pages → Source to *GitHub Actions*; it then deploys on every run of the
+default branch. Otherwise, open `dashboard.html` from the `freight-live` branch or from the run's
+artifact. To use your own GENESIS account instead of the
 rate-limited guest login, add a repository secret `DESTATIS_TOKEN`.
 
 The sandbox:
@@ -75,15 +80,24 @@ composite is reweighted over whatever is available.
 | Truck toll mileage index, working-daily | Destatis experimental statistics (xlsx) | `destatis_daily`: follows the xlsx link on the table page and reads the seasonally adjusted column; spliced onto the monthly index at the ragged edge | ✔ |
 | Port calls: Germany, euro area (EA20), world | IMF PortWatch (UN Global Platform AIS) | `portwatch`: public ArcGIS API, summed by day on the server, no key | ✔ |
 | Port calls (alternative) | OECD AIS vessel-tracking dashboard | CSV export; `oecd_*` entries are in the catalog with `"enabled": false`, so you can switch them on in place of PortWatch | manual |
-| Baltic Dry Index | Baltic Exchange (licensed) or a market-data export | CSV (`Date`, `Close`/`Price`) | manual |
+| Dry-bulk freight (free stand-in for the Baltic Dry) | Breakwave Dry Bulk Shipping ETF **BDRY**, which holds the near-dated Capesize/Panamax/Supramax freight futures that settle on Baltic indices | `yahoo_chart` (Yahoo's public chart endpoint, daily since 2018), falling back to a Stooq CSV, then the US deep-sea freight PPI on FRED (`PCU483111483111`) | ✔ |
+| Dry-bulk port calls, world | IMF PortWatch, `portcalls_dry_bulk` | `portwatch` | ✔ |
+| Baltic Dry Index (licensed) | Baltic Exchange | CSV; `baltic_dry` is kept with `"enabled": false`. Switch it on instead of `dry_bulk_freight` if you have a licence | manual |
 | Vessels in port, a handful of ports | aisstream.io free WebSocket | `ais-listen` → CSV | cron |
 | Manufacturing production, DE and euro area | Eurostat `sts_inpr_m` | `sdmx` | ✔ |
 | Exports, Germany | GENESIS 51000-0002, or the Eurostat `ext_st_eu27_2020sitc` export volume index (`IVOL_SCA`) as fallback | `genesis`, falling back to `eurostat_jsonstat` (dimensions passed by name) | ✔ |
-| World trade volume | CPB World Trade Monitor | CSV | manual |
+| World trade volume | CPB World Trade Monitor, row `tgz_w1_qnmi_sn` (world trade volume, seasonally adjusted) | `cpb`: the monitor is a free monthly xlsx with no API, so the connector follows the newest release page; if CPB is unreachable it falls back to Eurostat extra-EU export volume (`eurostat_jsonstat`) | ✔ |
 
-Neither the Baltic Dry nor CPB world trade has a free, stable API. Drop an export at the path given
-in the catalog and it's picked up on the next run. Until then, their validation pairs show as not
-run.
+The Baltic Dry itself is licensed, so the default catalog uses free stand-ins:
+
+- BDRY tracks dry-bulk freight *rates* through the same futures market.
+- PortWatch dry-bulk port calls track dry-bulk *volume*.
+
+BDRY is an ETF, so it carries futures roll and fees. Its year-on-year momentum follows the freight
+cycle, but its level is not the BDI.
+
+The only sources left that need anything from you are GENESIS (a token) and the aisstream.io
+layer (an API key and a daily schedule).
 
 **Codes.** I set table codes, filters and keys from the publishers' documentation; the ones I
 haven't confirmed against a live response are marked `_verify` in
@@ -216,7 +230,7 @@ for medium, ⅓ for low. The capstone decides how large the positions are.
 | `validation.json` | Full evidence results for each pair |
 | `capstone_feed.json` | The Tier 1 / Tier 2 contract above |
 | `nowcast_summary.md` | A one-page read |
-| `dashboard.html` | Interactive charts (composite with contraction shading and turning points, a small chart per geography), evidence table and tilt bars |
+| `dashboard.html` | Self-contained dashboard: headline tiles; composite chart with contraction shading and turning points; a chart per geography and per indicator (hover for values, 5Y/10Y/All); evidence table; Tier 2 tilt bars; and a **Sources** panel marking each series ok / fallback / stale / missing, with where it came from and how to fix a gap |
 
 ## Code
 
