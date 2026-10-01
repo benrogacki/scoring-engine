@@ -2,10 +2,10 @@
   "series": {
     "de_toll_mileage": {
       "source": "genesis",
-      "attempted_at": "2026-10-01T10:14:25+00:00",
+      "attempted_at": "2026-10-01T10:15:35+00:00",
       "optional": false,
       "status": "ok",
-      "fetched_at": "2026-10-01T10:14:25+00:00",
+      "fetched_at": "2026-10-01T10:15:35+00:00",
       "observations": 224,
       "first": "2008-01-01",
       "last": "2026-08-01",
@@ -20,10 +20,10 @@
     },
     "de_toll_mileage_daily": {
       "source": "destatis_daily",
-      "attempted_at": "2026-10-01T10:14:29+00:00",
+      "attempted_at": "2026-10-01T10:15:39+00:00",
       "optional": true,
       "status": "ok",
-      "fetched_at": "2026-10-01T10:14:29+00:00",
+      "fetched_at": "2026-10-01T10:15:39+00:00",
       "observations": 6844,
       "first": "2008-01-01",
       "last": "2026-09-26",
@@ -36,10 +36,10 @@
     },
     "de_port_calls": {
       "source": "portwatch",
-      "attempted_at": "2026-10-01T10:14:32+00:00",
+      "attempted_at": "2026-10-01T10:15:41+00:00",
       "optional": true,
       "status": "ok",
-      "fetched_at": "2026-10-01T10:14:32+00:00",
+      "fetched_at": "2026-10-01T10:15:41+00:00",
       "observations": 2825,
       "first": "2019-01-01",
       "last": "2026-09-25",
@@ -51,10 +51,10 @@
     },
     "ea_port_calls": {
       "source": "portwatch",
-      "attempted_at": "2026-10-01T10:14:32+00:00",
+      "attempted_at": "2026-10-01T10:15:41+00:00",
       "optional": true,
       "status": "ok",
-      "fetched_at": "2026-10-01T10:14:32+00:00",
+      "fetched_at": "2026-10-01T10:15:41+00:00",
       "observations": 2825,
       "first": "2019-01-01",
       "last": "2026-09-25",
@@ -66,10 +66,10 @@
     },
     "world_port_calls": {
       "source": "portwatch",
-      "attempted_at": "2026-10-01T10:14:32+00:00",
+      "attempted_at": "2026-10-01T10:15:42+00:00",
       "optional": true,
       "status": "ok",
-      "fetched_at": "2026-10-01T10:14:32+00:00",
+      "fetched_at": "2026-10-01T10:15:42+00:00",
       "observations": 2825,
       "first": "2019-01-01",
       "last": "2026-09-25",
@@ -81,7 +81,7 @@
     },
     "baltic_dry": {
       "source": "csv",
-      "attempted_at": "2026-10-01T10:14:33+00:00",
+      "attempted_at": "2026-10-01T10:15:42+00:00",
       "optional": true,
       "status": "failed",
       "error": "baltic_dry: file /home/runner/work/scoring-engine/scoring-engine/data/freight/raw/baltic_dry.csv not found (Baltic Exchange (licensed) or a market-data export with Date and Close/Price columns. For US-style dates add \"date_format\": \"%m/%d/%Y\".)",
@@ -91,7 +91,7 @@
     },
     "de_ais_stationary": {
       "source": "csv",
-      "attempted_at": "2026-10-01T10:14:33+00:00",
+      "attempted_at": "2026-10-01T10:15:42+00:00",
       "optional": true,
       "status": "failed",
       "error": "de_ais_stationary: file /home/runner/work/scoring-engine/scoring-engine/data/freight/ais_port_counts.csv not found (Written by `freight-nowcast ais-listen` (cron it daily). Enters the composite once it has 3 years of history.)",
@@ -101,10 +101,10 @@
     },
     "de_manufacturing_production": {
       "source": "sdmx",
-      "attempted_at": "2026-10-01T10:14:33+00:00",
+      "attempted_at": "2026-10-01T10:15:42+00:00",
       "optional": false,
       "status": "ok",
-      "fetched_at": "2026-10-01T10:14:33+00:00",
+      "fetched_at": "2026-10-01T10:15:42+00:00",
       "observations": 223,
       "first": "2008-01-01",
       "last": "2026-07-01",
@@ -115,10 +115,10 @@
     },
     "ea_manufacturing_production": {
       "source": "sdmx",
-      "attempted_at": "2026-10-01T10:14:33+00:00",
+      "attempted_at": "2026-10-01T10:15:43+00:00",
       "optional": false,
       "status": "ok",
-      "fetched_at": "2026-10-01T10:14:33+00:00",
+      "fetched_at": "2026-10-01T10:15:43+00:00",
       "observations": 223,
       "first": "2008-01-01",
       "last": "2026-07-01",
@@ -129,17 +129,22 @@
     },
     "de_exports": {
       "source": "genesis",
-      "attempted_at": "2026-10-01T10:14:34+00:00",
+      "attempted_at": "2026-10-01T10:15:43+00:00",
       "optional": true,
-      "status": "failed",
-      "error": "GENESIS HTTP 401: b'{\"Code\":15,\"Content\":\"You are not allowed to call this service or the header of your request does not contain all the necessary information so that your access data cannot be recognised.\",\"Type\":\"ERROR\"}' | fallback 1: Eurostat ei_eteu27_2020_m: pin these dimensions in dims: {'unit': ['MIO-EUR-SA', 'MIO-EUR-NSA', 'IVU-NSA', 'IVOL-SA', 'IVOL-NSA', 'RT1-ABS-SA', 'RT12-ABS-NSA', 'RT1-IVU-NSA', 'RT12-IVU-NSA', 'RT1-IVOL-SA'], 'partner': ['EU27_2020', 'EA20', 'EU27_2020_NEA20', 'EXT_EU27_2020', 'EXT_EA20', 'WORLD'], 'indic': ['ET-T', 'ET-CAP', 'ET-CONS', 'ET-CONXT', 'ET-INTER']}",
-      "last_good_fetch": null,
-      "last": null,
-      "observations": null
+      "status": "ok",
+      "fetched_at": "2026-10-01T10:15:43+00:00",
+      "observations": 294,
+      "first": "2002-01-01",
+      "last": "2026-06-01",
+      "origin": "eurostat:jsonstat",
+      "details": {
+        "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/ei_eteu27_2020_m?format=JSON&lang=EN&geo=DE&stk_flow=EXP&partner=WORLD&indic=ET-T&unit=IVOL-SA",
+        "fallback_used": "1: eurostat_jsonstat (primary failed: GENESIS HTTP 401: b'{\"Code\":15,\"Content\":\"You are not allowed to call this service or the header of your request does not contain all the necessary information )"
+      }
     },
     "world_trade_volume": {
       "source": "csv",
-      "attempted_at": "2026-10-01T10:14:37+00:00",
+      "attempted_at": "2026-10-01T10:15:45+00:00",
       "optional": true,
       "status": "failed",
       "error": "world_trade_volume: file /home/runner/work/scoring-engine/scoring-engine/data/freight/raw/cpb_world_trade_volume.csv not found (CPB World Trade Monitor (cpb.nl) -> world trade volume, seasonally adjusted -> save as date,value CSV.)",
@@ -148,6 +153,6 @@
       "observations": null
     }
   },
-  "updated_at": "2026-10-01T10:14:37+00:00",
+  "updated_at": "2026-10-01T10:15:45+00:00",
   "mode": "live"
 }
