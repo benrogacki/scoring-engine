@@ -43,6 +43,10 @@ h2 { font-size: 15px; margin: 0 0 10px; }
 .sub { color: var(--text-secondary); margin: 0 0 16px; }
 .banner { background: var(--banner-bg); color: var(--banner-ink); padding: 8px 12px; border-radius: 8px; margin-bottom: 16px; font-weight: 600; }
 .banner.live { background: var(--surface-1); color: var(--text-secondary); border: 1px solid var(--border); font-weight: 500; }
+.toc { display: flex; gap: 6px; flex-wrap: wrap; margin: 0 0 14px; }
+.toc a { color: var(--text-secondary); text-decoration: none; font-size: 12px; border: 1px solid var(--border); border-radius: 999px; padding: 3px 10px; background: var(--surface-1); }
+.toc a:hover { color: var(--text-primary); }
+#sources td:last-child { white-space: normal; min-width: 260px; color: var(--text-muted); font-size: 12px; }
 .card { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin-bottom: 16px; }
 .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin-bottom: 16px; }
 .tile { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
@@ -86,9 +90,10 @@ li, .tile .n { overflow-wrap: anywhere; }
   <h1>Freight nowcast</h1>
   <p class="sub" id="sub"></p>
   <div id="banner"></div>
+  <nav class="toc" aria-label="Sections"><a href="#s-composite">Composite</a><a href="#s-geo">Geographies</a><a href="#s-ind">Indicators</a><a href="#s-evidence">Evidence</a><a href="#s-tilt">Tier 2 tilt</a><a href="#s-sources">Sources</a></nav>
   <div class="tiles" id="tiles"></div>
 
-  <section class="card">
+  <section class="card" id="s-composite">
     <div class="row">
       <h2>Composite real-economy momentum (z)</h2>
       <div class="seg" id="range" role="group" aria-label="Time range">
@@ -100,12 +105,17 @@ li, .tile .n { overflow-wrap: anywhere; }
     <div class="chart" id="main-chart"></div>
   </section>
 
-  <section class="card">
+  <section class="card" id="s-geo">
     <h2>By geography</h2>
     <div class="multiples" id="multiples"></div>
   </section>
 
-  <section class="card">
+  <section class="card" id="s-ind">
+    <h2>Indicators (z-score of momentum)</h2>
+    <div class="multiples" id="ind-multiples"></div>
+  </section>
+
+  <section class="card" id="s-evidence">
     <h2>Evidence: does each signal track what it claims to lead?</h2>
     <div class="table-wrap"><table id="validation"></table></div>
     <p class="note">Evidenced = significant in-sample link (Newey-West t) with the expected sign <b>and</b> a better pseudo real-time nowcast than the target's own lag (RMSE ratio &lt; 1, Diebold-Mariano p &lt; 0.10). Publication lead = days the indicator is out before the target.</p>
@@ -116,16 +126,17 @@ li, .tile .n { overflow-wrap: anywhere; }
     <div class="table-wrap"><table id="indicators"></table></div>
   </section>
 
-  <section class="card">
+  <section class="card" id="s-tilt">
     <h2>Tier 2: cycle / sector tilt</h2>
     <p class="sub" id="tilt-sub"></p>
     <div id="tilt"></div>
     <p class="note">Directional tilts in [−1, 1] for the capstone to size; scaled by conviction. Blue = overweight, red = underweight.</p>
   </section>
 
-  <section class="card">
-    <h2>Data</h2>
-    <div class="table-wrap"><table id="vintages"></table></div>
+  <section class="card" id="s-sources">
+    <h2>Sources</h2>
+    <p class="sub" id="src-sub"></p>
+    <div class="table-wrap"><table id="sources"></table></div>
   </section>
 
   <section class="card" id="warn-card" hidden>
@@ -229,6 +240,8 @@ function draw() {
   chart($("main-chart"), D.composite, D.turns, {id: "main", label: "Composite z-score over time", phases: D.phases, years, extra: geoAt});
   $("multiples").innerHTML = D.geos.map((g) => `<div><div class="row"><b>${esc(g.label)}</b><span class="note">${esc(g.code)}</span></div><div class="chart" id="g-${g.code}"></div></div>`).join("");
   D.geos.forEach((g) => chart($(`g-${g.code}`), g.line, g.turns, {id: "g" + g.code, label: g.label + " z-score", years, h: 200}));
+  $("ind-multiples").innerHTML = D.indicators.map((s, k) => `<div><div class="row"><b>${esc(s.label)}</b><span class="note">${esc(s.geo)} · ${esc(s.transform)} · ${f(s.z)} z</span></div><div class="chart" id="i-${k}"></div></div>`).join("");
+  D.indicators.forEach((s, k) => chart($(`i-${k}`), s.line, [], {id: "i" + k, label: s.label + " z-score", years, h: 160}));
 }
 document.querySelectorAll("#range button").forEach((b) => b.addEventListener("click", () => {
   document.querySelectorAll("#range button").forEach((o) => o.setAttribute("aria-pressed", o === b));
@@ -251,8 +264,13 @@ $("tilt").innerHTML = Object.entries(t2.tilt.sectors || {}).sort((a, b) => b[1] 
   const w = Math.abs(v) * 50, left = v >= 0 ? 50 : 50 - w;
   return `<div class="tilt-row"><span>${esc(k.replace(/_/g, " "))}</span><div class="tilt-track" title="${f(v)}"><div class="tilt-bar" style="left:${left}%;width:${w}%;background:${v >= 0 ? "var(--pos)" : "var(--neg)"}"></div><div class="tilt-mid"></div></div><span class="num" style="text-align:right">${f(v)}</span></div>`;
 }).join("");
-$("vintages").innerHTML = "<tr><th>Series</th><th>Role</th><th>Last observation</th><th>Fetched</th><th>Origin</th></tr>" +
-  D.vintages.map((v) => `<tr><td>${esc(v.label)}</td><td>${esc(v.role)}</td><td>${esc(v.last)}</td><td>${esc(v.fetched || "–")}</td><td>${esc(v.origin)}</td></tr>`).join("");
+const SRC = {ok: ["b-good", "ok"], fallback: ["b-warn", "fallback"], stale: ["b-warn", "stale"], missing: ["b-bad", "missing"],
+             synthetic: ["b-na", "synthetic"], absent: ["b-na", "not in demo"]};
+const counts = D.sources.reduce((a, s) => (a[s.status] = (a[s.status] || 0) + 1, a), {});
+$("src-sub").textContent = Object.entries(counts).map(([k, n]) => `${n} ${SRC[k] ? SRC[k][1] : k}`).join(" · ");
+$("sources").innerHTML = "<tr><th>Series</th><th>Role</th><th>Status</th><th>Last observation</th><th>Fetched</th><th>Origin</th><th>Notes</th></tr>" +
+  D.sources.map((s) => { const [cls, txt] = SRC[s.status] || ["b-na", s.status];
+    return `<tr><td>${esc(s.label)}${s.required ? "" : ' <span class="note">optional</span>'}</td><td>${esc(s.role)}</td><td><span class="badge ${cls}">${txt}</span></td><td>${esc(s.last || "–")}</td><td>${esc(s.fetched || "–")}</td><td>${esc(s.origin || "–")}</td><td>${esc(s.note)}</td></tr>`; }).join("");
 if (D.warnings.length) { $("warn-card").hidden = false; $("warnings").innerHTML = D.warnings.map((w) => `<li>${esc(w)}</li>`).join(""); }
 </script>
 </body>

@@ -76,6 +76,20 @@ jobs:
             probe.log
           if-no-files-found: warn
 
+      - name: Build the dashboard site
+        if: always()
+        run: |
+          mkdir -p site
+          if [ -f out/freight/live/dashboard.html ]; then
+            cp out/freight/live/dashboard.html site/index.html
+            cp out/freight/live/*.json out/freight/live/*.csv out/freight/live/*.md site/ 2>/dev/null || true
+          fi
+
+      - uses: actions/upload-pages-artifact@v3
+        if: always()
+        with:
+          path: site
+
       - name: Publish to the freight-live branch
         if: github.event_name != 'workflow_dispatch' || inputs.publish
         run: |
@@ -94,3 +108,22 @@ jobs:
           git add -A
           git commit -qm "Live freight nowcast $(date -u +%Y-%m-%dT%H:%MZ)" || { echo "no changes"; exit 0; }
           git push origin HEAD:freight-live
+
+  # Serves the live dashboard on GitHub Pages. Needs Pages enabled once
+  # (Settings -> Pages -> Source: GitHub Actions); the default github-pages
+  # environment only deploys from the default branch, so runs on other
+  # branches skip this without failing the workflow.
+  pages:
+    needs: live
+    if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v4
