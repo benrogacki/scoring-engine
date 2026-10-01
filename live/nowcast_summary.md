@@ -1,6 +1,6 @@
 # Freight nowcast — as of 2026-10-01
 
-Live data, fetched 2026-10-01T10:15:45+00:00.
+Live data, fetched 2026-10-01T10:17:17+00:00.
 
 **Composite real-economy momentum: -0.11 z** in 2026-09 (provisional: month-to-date or incomplete coverage), falling over 3 months → **Contraction** (conviction: low).
 
@@ -70,13 +70,13 @@ Phase **Contraction**, conviction low; cyclicals minus defensives -0.66.
 
 | Series | Role | Last observation | Fetched | Origin |
 |---|---|---|---|---|
-| Truck toll mileage index (sa) | indicator | 2026-09-26 | 2026-10-01T10:15:35+00:00 | destatis:daily-toll-xlsx |
-| Port calls, Germany (IMF PortWatch, AIS) | indicator | 2026-09-25 | 2026-10-01T10:15:41+00:00 | imf:portwatch |
-| Port calls, euro-area ports (IMF PortWatch, AIS) | indicator | 2026-09-25 | 2026-10-01T10:15:41+00:00 | imf:portwatch |
-| Port calls, world (IMF PortWatch, AIS) | indicator | 2026-09-25 | 2026-10-01T10:15:42+00:00 | imf:portwatch |
-| Manufacturing production, Germany (sca) | target | 2026-07-01 | 2026-10-01T10:15:42+00:00 | sdmx:eurostat |
-| Manufacturing production, euro area (sca) | target | 2026-07-01 | 2026-10-01T10:15:43+00:00 | sdmx:eurostat |
-| Exports, Germany (foreign trade statistics) | target | 2026-06-01 | 2026-10-01T10:15:43+00:00 | eurostat:jsonstat |
+| Truck toll mileage index (sa) | indicator | 2026-09-26 | 2026-10-01T10:17:05+00:00 | destatis:daily-toll-xlsx |
+| Port calls, Germany (IMF PortWatch, AIS) | indicator | 2026-09-25 | 2026-10-01T10:17:12+00:00 | imf:portwatch |
+| Port calls, euro-area ports (IMF PortWatch, AIS) | indicator | 2026-09-25 | 2026-10-01T10:17:12+00:00 | imf:portwatch |
+| Port calls, world (IMF PortWatch, AIS) | indicator | 2026-09-25 | 2026-10-01T10:17:13+00:00 | imf:portwatch |
+| Manufacturing production, Germany (sca) | target | 2026-07-01 | 2026-10-01T10:17:13+00:00 | sdmx:eurostat |
+| Manufacturing production, euro area (sca) | target | 2026-07-01 | 2026-10-01T10:17:14+00:00 | sdmx:eurostat |
+| Exports, Germany (foreign trade statistics) | target | 2026-06-01 | 2026-10-01T10:17:15+00:00 | eurostat:jsonstat |
 
 ## Data warnings
 
