@@ -33,16 +33,21 @@ def _where(countries: Optional[Sequence[str]], year: int, iso_field: str, year_f
     return " AND ".join(clauses)
 
 
+VARIANTS = ("full", "sum_only", "by_date")
+
+
 def build_query(countries: Optional[Sequence[str]], year: int, field: str = "portcalls",
                 iso_field: str = "ISO3", year_field: str = "year", layer_url: str = LAYER_URL,
-                month: Optional[int] = None) -> str:
-    stats = [{"statisticType": "sum", "onStatisticField": field, "outStatisticFieldName": "total"},
-             {"statisticType": "count", "onStatisticField": field, "outStatisticFieldName": "n_ports"}]
+                month: Optional[int] = None, variant: str = "full") -> str:
+    stats = [{"statisticType": "sum", "onStatisticField": field, "outStatisticFieldName": "total"}]
+    if variant == "full":
+        stats.append({"statisticType": "count", "onStatisticField": field, "outStatisticFieldName": "n_ports"})
+    group = "date" if variant == "by_date" else "year,month,day"
     params = {
         "where": _where(countries, year, iso_field, year_field, month),
-        "groupByFieldsForStatistics": "year,month,day",
+        "groupByFieldsForStatistics": group,
         "outStatistics": json.dumps(stats, separators=(",", ":")),
-        "orderByFields": "year,month,day",
+        "orderByFields": group,
         "f": "json",
     }
     return layer_url + "?" + urllib.parse.urlencode(params)
@@ -56,7 +61,12 @@ def parse_response(payload: Dict) -> Dict[date, float]:
     for feat in payload.get("features", []):
         a = {k.lower(): v for k, v in feat.get("attributes", {}).items()}
         try:
-            d = date(int(a["year"]), int(a["month"]), int(a["day"]))
+            if "year" in a:
+                d = date(int(a["year"]), int(a["month"]), int(a["day"]))
+            elif isinstance(a.get("date"), (int, float)):  # epoch milliseconds
+                d = datetime.fromtimestamp(a["date"] / 1000, timezone.utc).date()
+            else:
+                d = date.fromisoformat(str(a["date"])[:10])
         except (KeyError, TypeError, ValueError):
             continue
         if a.get("total") is not None:
@@ -80,8 +90,22 @@ def fetch(series_id: str, frequency: str = "D", countries: Optional[Sequence[str
     getter = getter or get
     end_year = end_year or datetime.now(timezone.utc).year
     obs: Dict[date, float] = {}
+    variant = {"v": VARIANTS[0]}
+
     def query(y: int, m: Optional[int] = None) -> Dict[date, float]:
-        payload = json.loads(getter(build_query(countries, y, field, layer_url=layer_url, month=m)).decode("utf-8"))
+        last_exc: Optional[SourceError] = None
+        for v in VARIANTS[VARIANTS.index(variant["v"]):]:
+            try:
+                part = _query(y, m, v)
+                variant["v"] = v  # stick with the first variant that works
+                return part
+            except SourceError as exc:
+                last_exc = exc
+        raise last_exc
+
+    def _query(y: int, m: Optional[int], v: str) -> Dict[date, float]:
+        payload = json.loads(getter(build_query(countries, y, field, layer_url=layer_url, month=m,
+                                                variant=v)).decode("utf-8"))
         part = parse_response(payload)
         if payload.get("exceededTransferLimit"):
             raise SourceError(f"PortWatch truncated the {y} response; narrow the query")
@@ -104,4 +128,4 @@ def fetch(series_id: str, frequency: str = "D", countries: Optional[Sequence[str
         raise SourceError(f"{series_id}: PortWatch returned no rows for {countries or 'world'}")
     days = sorted(obs)
     return Series(series_id, [(d, obs[d]) for d in days], frequency, "imf:portwatch",
-                  {"countries": ",".join(countries or ["WORLD"]), "field": field})
+                  {"countries": ",".join(countries or ["WORLD"]), "field": field, "query": variant["v"]})

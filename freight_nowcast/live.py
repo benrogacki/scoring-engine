@@ -69,6 +69,9 @@ def fetch_all(cfg: Mapping[str, Any], cache_dir: Path, only: Optional[List[str]]
                      origin=s.source, details={k: str(v) for k, v in s.meta.items()})
         series[sid] = entry
         log(f"  ok   {sid}: {len(s.observations)} obs {entry['first']} .. {entry['last']}  ({s.source})")
+    enabled = {s["id"] for s in enabled_series(cfg)}
+    for sid in [k for k in series if k not in enabled]:
+        del series[sid]  # switched off in the catalog
     manifest["updated_at"] = _now()
     manifest["mode"] = "live"
     cache_dir.mkdir(parents=True, exist_ok=True)
