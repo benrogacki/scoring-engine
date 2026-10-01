@@ -410,6 +410,19 @@ class LiveSourceTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 write_demo_cache(Path(tmp), AS_OF)
 
+    def test_fallback_source_is_averaged_to_months(self):
+        from freight_nowcast.sources import fetch_series
+        with tempfile.TemporaryDirectory() as tmp:
+            rows = ["date,value"] + [f"{(date(2026, 7, 1) + timedelta(days=i)).isoformat()},{100 + (i >= 31)}"
+                                     for i in range(31 + 31 + 5)]
+            (Path(tmp) / "daily.csv").write_text("\n".join(rows) + "\n")
+            spec = {"id": "toll", "source": "csv", "frequency": "M", "params": {"path": "missing.csv"},
+                    "fallback": {"source": "csv", "frequency": "D", "params": {"path": "daily.csv"}}}
+            s = fetch_series(spec, Path(tmp))
+            self.assertEqual(s.frequency, "M")
+            self.assertEqual(s.observations, [(date(2026, 7, 1), 100.0), (date(2026, 8, 1), 101.0)])
+            self.assertIn("fallback_used", s.meta)
+
     def test_failed_fetch_keeps_last_good_copy(self):
         from freight_nowcast.live import fetch_all, required_failures
         with tempfile.TemporaryDirectory() as tmp:

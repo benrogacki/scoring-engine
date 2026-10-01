@@ -85,8 +85,8 @@ def parse_sdmx_csv(text: str, filters: Optional[Mapping[str, str]] = None) -> Li
             continue
         by_key.setdefault(tuple(r.get(c, "") for c in dims), {})[d] = v
     if len(by_key) > 1:
-        varying = [c for i, c in enumerate(dims) if len({k[i] for k in by_key}) > 1]
-        raise SourceError(f"query returned {len(by_key)} series; pin {varying} in the key or filters")
+        varying = {c: sorted({k[i] for k in by_key})[:8] for i, c in enumerate(dims) if len({k[i] for k in by_key}) > 1}
+        raise SourceError(f"query returned {len(by_key)} series; pin these in the key or filters: {varying}")
     return sorted(next(iter(by_key.values())).items()) if by_key else []
 
 

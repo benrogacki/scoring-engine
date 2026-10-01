@@ -160,8 +160,38 @@ def read_cache(cache_dir: Path, series_id: str, frequency: str, source: str = "c
                            "date", "value", ".", "%Y-%m-%d", source=source)
 
 
+def monthly_average(s: Series) -> Series:
+    """Collapse a daily/weekly series to complete calendar months (the partial month is dropped:
+    the ragged edge is the job of an ``extends`` series)."""
+    vals, cov = s.to_monthly()
+    keep = [(date(y, m, 1), v) for (y, m), v in sorted(vals.items()) if cov[(y, m)] >= 0.999]
+    return Series(s.id, keep, "M", s.source, {**s.meta, "aggregated": "monthly mean of " + s.frequency})
+
+
 def fetch_series(spec: Mapping[str, Any], base_dir: Path = Path(".")) -> Series:
-    """Fetch one catalog entry from its source."""
+    """Fetch one catalog entry; on failure try its ``fallback`` source, if it has one.
+
+    A fallback with a higher frequency than the entry is averaged to complete
+    months, so the cache always holds the frequency the catalog declares.
+    """
+    try:
+        return _fetch_one(spec, base_dir)
+    except SourceError as primary:
+        fb = spec.get("fallback")
+        if not fb:
+            raise
+        alt = {**fb, "id": spec["id"]}
+        try:
+            s = _fetch_one(alt, base_dir)
+        except SourceError as secondary:
+            raise SourceError(f"{primary}; fallback failed too: {secondary}") from secondary
+        if alt.get("frequency", "M") != spec.get("frequency", "M") and spec.get("frequency", "M") == "M":
+            s = monthly_average(s)
+        s.meta["fallback_used"] = f"{alt.get('source')} (primary failed: {str(primary)[:160]})"
+        return s
+
+
+def _fetch_one(spec: Mapping[str, Any], base_dir: Path) -> Series:
     kind = spec.get("source")
     sid, freq = spec["id"], spec.get("frequency", "M")
     params: Dict[str, Any] = dict(spec.get("params", {}))

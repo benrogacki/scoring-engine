@@ -52,7 +52,13 @@
         },
         "startyear": 2008
       },
-      "_verify": "filter code for the calendar- and seasonally-adjusted line"
+      "_verify": "filter code for the calendar- and seasonally-adjusted line",
+      "fallback": {
+        "source": "destatis_daily",
+        "frequency": "D",
+        "params": {}
+      },
+      "_note": "GENESIS needs DESTATIS_TOKEN; without it the monthly index is the monthly mean of the Destatis daily index (same source, published from 2008)."
     },
     {
       "id": "de_toll_mileage_daily",
@@ -280,7 +286,18 @@
         "value_variable": "WERTAUS",
         "startyear": 2008
       },
-      "_verify": "value variable code for exports"
+      "_verify": "GENESIS value variable; Eurostat fallback key",
+      "fallback": {
+        "source": "sdmx",
+        "frequency": "M",
+        "params": {
+          "agency": "eurostat",
+          "flow": "ext_st_eu27_2020sitc",
+          "key": "M..TOTAL.WORLD.DE",
+          "start": "2008-01"
+        }
+      },
+      "optional": true
     },
     {
       "id": "world_trade_volume",
