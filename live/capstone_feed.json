@@ -1,9 +1,9 @@
 {
   "schema": "freight_nowcast/capstone_feed@1",
-  "generated_at": "2026-10-01T11:18:19+00:00",
+  "generated_at": "2026-10-01T11:35:19+00:00",
   "as_of": "2026-10-01",
   "data_mode": "live",
-  "data_updated_at": "2026-10-01T11:18:18+00:00",
+  "data_updated_at": "2026-10-01T11:35:19+00:00",
   "tier1": {
     "signal": "real_economy_momentum",
     "read_alongside": "yield_curve",
@@ -20,7 +20,7 @@
       "month": "2026-01",
       "kind": "trough",
       "status": "confirmed",
-      "value": -0.969,
+      "value": -1.008,
       "detected": "2026-06"
     },
     "evidence": {
@@ -28,9 +28,10 @@
       "de_port_calls->de_exports": "evidenced",
       "ea_port_calls->ea_manufacturing_production": "partial",
       "world_port_calls->world_trade_volume": "not evidenced",
-      "dry_bulk_freight->world_trade_volume": "partial"
+      "dry_bulk_freight->world_trade_volume": "partial",
+      "world_dry_bulk_calls->world_trade_volume": "partial"
     },
-    "evidenced_weight_share": 0.12,
+    "evidenced_weight_share": 0.11,
     "conviction": "low",
     "by_geography": {
       "DE": {
@@ -80,11 +81,12 @@
         "direction": "falling",
         "phase": "Contraction",
         "provisional": true,
-        "coverage": 1.0,
+        "coverage": 0.75,
         "turning_point": null,
         "evidence": {
           "world_port_calls->world_trade_volume": "not evidenced",
-          "dry_bulk_freight->world_trade_volume": "partial"
+          "dry_bulk_freight->world_trade_volume": "partial",
+          "world_dry_bulk_calls->world_trade_volume": "partial"
         },
         "evidenced_weight_share": 0.0,
         "conviction": "low"
@@ -352,27 +354,35 @@
       "indicator": "world_dry_bulk_calls",
       "target": "world_trade_volume",
       "transform": "yoy",
-      "n": 0,
-      "first": "",
-      "last": "",
-      "lead_profile": {},
-      "best_lead": null,
-      "best_corr": null,
-      "beta": null,
-      "beta_t": null,
-      "beta_p": null,
-      "r2": null,
-      "oos_n": 0,
-      "rmse_model": null,
-      "rmse_benchmark": null,
-      "rmse_ratio": null,
-      "dm_stat": null,
-      "dm_p": null,
-      "hit_rate": null,
-      "timing_advantage_days": null,
-      "verdict": "not run",
+      "n": 75,
+      "first": "2020-01",
+      "last": "2026-03",
+      "lead_profile": {
+        "-3": 0.182,
+        "-2": 0.253,
+        "-1": 0.408,
+        "0": 0.472,
+        "1": 0.455,
+        "2": 0.387,
+        "3": 0.311
+      },
+      "best_lead": 0,
+      "best_corr": 0.4717,
+      "beta": 0.8804,
+      "beta_t": 2.2434,
+      "beta_p": 0.0249,
+      "r2": 0.2225,
+      "oos_n": 39,
+      "rmse_model": 2.8965,
+      "rmse_benchmark": 1.7194,
+      "rmse_ratio": 1.6846,
+      "dm_stat": 3.5505,
+      "dm_p": 0.9998,
+      "hit_rate": 0.4359,
+      "timing_advantage_days": 45,
+      "verdict": "partial",
       "notes": [
-        "missing data for world_dry_bulk_calls"
+        "significant in sample but no reliable out-of-sample gain"
       ]
     }
   ],
@@ -386,7 +396,7 @@
       "last_observation": "2026-09-26",
       "extended_by": "de_toll_mileage_daily",
       "latest_month_coverage": 0.867,
-      "fetched_at": "2026-10-01T11:16:08+00:00"
+      "fetched_at": "2026-10-01T11:25:16+00:00"
     },
     "de_port_calls": {
       "label": "Port calls, Germany (IMF PortWatch, AIS)",
@@ -397,7 +407,7 @@
       "last_observation": "2026-09-25",
       "extended_by": null,
       "latest_month_coverage": 0.833,
-      "fetched_at": "2026-10-01T11:16:15+00:00"
+      "fetched_at": "2026-10-01T11:25:24+00:00"
     },
     "ea_port_calls": {
       "label": "Port calls, euro-area ports (IMF PortWatch, AIS)",
@@ -408,7 +418,7 @@
       "last_observation": "2026-09-25",
       "extended_by": null,
       "latest_month_coverage": 0.833,
-      "fetched_at": "2026-10-01T11:16:17+00:00"
+      "fetched_at": "2026-10-01T11:25:25+00:00"
     },
     "world_port_calls": {
       "label": "Port calls, world (IMF PortWatch, AIS)",
@@ -419,7 +429,7 @@
       "last_observation": "2026-09-25",
       "extended_by": null,
       "latest_month_coverage": 0.833,
-      "fetched_at": "2026-10-01T11:16:18+00:00"
+      "fetched_at": "2026-10-01T11:25:26+00:00"
     },
     "dry_bulk_freight": {
       "label": "Dry-bulk freight (Breakwave BDRY, BDI futures)",
@@ -430,7 +440,18 @@
       "last_observation": "2026-09-30",
       "extended_by": null,
       "latest_month_coverage": 1.0,
-      "fetched_at": "2026-10-01T11:16:19+00:00"
+      "fetched_at": "2026-10-01T11:25:27+00:00"
+    },
+    "world_dry_bulk_calls": {
+      "label": "Dry-bulk port calls, world (IMF PortWatch)",
+      "role": "indicator",
+      "mode": "sea",
+      "geography": "WORLD",
+      "source": "imf:portwatch",
+      "last_observation": "2026-03-31",
+      "extended_by": null,
+      "latest_month_coverage": 1.0,
+      "fetched_at": "2026-10-01T11:25:27+00:00"
     },
     "de_manufacturing_production": {
       "label": "Manufacturing production, Germany (sca)",
@@ -441,7 +462,7 @@
       "last_observation": "2026-07-01",
       "extended_by": null,
       "latest_month_coverage": 1.0,
-      "fetched_at": "2026-10-01T11:18:10+00:00"
+      "fetched_at": "2026-10-01T11:35:10+00:00"
     },
     "ea_manufacturing_production": {
       "label": "Manufacturing production, euro area (sca)",
@@ -452,7 +473,7 @@
       "last_observation": "2026-07-01",
       "extended_by": null,
       "latest_month_coverage": 1.0,
-      "fetched_at": "2026-10-01T11:18:10+00:00"
+      "fetched_at": "2026-10-01T11:35:11+00:00"
     },
     "de_exports": {
       "label": "Exports, Germany (foreign trade statistics)",
@@ -463,7 +484,7 @@
       "last_observation": "2026-06-01",
       "extended_by": null,
       "latest_month_coverage": 1.0,
-      "fetched_at": "2026-10-01T11:18:11+00:00"
+      "fetched_at": "2026-10-01T11:35:12+00:00"
     },
     "world_trade_volume": {
       "label": "World trade volume (CPB World Trade Monitor)",
@@ -474,11 +495,10 @@
       "last_observation": "2026-07-01",
       "extended_by": null,
       "latest_month_coverage": 1.0,
-      "fetched_at": "2026-10-01T11:18:13+00:00"
+      "fetched_at": "2026-10-01T11:35:14+00:00"
     }
   },
   "warnings": [
-    "world_dry_bulk_calls: optional, no data cached yet (skipped)",
     "de_ais_stationary: optional, no data cached yet (skipped)"
   ]
 }
