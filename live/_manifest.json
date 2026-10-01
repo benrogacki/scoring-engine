@@ -2,10 +2,10 @@
   "series": {
     "de_toll_mileage": {
       "source": "genesis",
-      "attempted_at": "2026-10-01T10:00:19+00:00",
+      "attempted_at": "2026-10-01T10:04:30+00:00",
       "optional": false,
       "status": "ok",
-      "fetched_at": "2026-10-01T10:00:19+00:00",
+      "fetched_at": "2026-10-01T10:04:30+00:00",
       "observations": 224,
       "first": "2008-01-01",
       "last": "2026-08-01",
@@ -20,10 +20,10 @@
     },
     "de_toll_mileage_daily": {
       "source": "destatis_daily",
-      "attempted_at": "2026-10-01T10:00:22+00:00",
+      "attempted_at": "2026-10-01T10:04:34+00:00",
       "optional": true,
       "status": "ok",
-      "fetched_at": "2026-10-01T10:00:22+00:00",
+      "fetched_at": "2026-10-01T10:04:34+00:00",
       "observations": 6844,
       "first": "2008-01-01",
       "last": "2026-09-26",
@@ -36,10 +36,10 @@
     },
     "de_port_calls": {
       "source": "portwatch",
-      "attempted_at": "2026-10-01T10:00:24+00:00",
+      "attempted_at": "2026-10-01T10:04:36+00:00",
       "optional": true,
       "status": "ok",
-      "fetched_at": "2026-10-01T10:00:24+00:00",
+      "fetched_at": "2026-10-01T10:04:36+00:00",
       "observations": 2825,
       "first": "2019-01-01",
       "last": "2026-09-25",
@@ -51,10 +51,10 @@
     },
     "ea_port_calls": {
       "source": "portwatch",
-      "attempted_at": "2026-10-01T10:00:25+00:00",
+      "attempted_at": "2026-10-01T10:04:37+00:00",
       "optional": true,
       "status": "ok",
-      "fetched_at": "2026-10-01T10:00:25+00:00",
+      "fetched_at": "2026-10-01T10:04:37+00:00",
       "observations": 2825,
       "first": "2019-01-01",
       "last": "2026-09-25",
@@ -66,10 +66,10 @@
     },
     "world_port_calls": {
       "source": "portwatch",
-      "attempted_at": "2026-10-01T10:00:25+00:00",
+      "attempted_at": "2026-10-01T10:04:37+00:00",
       "optional": true,
       "status": "ok",
-      "fetched_at": "2026-10-01T10:00:25+00:00",
+      "fetched_at": "2026-10-01T10:04:37+00:00",
       "observations": 2825,
       "first": "2019-01-01",
       "last": "2026-09-25",
@@ -81,7 +81,7 @@
     },
     "baltic_dry": {
       "source": "csv",
-      "attempted_at": "2026-10-01T10:00:25+00:00",
+      "attempted_at": "2026-10-01T10:04:37+00:00",
       "optional": true,
       "status": "failed",
       "error": "baltic_dry: file /home/runner/work/scoring-engine/scoring-engine/data/freight/raw/baltic_dry.csv not found (Baltic Exchange (licensed) or a market-data export with Date and Close/Price columns. For US-style dates add \"date_format\": \"%m/%d/%Y\".)",
@@ -91,7 +91,7 @@
     },
     "de_ais_stationary": {
       "source": "csv",
-      "attempted_at": "2026-10-01T10:00:25+00:00",
+      "attempted_at": "2026-10-01T10:04:37+00:00",
       "optional": true,
       "status": "failed",
       "error": "de_ais_stationary: file /home/runner/work/scoring-engine/scoring-engine/data/freight/ais_port_counts.csv not found (Written by `freight-nowcast ais-listen` (cron it daily). Enters the composite once it has 3 years of history.)",
@@ -101,10 +101,10 @@
     },
     "de_manufacturing_production": {
       "source": "sdmx",
-      "attempted_at": "2026-10-01T10:00:25+00:00",
+      "attempted_at": "2026-10-01T10:04:37+00:00",
       "optional": false,
       "status": "ok",
-      "fetched_at": "2026-10-01T10:00:25+00:00",
+      "fetched_at": "2026-10-01T10:04:37+00:00",
       "observations": 223,
       "first": "2008-01-01",
       "last": "2026-07-01",
@@ -115,10 +115,10 @@
     },
     "ea_manufacturing_production": {
       "source": "sdmx",
-      "attempted_at": "2026-10-01T10:00:26+00:00",
+      "attempted_at": "2026-10-01T10:04:38+00:00",
       "optional": false,
       "status": "ok",
-      "fetched_at": "2026-10-01T10:00:26+00:00",
+      "fetched_at": "2026-10-01T10:04:38+00:00",
       "observations": 223,
       "first": "2008-01-01",
       "last": "2026-07-01",
@@ -129,17 +129,17 @@
     },
     "de_exports": {
       "source": "genesis",
-      "attempted_at": "2026-10-01T10:00:26+00:00",
+      "attempted_at": "2026-10-01T10:04:38+00:00",
       "optional": true,
       "status": "failed",
-      "error": "GENESIS HTTP 401: b'{\"Code\":15,\"Content\":\"You are not allowed to call this service or the header of your request does not contain all the necessary information so that your access data cannot be recognised.\",\"Type\":\"ERROR\"}'; fallback failed too: SDMX HTTP 406 for https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/ext_st_eu27_2020sitc?format=JSON&lang=EN&geo=DE&partner=WORLD&sinceTimePeriod=2008-01: b'Not Acceptable' (check dimension names with a query that pins nothing but geo)",
+      "error": "GENESIS HTTP 401: b'{\"Code\":15,\"Content\":\"You are not allowed to call this service or the header of your request does not contain all the necessary information so that your access data cannot be recognised.\",\"Type\":\"ERROR\"}'; fallback failed too: HTTP 413 for https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/ext_st_eu27_2020sitc?format=JSON&lang=EN&geo=DE&partner=WORLD&sinceTimePeriod=2008-01: b'{ \"error\": [{\"status\": 413,\"id\": 413,\"label\": \"EXTRACTION_TOO_BIG: The requested extraction is too big, estimated 6593664 rows, max authorised is 5000000, please change your filters to reduce the extr' (check dimension names with a query that pins nothing but geo)",
       "last_good_fetch": null,
       "last": null,
       "observations": null
     },
     "world_trade_volume": {
       "source": "csv",
-      "attempted_at": "2026-10-01T10:00:28+00:00",
+      "attempted_at": "2026-10-01T10:04:40+00:00",
       "optional": true,
       "status": "failed",
       "error": "world_trade_volume: file /home/runner/work/scoring-engine/scoring-engine/data/freight/raw/cpb_world_trade_volume.csv not found (CPB World Trade Monitor (cpb.nl) -> world trade volume, seasonally adjusted -> save as date,value CSV.)",
@@ -148,6 +148,6 @@
       "observations": null
     }
   },
-  "updated_at": "2026-10-01T10:00:28+00:00",
+  "updated_at": "2026-10-01T10:04:40+00:00",
   "mode": "live"
 }
