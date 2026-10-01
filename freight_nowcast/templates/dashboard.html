@@ -46,7 +46,8 @@ h2 { font-size: 15px; margin: 0 0 10px; }
 .toc { display: flex; gap: 6px; flex-wrap: wrap; margin: 0 0 14px; }
 .toc a { color: var(--text-secondary); text-decoration: none; font-size: 12px; border: 1px solid var(--border); border-radius: 999px; padding: 3px 10px; background: var(--surface-1); }
 .toc a:hover { color: var(--text-primary); }
-#sources td:last-child { white-space: normal; min-width: 260px; color: var(--text-muted); font-size: 12px; }
+#sources td:first-child { white-space: normal; min-width: 220px; }
+#sources .src-note { color: var(--text-muted); font-size: 12px; margin-top: 2px; max-width: 46ch; }
 .card { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin-bottom: 16px; }
 .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin-bottom: 16px; }
 .tile { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
@@ -268,9 +269,10 @@ const SRC = {ok: ["b-good", "ok"], fallback: ["b-warn", "fallback"], stale: ["b-
              synthetic: ["b-na", "synthetic"], absent: ["b-na", "not in demo"]};
 const counts = D.sources.reduce((a, s) => (a[s.status] = (a[s.status] || 0) + 1, a), {});
 $("src-sub").textContent = Object.entries(counts).map(([k, n]) => `${n} ${SRC[k] ? SRC[k][1] : k}`).join(" · ");
-$("sources").innerHTML = "<tr><th>Series</th><th>Role</th><th>Status</th><th>Last observation</th><th>Fetched</th><th>Origin</th><th>Notes</th></tr>" +
+$("sources").innerHTML = "<tr><th>Series</th><th>Role</th><th>Status</th><th>Last observation</th><th>Fetched</th><th>Origin</th></tr>" +
   D.sources.map((s) => { const [cls, txt] = SRC[s.status] || ["b-na", s.status];
-    return `<tr><td>${esc(s.label)}${s.required ? "" : ' <span class="note">optional</span>'}</td><td>${esc(s.role)}</td><td><span class="badge ${cls}">${txt}</span></td><td>${esc(s.last || "–")}</td><td>${esc(s.fetched || "–")}</td><td>${esc(s.origin || "–")}</td><td>${esc(s.note)}</td></tr>`; }).join("");
+    const note = s.note ? `<div class="src-note">${esc(s.note)}</div>` : "";
+    return `<tr><td>${esc(s.label)}${s.required ? "" : ' <span class="note">optional</span>'}${note}</td><td>${esc(s.role)}</td><td><span class="badge ${cls}">${txt}</span></td><td>${esc(s.last || "–")}</td><td>${esc((s.fetched || "–").replace("T", " ").replace("+00:00", " UTC"))}</td><td>${esc(s.origin || "–")}</td></tr>`; }).join("");
 if (D.warnings.length) { $("warn-card").hidden = false; $("warnings").innerHTML = D.warnings.map((w) => `<li>${esc(w)}</li>`).join(""); }
 </script>
 </body>

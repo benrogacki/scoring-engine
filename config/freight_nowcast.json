@@ -310,7 +310,7 @@
           "port": "Hamburg"
         }
       },
-      "how_to_get": "Written by `freight-nowcast ais-listen` (cron it daily). Enters the composite once it has 3 years of history."
+      "how_to_get": "Written by `freight-nowcast ais-listen` (needs AISSTREAM_API_KEY; cron it daily). Enters the composite once it has 3 years of history."
     },
     {
       "id": "de_manufacturing_production",

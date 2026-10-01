@@ -32,11 +32,14 @@ def source_status(r: NowcastResult, cfg: Mapping[str, Any]) -> list:
             status = "ok" if sid in r.series_meta else "missing"
         note = ""
         if status == "fallback":
-            note = "Primary failed; using fallback " + (e.get("details") or {}).get("fallback_used", "")[:140]
+            primary = spec.get("source", "primary source")
+            note = f"{primary} unavailable, using the fallback source"
+            if "401" in (e.get("details") or {}).get("fallback_used", ""):
+                note = f"{primary} needs credentials (DESTATIS_TOKEN), using the fallback source"
         elif status in ("stale", "missing"):
-            note = (e.get("error") or "")[:220]
-            if spec.get("how_to_get"):
-                note += " | " + spec["how_to_get"]
+            note = spec.get("how_to_get") or (e.get("error") or "")[:160]
+            if status == "stale":
+                note = f"Last fetch failed; showing data fetched {e.get('last_good_fetch')}. " + note
         rows.append({"id": sid, "label": spec.get("label", sid), "role": spec.get("role"),
                      "geo": spec.get("geography", ""), "status": status,
                      "required": not spec.get("optional"),

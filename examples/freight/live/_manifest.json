@@ -2,10 +2,10 @@
   "series": {
     "de_toll_mileage": {
       "source": "genesis",
-      "attempted_at": "2026-10-01T10:17:05+00:00",
+      "attempted_at": "2026-10-01T12:02:56+00:00",
       "optional": false,
       "status": "ok",
-      "fetched_at": "2026-10-01T10:17:05+00:00",
+      "fetched_at": "2026-10-01T12:02:56+00:00",
       "observations": 224,
       "first": "2008-01-01",
       "last": "2026-08-01",
@@ -20,10 +20,10 @@
     },
     "de_toll_mileage_daily": {
       "source": "destatis_daily",
-      "attempted_at": "2026-10-01T10:17:09+00:00",
+      "attempted_at": "2026-10-01T12:03:01+00:00",
       "optional": true,
       "status": "ok",
-      "fetched_at": "2026-10-01T10:17:09+00:00",
+      "fetched_at": "2026-10-01T12:03:01+00:00",
       "observations": 6844,
       "first": "2008-01-01",
       "last": "2026-09-26",
@@ -36,62 +36,55 @@
     },
     "de_port_calls": {
       "source": "portwatch",
-      "attempted_at": "2026-10-01T10:17:12+00:00",
+      "attempted_at": "2026-10-01T12:03:03+00:00",
       "optional": true,
       "status": "ok",
-      "fetched_at": "2026-10-01T10:17:12+00:00",
+      "fetched_at": "2026-10-01T12:03:03+00:00",
       "observations": 2825,
       "first": "2019-01-01",
       "last": "2026-09-25",
       "origin": "imf:portwatch",
       "details": {
         "countries": "DEU",
-        "field": "portcalls"
+        "field": "portcalls",
+        "query": "full"
       }
     },
     "ea_port_calls": {
       "source": "portwatch",
-      "attempted_at": "2026-10-01T10:17:12+00:00",
+      "attempted_at": "2026-10-01T12:03:04+00:00",
       "optional": true,
       "status": "ok",
-      "fetched_at": "2026-10-01T10:17:12+00:00",
+      "fetched_at": "2026-10-01T12:03:04+00:00",
       "observations": 2825,
       "first": "2019-01-01",
       "last": "2026-09-25",
       "origin": "imf:portwatch",
       "details": {
         "countries": "AUT,BEL,HRV,CYP,EST,FIN,FRA,DEU,GRC,IRL,ITA,LVA,LTU,LUX,MLT,NLD,PRT,SVK,SVN,ESP",
-        "field": "portcalls"
+        "field": "portcalls",
+        "query": "full"
       }
     },
     "world_port_calls": {
       "source": "portwatch",
-      "attempted_at": "2026-10-01T10:17:13+00:00",
+      "attempted_at": "2026-10-01T12:03:04+00:00",
       "optional": true,
       "status": "ok",
-      "fetched_at": "2026-10-01T10:17:13+00:00",
+      "fetched_at": "2026-10-01T12:03:04+00:00",
       "observations": 2825,
       "first": "2019-01-01",
       "last": "2026-09-25",
       "origin": "imf:portwatch",
       "details": {
         "countries": "WORLD",
-        "field": "portcalls"
+        "field": "portcalls",
+        "query": "full"
       }
-    },
-    "baltic_dry": {
-      "source": "csv",
-      "attempted_at": "2026-10-01T10:17:13+00:00",
-      "optional": true,
-      "status": "failed",
-      "error": "baltic_dry: file /home/runner/work/scoring-engine/scoring-engine/data/freight/raw/baltic_dry.csv not found (Baltic Exchange (licensed) or a market-data export with Date and Close/Price columns. For US-style dates add \"date_format\": \"%m/%d/%Y\".)",
-      "last_good_fetch": null,
-      "last": null,
-      "observations": null
     },
     "de_ais_stationary": {
       "source": "csv",
-      "attempted_at": "2026-10-01T10:17:13+00:00",
+      "attempted_at": "2026-10-01T12:03:05+00:00",
       "optional": true,
       "status": "failed",
       "error": "de_ais_stationary: file /home/runner/work/scoring-engine/scoring-engine/data/freight/ais_port_counts.csv not found (Written by `freight-nowcast ais-listen` (cron it daily). Enters the composite once it has 3 years of history.)",
@@ -101,10 +94,10 @@
     },
     "de_manufacturing_production": {
       "source": "sdmx",
-      "attempted_at": "2026-10-01T10:17:13+00:00",
+      "attempted_at": "2026-10-01T12:03:05+00:00",
       "optional": false,
       "status": "ok",
-      "fetched_at": "2026-10-01T10:17:13+00:00",
+      "fetched_at": "2026-10-01T12:03:05+00:00",
       "observations": 223,
       "first": "2008-01-01",
       "last": "2026-07-01",
@@ -115,10 +108,10 @@
     },
     "ea_manufacturing_production": {
       "source": "sdmx",
-      "attempted_at": "2026-10-01T10:17:14+00:00",
+      "attempted_at": "2026-10-01T12:03:05+00:00",
       "optional": false,
       "status": "ok",
-      "fetched_at": "2026-10-01T10:17:14+00:00",
+      "fetched_at": "2026-10-01T12:03:05+00:00",
       "observations": 223,
       "first": "2008-01-01",
       "last": "2026-07-01",
@@ -129,10 +122,10 @@
     },
     "de_exports": {
       "source": "genesis",
-      "attempted_at": "2026-10-01T10:17:15+00:00",
+      "attempted_at": "2026-10-01T12:03:06+00:00",
       "optional": true,
       "status": "ok",
-      "fetched_at": "2026-10-01T10:17:15+00:00",
+      "fetched_at": "2026-10-01T12:03:06+00:00",
       "observations": 294,
       "first": "2002-01-01",
       "last": "2026-06-01",
@@ -143,16 +136,36 @@
       }
     },
     "world_trade_volume": {
-      "source": "csv",
-      "attempted_at": "2026-10-01T10:17:17+00:00",
+      "source": "cpb",
+      "attempted_at": "2026-10-01T12:03:08+00:00",
       "optional": true,
-      "status": "failed",
-      "error": "world_trade_volume: file /home/runner/work/scoring-engine/scoring-engine/data/freight/raw/cpb_world_trade_volume.csv not found (CPB World Trade Monitor (cpb.nl) -> world trade volume, seasonally adjusted -> save as date,value CSV.)",
-      "last_good_fetch": null,
-      "last": null,
-      "observations": null
+      "status": "ok",
+      "fetched_at": "2026-10-01T12:03:08+00:00",
+      "observations": 319,
+      "first": "2000-01-01",
+      "last": "2026-07-01",
+      "origin": "cpb:world-trade-monitor",
+      "details": {
+        "url": "https://www.cpb.nl/system/files/cpbmedia/CPB-world-trade-monitor-july-2026.xlsx",
+        "sheet": "trade_out",
+        "row": "World trade tgz_w1_qnmi_sn"
+      }
+    },
+    "dry_bulk_freight": {
+      "source": "yahoo_chart",
+      "attempted_at": "2026-10-01T12:03:04+00:00",
+      "optional": true,
+      "status": "ok",
+      "fetched_at": "2026-10-01T12:03:04+00:00",
+      "observations": 2143,
+      "first": "2018-03-22",
+      "last": "2026-09-30",
+      "origin": "yahoo:BDRY",
+      "details": {
+        "url": "https://query1.finance.yahoo.com/v8/finance/chart/BDRY?period1=946684800&period2=1790856184&interval=1d&includeAdjustedClose=true"
+      }
     }
   },
-  "updated_at": "2026-10-01T10:17:17+00:00",
+  "updated_at": "2026-10-01T12:03:11+00:00",
   "mode": "live"
 }
