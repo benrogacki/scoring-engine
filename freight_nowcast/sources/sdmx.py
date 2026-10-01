@@ -159,5 +159,28 @@ def fetch_eurostat_jsonstat(series_id: str, frequency: str, flow: str, dims: Map
         raise
     obs = parse_jsonstat(payload, flow)
     if not obs:
-        raise SourceError(f"{series_id}: no observations from {url}")
+        raise SourceError(f"{series_id}: no observations from {url}{_diagnose(flow, dims, _get)}")
     return Series(series_id, obs, frequency, "eurostat:jsonstat", {"url": url})
+
+
+def _diagnose(flow: str, dims: Mapping[str, str], get) -> str:
+    """Explain an empty Eurostat result: which pinned codes the dataset does not know."""
+    keep = {k: v for k, v in dims.items() if k == "geo"}
+    url = JSONSTAT_URL.format(flow=flow) + "?" + urllib.parse.urlencode(
+        [("format", "JSON"), ("lang", "EN")] + list(keep.items()) + [("lastTimePeriod", "1")])
+    try:
+        payload = get(url)
+        cats = {d: payload["dimension"][d]["category"] for d in payload.get("id", [])}
+    except (SourceError, KeyError, ValueError) as exc:
+        return f" (diagnosis failed: {exc})"
+    notes = []
+    for d, code in dims.items():
+        if d not in cats:
+            notes.append(f"{d}: not a dimension of {flow} (dimensions: {list(cats)})")
+            continue
+        codes = list(cats[d].get("index", {}))
+        if code not in codes:
+            labels = cats[d].get("label", {})
+            sample = [f"{c}={labels.get(c, '')[:40]}" for c in codes[:25]]
+            notes.append(f"{d}={code} unknown; codes: {sample}")
+    return " (" + "; ".join(notes) + ")" if notes else " (all pinned codes exist; that combination has no data)"
