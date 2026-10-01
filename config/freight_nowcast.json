@@ -292,41 +292,10 @@
           "source": "eurostat_jsonstat",
           "frequency": "M",
           "params": {
-            "flow": "ext_st_eu27_2020sitc",
+            "flow": "ei_eteu27_2020_m",
             "dims": {
               "geo": "DE",
-              "partner": "WORLD",
-              "sitc06": "TOTAL",
-              "stk_flow": "EXP",
-              "indic_et": "IVOL_SCA"
-            }
-          }
-        },
-        {
-          "source": "eurostat_jsonstat",
-          "frequency": "M",
-          "params": {
-            "flow": "ext_st_eu27_2020sitc",
-            "dims": {
-              "geo": "DE",
-              "partner": "WORLD",
-              "sitc06": "TOTAL",
-              "stk_flow": "EXP",
-              "indic_et": "TRD_VAL_SCA"
-            }
-          }
-        },
-        {
-          "source": "eurostat_jsonstat",
-          "frequency": "M",
-          "params": {
-            "flow": "ext_st_eu27_2020sitc",
-            "dims": {
-              "geo": "DE",
-              "partner": "WORLD",
-              "sitc06": "TOTAL",
-              "stk_flow": "EXP",
-              "indic_et": "TRD_VAL"
+              "stk_flow": "EXP"
             }
           }
         }
