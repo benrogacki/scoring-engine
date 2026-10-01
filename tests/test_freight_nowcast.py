@@ -137,6 +137,16 @@ class TurningPointTests(unittest.TestCase):
         self.assertIsNotNone(t)
         self.assertEqual((t.kind, t.month), ("peak", ms[25]))
 
+    def test_provisional_only_at_ragged_edge(self):
+        from freight_nowcast.composite import IndicatorSignal, _weighted
+        ms = months(10)
+        a = IndicatorSignal({"id": "a"}, {}, {}, {}, {m: 0.1 for m in ms})
+        b = IndicatorSignal({"id": "b"}, {}, {}, {}, {m: 0.2 for m in ms[4:8]})  # starts late, stops early
+        _, _, prov = _weighted([a, b], {"a": 1.0, "b": 1.0}, 0.5)
+        self.assertFalse(prov[ms[0]])   # b had not started: not provisional
+        self.assertFalse(prov[ms[5]])
+        self.assertTrue(prov[ms[9]])    # b not yet published
+
     def test_phase_clock(self):
         x = {(2026, 1): -1.0, (2026, 4): -0.5, (2026, 7): 0.5, (2026, 10): 0.2}
         self.assertEqual(phase(x, (2026, 4)), "Recovery")

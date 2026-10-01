@@ -60,7 +60,11 @@ def _weighted(signals: List[IndicatorSignal], weights: Mapping[str, float], min_
             continue
         comp[m] = sum(s.z[m] * wt for s, wt in got) / w
         cov[m] = w / total
-        prov[m] = cov[m] < 1.0 or any(s.coverage.get(m, 1.0) < 1.0 for s, _ in got)
+        # provisional = built on month-to-date data, or a member has history but has
+        # not published this month yet (ragged edge); a member whose history starts
+        # later does not make old months provisional
+        not_yet = any(m not in s.z and s.z and min(s.z) < m for s in signals)
+        prov[m] = not_yet or any(s.coverage.get(m, 1.0) < 1.0 for s, _ in got)
     return comp, cov, prov
 
 
@@ -92,7 +96,8 @@ def build_global(geos: Mapping[str, GeoComposite], min_coverage: float = 0.5,
             continue
         comp[m] = sum(g.composite[m] * g.weight for g in got) / w
         cov[m] = w / total
-        prov[m] = cov[m] < 1.0 or any(g.provisional.get(m) for g in got)
+        not_yet = any(m not in g.composite and g.composite and min(g.composite) < m for g in geos.values())
+        prov[m] = not_yet or any(g.provisional.get(m) for g in got)
     gc = GeoComposite("GLOBAL", "Composite", 1.0, comp, cov, prov, list(geos))
     gc.turning_points = turning_points(comp, tp_cfg)
     return gc

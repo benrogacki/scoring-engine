@@ -1,15 +1,17 @@
 {
   "schema": "freight_nowcast/capstone_feed@1",
-  "generated_at": "2026-10-01T09:37:53+00:00",
+  "generated_at": "2026-10-01T10:16:31+00:00",
   "as_of": "2026-09-30",
+  "data_mode": "synthetic",
+  "data_updated_at": null,
   "tier1": {
     "signal": "real_economy_momentum",
     "read_alongside": "yield_curve",
     "units": "z-score of freight momentum vs trailing history; 0 = normal pace",
     "label": "Composite",
-    "latest_month": "2026-08",
-    "composite_z": -0.53,
-    "change_3m": -0.381,
+    "latest_month": "2026-07",
+    "composite_z": -0.302,
+    "change_3m": -0.164,
     "direction": "falling",
     "phase": "Contraction",
     "provisional": false,
@@ -50,9 +52,9 @@
       },
       "EA": {
         "label": "Euro area",
-        "latest_month": "2026-08",
-        "composite_z": 0.332,
-        "change_3m": 0.229,
+        "latest_month": "2026-07",
+        "composite_z": 0.473,
+        "change_3m": 0.49,
         "direction": "rising",
         "phase": "Expansion",
         "provisional": false,
@@ -60,9 +62,9 @@
         "turning_point": {
           "month": "2026-03",
           "kind": "trough",
-          "status": "confirmed",
+          "status": "provisional",
           "value": -0.344,
-          "detected": "2026-08"
+          "detected": "2026-07"
         },
         "evidence": {
           "ea_port_calls->ea_manufacturing_production": "partial"
@@ -72,9 +74,9 @@
       },
       "WORLD": {
         "label": "World sea trade",
-        "latest_month": "2026-08",
-        "composite_z": -0.996,
-        "change_3m": -0.494,
+        "latest_month": "2026-07",
+        "composite_z": -0.902,
+        "change_3m": -0.691,
         "direction": "falling",
         "phase": "Contraction",
         "provisional": false,
@@ -210,9 +212,9 @@
       "first": "2013-01",
       "last": "2026-07",
       "lead_profile": {
-        "-3": 0.646,
-        "-2": 0.698,
-        "-1": 0.745,
+        "-3": 0.644,
+        "-2": 0.696,
+        "-1": 0.744,
         "0": 0.766,
         "1": 0.749,
         "2": 0.701,
@@ -231,7 +233,7 @@
       "dm_stat": -0.9557,
       "dm_p": 0.1696,
       "hit_rate": 0.6111,
-      "timing_advantage_days": 31,
+      "timing_advantage_days": 28,
       "verdict": "partial",
       "notes": [
         "significant in sample but no reliable out-of-sample gain"
@@ -245,7 +247,7 @@
       "first": "2013-01",
       "last": "2026-07",
       "lead_profile": {
-        "-3": 0.534,
+        "-3": 0.533,
         "-2": 0.6,
         "-1": 0.66,
         "0": 0.697,
@@ -266,7 +268,7 @@
       "dm_stat": 0.0452,
       "dm_p": 0.518,
       "hit_rate": 0.6508,
-      "timing_advantage_days": 38,
+      "timing_advantage_days": 35,
       "verdict": "partial",
       "notes": [
         "significant in sample but no reliable out-of-sample gain"
@@ -280,9 +282,9 @@
       "first": "2013-01",
       "last": "2026-07",
       "lead_profile": {
-        "-3": 0.678,
-        "-2": 0.761,
-        "-1": 0.818,
+        "-3": 0.673,
+        "-2": 0.757,
+        "-1": 0.814,
         "0": 0.847,
         "1": 0.824,
         "2": 0.773,
@@ -301,7 +303,7 @@
       "dm_stat": -0.8879,
       "dm_p": 0.1873,
       "hit_rate": 0.5556,
-      "timing_advantage_days": 48,
+      "timing_advantage_days": 45,
       "verdict": "partial",
       "notes": [
         "significant in sample but no reliable out-of-sample gain"
@@ -356,37 +358,41 @@
       "source": "genesis",
       "last_observation": "2026-09-30",
       "extended_by": "de_toll_mileage_daily",
-      "latest_month_coverage": 1.0
+      "latest_month_coverage": 1.0,
+      "fetched_at": null
     },
     "de_port_calls": {
-      "label": "Port calls, Germany (OECD AIS)",
+      "label": "Port calls, Germany (IMF PortWatch, AIS)",
       "role": "indicator",
       "mode": "sea",
       "geography": "DE",
-      "source": "csv",
+      "source": "portwatch",
       "last_observation": "2026-08-01",
       "extended_by": null,
-      "latest_month_coverage": 1.0
+      "latest_month_coverage": 1.0,
+      "fetched_at": null
     },
     "ea_port_calls": {
-      "label": "Port calls, euro-area ports (OECD AIS)",
+      "label": "Port calls, euro-area ports (IMF PortWatch, AIS)",
       "role": "indicator",
       "mode": "sea",
       "geography": "EA",
-      "source": "csv",
+      "source": "portwatch",
       "last_observation": "2026-08-01",
       "extended_by": null,
-      "latest_month_coverage": 1.0
+      "latest_month_coverage": 1.0,
+      "fetched_at": null
     },
     "world_port_calls": {
-      "label": "Port calls, world (OECD AIS)",
+      "label": "Port calls, world (IMF PortWatch, AIS)",
       "role": "indicator",
       "mode": "sea",
       "geography": "WORLD",
-      "source": "csv",
+      "source": "portwatch",
       "last_observation": "2026-08-01",
       "extended_by": null,
-      "latest_month_coverage": 1.0
+      "latest_month_coverage": 1.0,
+      "fetched_at": null
     },
     "baltic_dry": {
       "label": "Baltic Dry Index",
@@ -396,7 +402,8 @@
       "source": "csv",
       "last_observation": "2026-09-30",
       "extended_by": null,
-      "latest_month_coverage": 1.0
+      "latest_month_coverage": 1.0,
+      "fetched_at": null
     },
     "de_manufacturing_production": {
       "label": "Manufacturing production, Germany (sca)",
@@ -406,7 +413,8 @@
       "source": "sdmx",
       "last_observation": "2026-07-01",
       "extended_by": null,
-      "latest_month_coverage": 1.0
+      "latest_month_coverage": 1.0,
+      "fetched_at": null
     },
     "ea_manufacturing_production": {
       "label": "Manufacturing production, euro area (sca)",
@@ -416,7 +424,8 @@
       "source": "sdmx",
       "last_observation": "2026-07-01",
       "extended_by": null,
-      "latest_month_coverage": 1.0
+      "latest_month_coverage": 1.0,
+      "fetched_at": null
     },
     "de_exports": {
       "label": "Exports, Germany (foreign trade statistics)",
@@ -426,7 +435,8 @@
       "source": "genesis",
       "last_observation": "2026-07-01",
       "extended_by": null,
-      "latest_month_coverage": 1.0
+      "latest_month_coverage": 1.0,
+      "fetched_at": null
     },
     "world_trade_volume": {
       "label": "World trade volume (CPB World Trade Monitor)",
@@ -436,7 +446,8 @@
       "source": "csv",
       "last_observation": "2026-07-01",
       "extended_by": null,
-      "latest_month_coverage": 1.0
+      "latest_month_coverage": 1.0,
+      "fetched_at": null
     }
   },
   "warnings": [

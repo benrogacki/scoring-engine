@@ -40,9 +40,9 @@
     "first": "2013-01",
     "last": "2026-07",
     "lead_profile": {
-      "-3": 0.646,
-      "-2": 0.698,
-      "-1": 0.745,
+      "-3": 0.644,
+      "-2": 0.696,
+      "-1": 0.744,
       "0": 0.766,
       "1": 0.749,
       "2": 0.701,
@@ -61,7 +61,7 @@
     "dm_stat": -0.9557,
     "dm_p": 0.1696,
     "hit_rate": 0.6111,
-    "timing_advantage_days": 31,
+    "timing_advantage_days": 28,
     "verdict": "partial",
     "notes": [
       "significant in sample but no reliable out-of-sample gain"
@@ -75,7 +75,7 @@
     "first": "2013-01",
     "last": "2026-07",
     "lead_profile": {
-      "-3": 0.534,
+      "-3": 0.533,
       "-2": 0.6,
       "-1": 0.66,
       "0": 0.697,
@@ -96,7 +96,7 @@
     "dm_stat": 0.0452,
     "dm_p": 0.518,
     "hit_rate": 0.6508,
-    "timing_advantage_days": 38,
+    "timing_advantage_days": 35,
     "verdict": "partial",
     "notes": [
       "significant in sample but no reliable out-of-sample gain"
@@ -110,9 +110,9 @@
     "first": "2013-01",
     "last": "2026-07",
     "lead_profile": {
-      "-3": 0.678,
-      "-2": 0.761,
-      "-1": 0.818,
+      "-3": 0.673,
+      "-2": 0.757,
+      "-1": 0.814,
       "0": 0.847,
       "1": 0.824,
       "2": 0.773,
@@ -131,7 +131,7 @@
     "dm_stat": -0.8879,
     "dm_p": 0.1873,
     "hit_rate": 0.5556,
-    "timing_advantage_days": 48,
+    "timing_advantage_days": 45,
     "verdict": "partial",
     "notes": [
       "significant in sample but no reliable out-of-sample gain"

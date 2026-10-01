@@ -55,7 +55,7 @@ EA,2024-02,trough,confirmed,-1.632,2024-07
 EA,2024-12,cross_up,event,0.205,2024-12
 EA,2025-03,peak,confirmed,1.441,2025-08
 EA,2025-12,cross_down,event,-0.206,2025-12
-EA,2026-03,trough,confirmed,-0.344,2026-08
+EA,2026-03,trough,provisional,-0.344,2026-07
 EA,2026-05,cross_up,event,0.103,2026-05
 WORLD,2015-05,trough,confirmed,-1.484,2015-10
 WORLD,2016-03,cross_up,event,0.193,2016-03
