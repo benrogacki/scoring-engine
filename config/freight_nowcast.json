@@ -205,6 +205,57 @@
       "_note": "OECD AIS dashboard export; enable this and disable world_port_calls to use the OECD series instead of IMF PortWatch"
     },
     {
+      "id": "dry_bulk_freight",
+      "label": "Dry-bulk freight (Breakwave BDRY, BDI futures)",
+      "role": "indicator",
+      "mode": "sea",
+      "geography": "WORLD",
+      "frequency": "D",
+      "transform": "yoy",
+      "weight": 0.5,
+      "optional": true,
+      "publication_lag_days": 1,
+      "source": "yahoo_chart",
+      "params": {
+        "symbol": "BDRY"
+      },
+      "fallback": [
+        {
+          "source": "csv_url",
+          "frequency": "D",
+          "params": {
+            "url": "https://stooq.com/q/d/l/?s=bdry.us&i=d",
+            "value_col": "Close"
+          }
+        },
+        {
+          "source": "fred",
+          "frequency": "M",
+          "params": {
+            "fred_id": "PCU483111483111"
+          }
+        }
+      ],
+      "_note": "Free stand-in for the licensed Baltic Dry: the BDRY ETF holds the dry-bulk freight futures (Capesize/Panamax/Supramax) that settle on Baltic indices. Fallbacks: Stooq CSV, then the US deep-sea freight PPI (FRED)."
+    },
+    {
+      "id": "world_dry_bulk_calls",
+      "label": "Dry-bulk port calls, world (IMF PortWatch)",
+      "role": "indicator",
+      "mode": "sea",
+      "geography": "WORLD",
+      "frequency": "D",
+      "transform": "yoy",
+      "weight": 0.5,
+      "optional": true,
+      "publication_lag_days": 10,
+      "source": "portwatch",
+      "params": {
+        "field": "portcalls_dry_bulk",
+        "start_year": 2019
+      }
+    },
+    {
       "id": "baltic_dry",
       "label": "Baltic Dry Index",
       "role": "indicator",
@@ -219,7 +270,9 @@
       "params": {
         "path": "data/freight/raw/baltic_dry.csv"
       },
-      "how_to_get": "Baltic Exchange (licensed) or a market-data export with Date and Close/Price columns. For US-style dates add \"date_format\": \"%m/%d/%Y\"."
+      "how_to_get": "Baltic Exchange (licensed) or a market-data export with Date and Close/Price columns. For US-style dates add \"date_format\": \"%m/%d/%Y\".",
+      "enabled": false,
+      "_note": "Licensed Baltic Exchange BDI export; enable instead of dry_bulk_freight if you have it."
     },
     {
       "id": "de_ais_stationary",
@@ -326,11 +379,25 @@
       "frequency": "M",
       "publication_lag_days": 55,
       "optional": true,
-      "source": "csv",
-      "params": {
-        "path": "data/freight/raw/cpb_world_trade_volume.csv"
-      },
-      "how_to_get": "CPB World Trade Monitor (cpb.nl) -> world trade volume, seasonally adjusted -> save as date,value CSV."
+      "source": "cpb",
+      "params": {},
+      "fallback": [
+        {
+          "source": "eurostat_jsonstat",
+          "frequency": "M",
+          "params": {
+            "flow": "ei_eteu27_2020_m",
+            "dims": {
+              "geo": "EU27_2020",
+              "stk_flow": "EXP",
+              "partner": "EXT_EU27_2020",
+              "indic": "ET-T",
+              "unit": "IVOL-SA"
+            }
+          }
+        }
+      ],
+      "_note": "CPB publishes the monitor as a free xlsx; the connector follows the newest link. Fallback: Eurostat extra-EU export volume (sa)."
     }
   ],
   "validation": [
@@ -359,10 +426,16 @@
       "max_lag": 3
     },
     {
-      "indicator": "baltic_dry",
+      "indicator": "dry_bulk_freight",
       "target": "world_trade_volume",
       "transform": "yoy",
       "max_lag": 6
+    },
+    {
+      "indicator": "world_dry_bulk_calls",
+      "target": "world_trade_volume",
+      "transform": "yoy",
+      "max_lag": 3
     }
   ],
   "ais": {

@@ -302,7 +302,7 @@ class PipelineTests(unittest.TestCase):
             self.assertTrue(feed["tier1"]["by_geography"]["DE"]["provisional"])  # month-to-date daily toll
             verdicts = {f"{v['indicator']}->{v['target']}": v["verdict"] for v in feed["validation"]}
             self.assertEqual(verdicts["de_toll_mileage->de_manufacturing_production"], "evidenced")
-            self.assertEqual(verdicts["baltic_dry->world_trade_volume"], "not evidenced")
+            self.assertNotEqual(verdicts["dry_bulk_freight->world_trade_volume"], "evidenced")
             self.assertTrue(any("SYNTHETIC" in w for w in feed["warnings"]))
             html = (tmp / "out" / "dashboard.html").read_text()
             self.assertNotIn("/*__DATA__*/null", html)
@@ -443,6 +443,34 @@ class LiveSourceTests(unittest.TestCase):
         payload["dimension"]["geo"]["category"]["index"] = {"DE": 0, "FR": 1}
         with self.assertRaisesRegex(SourceError, "geo"):
             sdmx.parse_jsonstat(payload)
+
+    def test_yahoo_chart(self):
+        from freight_nowcast.sources import market
+        payload = {"chart": {"result": [{"timestamp": [1790812800, 1790899200],
+                   "indicators": {"quote": [{"close": [10.5, None]}], "adjclose": [{"adjclose": [10.4, 10.6]}]}}],
+                   "error": None}}
+        s = market.fetch_yahoo("bdry", getter=lambda u: json.dumps(payload).encode())
+        self.assertEqual([v for _, v in s.observations], [10.4, 10.6])
+        with self.assertRaises(SourceError):
+            market.parse_yahoo({"chart": {"error": {"description": "No data found"}}}, "X")
+
+    def test_fred_csv(self):
+        from freight_nowcast.sources import market
+        text = "observation_date,PCU483111483111\n2026-06-01,180.2\n2026-07-01,.\n2026-08-01,182.0\n"
+        s = market.fetch_fred("ppi", fred_id="PCU483111483111", getter=lambda u: text.encode())
+        self.assertEqual(s.observations, [(date(2026, 6, 1), 180.2), (date(2026, 8, 1), 182.0)])
+
+    def test_cpb_rows(self):
+        from freight_nowcast.sources import cpb
+        months_hdr = [f"2024m{m:02d}" for m in range(1, 13)] + [f"2025m{m:02d}" for m in range(1, 13)]
+        rows = [["CPB World Trade Monitor"], [None, None] + months_hdr,
+                ["World trade", "prices", *[100.0] * 24],
+                ["World trade", "volume, 2021=100", *[101.0 + i for i in range(24)]]]
+        obs, label = cpb.parse_rows(rows, ("world", "trade"), ("price",))
+        self.assertEqual(obs[0], (date(2024, 1, 1), 101.0))
+        self.assertIn("volume", label)
+        with self.assertRaisesRegex(SourceError, "labels"):
+            cpb.parse_rows(rows, ("industrial",))
 
     def test_failed_fetch_keeps_last_good_copy(self):
         from freight_nowcast.live import fetch_all, required_failures

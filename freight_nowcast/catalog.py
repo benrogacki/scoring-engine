@@ -10,7 +10,8 @@ DEFAULT_CATALOG_PATH = Path(__file__).resolve().parent.parent / "config" / "frei
 TRANSFORMS = {"mom", "yoy", "3m3m", "diff", "level"}
 FREQUENCIES = {"D", "W", "M"}
 ROLES = {"indicator", "target"}
-SOURCES = {"genesis", "destatis_daily", "portwatch", "sdmx", "eurostat_jsonstat", "csv"}
+SOURCES = {"genesis", "destatis_daily", "portwatch", "sdmx", "eurostat_jsonstat", "csv",
+           "yahoo_chart", "fred", "csv_url", "cpb"}
 
 
 class CatalogError(ValueError):

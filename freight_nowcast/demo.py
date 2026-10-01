@@ -69,6 +69,7 @@ def generate(as_of: date, seed: int = 11, start: Tuple[int, int] = (2012, 1)) ->
         "ea_manufacturing_production": mk("ea_manufacturing_production", 0.05, 0.8, 0.7),
         "world_port_calls": mk("world_port_calls", 0.15, 0.6, 0.9),
         "world_trade_volume": mk("world_trade_volume", 0.2, 0.7, 0.8),
+        "world_dry_bulk_calls": mk("world_dry_bulk_calls", 0.1, 0.5, 1.4),
     }
     # the US-style partial last month is dropped from the monthly series: those
     # are "not yet published"; the daily toll series carries the ragged edge
@@ -96,7 +97,7 @@ def generate(as_of: date, seed: int = 11, start: Tuple[int, int] = (2012, 1)) ->
     for sid in ("de_manufacturing_production", "ea_manufacturing_production", "de_exports", "world_trade_volume"):
         s = out[sid]
         out[sid] = Series(sid, s.observations[:-1], "M", "synthetic")
-    # Baltic Dry: working-daily, volatile, loosely tied to the world cycle
+    # dry-bulk freight (Baltic Dry stand-in): working-daily, volatile, loosely tied to the world cycle
     bdi, lvl = [], 1500.0
     d = date(2012, 1, 2)
     month_idx = {mo: i for i, mo in enumerate(months)}
@@ -107,7 +108,7 @@ def generate(as_of: date, seed: int = 11, start: Tuple[int, int] = (2012, 1)) ->
             lvl = min(max(lvl, 300.0), 6000.0)
             bdi.append((d, round(lvl)))
         d += timedelta(days=1)
-    out["baltic_dry"] = Series("baltic_dry", bdi, "D", "synthetic")
+    out["dry_bulk_freight"] = Series("dry_bulk_freight", bdi, "D", "synthetic")
     return out
 
 

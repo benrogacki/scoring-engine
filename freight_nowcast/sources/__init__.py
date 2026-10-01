@@ -122,7 +122,7 @@ def read_csv_series(series_id: str, text: str, frequency: str = "M", date_col: O
                 return lower[c]
         raise SourceError(f"{series_id}: cannot tell which column is the {what}; set it in the catalog ({cols})")
 
-    dcol = pick(date_col, ["date", "time_period", "period", "time", "datum", "day", "month", "week"], "date")
+    dcol = pick(date_col, ["date", "observation_date", "time_period", "period", "time", "datum", "day", "month", "week"], "date")
     vcol = pick(value_col, ["value", "obs_value", "close", "price", "index", "wert", "count", "port_calls"], "value")
     obs: List[Tuple[date, float]] = []
     for r in rows:
@@ -210,6 +210,13 @@ def _fetch_one(spec: Mapping[str, Any], base_dir: Path) -> Series:
     if kind == "portwatch":
         from . import portwatch
         return portwatch.fetch(sid, freq, **params)
+    if kind in ("yahoo_chart", "fred", "csv_url"):
+        from . import market
+        fn = {"yahoo_chart": market.fetch_yahoo, "fred": market.fetch_fred, "csv_url": market.fetch_csv_url}[kind]
+        return fn(sid, freq, **params)
+    if kind == "cpb":
+        from . import cpb
+        return cpb.fetch(sid, freq, **params)
     if kind == "eurostat_jsonstat":
         from . import sdmx
         return sdmx.fetch_eurostat_jsonstat(sid, freq, **params)
