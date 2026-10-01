@@ -1,6 +1,6 @@
 # Freight nowcast — as of 2026-10-01
 
-Live data, fetched 2026-10-01T11:50:41+00:00.
+Live data, fetched 2026-10-01T12:01:57+00:00.
 
 **Composite real-economy momentum: +0.15 z** in 2026-09 (provisional: month-to-date or incomplete coverage), falling over 3 months → **Slowdown** (conviction: low).
 
@@ -25,7 +25,7 @@ Live data, fetched 2026-10-01T11:50:41+00:00.
 | Port calls, euro-area ports (IMF PortWatch, AIS) | EA | sea | 2026-09-25 | -0.64 % (yoy) | +0.09 |
 | Port calls, world (IMF PortWatch, AIS) | WORLD | sea | 2026-09-25 | -6.42 % (yoy) | -1.89 |
 | Dry-bulk freight (Breakwave BDRY, BDI futures) | WORLD | sea | 2026-09-30 | +93.56 % (yoy) | +0.76 |
-| Dry-bulk port calls, world (IMF PortWatch) | WORLD | sea | 2026-03-31 | -4.13 % (yoy) | -1.29 |
+| Dry-bulk port calls, major bulk traders (IMF PortWatch) | WORLD | sea | 2026-03-31 | -4.13 % (yoy) | -1.29 |
 
 ## Evidence: does each signal track what it claims to lead?
 
@@ -72,16 +72,16 @@ Phase **Slowdown**, conviction low; cyclicals minus defensives -0.43.
 
 | Series | Role | Last observation | Fetched | Origin |
 |---|---|---|---|---|
-| Truck toll mileage index (sa) | indicator | 2026-09-26 | 2026-10-01T11:48:29+00:00 | destatis:daily-toll-xlsx |
-| Port calls, Germany (IMF PortWatch, AIS) | indicator | 2026-09-25 | 2026-10-01T11:48:36+00:00 | imf:portwatch |
-| Port calls, euro-area ports (IMF PortWatch, AIS) | indicator | 2026-09-25 | 2026-10-01T11:48:37+00:00 | imf:portwatch |
-| Port calls, world (IMF PortWatch, AIS) | indicator | 2026-09-25 | 2026-10-01T11:48:38+00:00 | imf:portwatch |
-| Dry-bulk freight (Breakwave BDRY, BDI futures) | indicator | 2026-09-30 | 2026-10-01T11:48:40+00:00 | yahoo:BDRY |
-| Dry-bulk port calls, world (IMF PortWatch) | indicator | 2026-03-31 | 2026-10-01T11:25:27+00:00 | portwatch |
-| Manufacturing production, Germany (sca) | target | 2026-07-01 | 2026-10-01T11:50:32+00:00 | sdmx:eurostat |
-| Manufacturing production, euro area (sca) | target | 2026-07-01 | 2026-10-01T11:50:33+00:00 | sdmx:eurostat |
-| Exports, Germany (foreign trade statistics) | target | 2026-06-01 | 2026-10-01T11:50:33+00:00 | eurostat:jsonstat |
-| World trade volume (CPB World Trade Monitor) | target | 2026-07-01 | 2026-10-01T11:50:36+00:00 | cpb:world-trade-monitor |
+| Truck toll mileage index (sa) | indicator | 2026-09-26 | 2026-10-01T11:57:06+00:00 | destatis:daily-toll-xlsx |
+| Port calls, Germany (IMF PortWatch, AIS) | indicator | 2026-09-25 | 2026-10-01T11:57:12+00:00 | imf:portwatch |
+| Port calls, euro-area ports (IMF PortWatch, AIS) | indicator | 2026-09-25 | 2026-10-01T11:57:12+00:00 | imf:portwatch |
+| Port calls, world (IMF PortWatch, AIS) | indicator | 2026-09-25 | 2026-10-01T11:57:13+00:00 | imf:portwatch |
+| Dry-bulk freight (Breakwave BDRY, BDI futures) | indicator | 2026-09-30 | 2026-10-01T11:57:15+00:00 | yahoo:BDRY |
+| Dry-bulk port calls, major bulk traders (IMF PortWatch) | indicator | 2026-03-31 | 2026-10-01T11:25:27+00:00 | portwatch |
+| Manufacturing production, Germany (sca) | target | 2026-07-01 | 2026-10-01T12:01:52+00:00 | sdmx:eurostat |
+| Manufacturing production, euro area (sca) | target | 2026-07-01 | 2026-10-01T12:01:52+00:00 | sdmx:eurostat |
+| Exports, Germany (foreign trade statistics) | target | 2026-06-01 | 2026-10-01T12:01:52+00:00 | eurostat:jsonstat |
+| World trade volume (CPB World Trade Monitor) | target | 2026-07-01 | 2026-10-01T12:01:54+00:00 | cpb:world-trade-monitor |
 
 ## Data warnings
 
