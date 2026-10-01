@@ -252,7 +252,9 @@
       "source": "portwatch",
       "params": {
         "field": "portcalls_dry_bulk",
-        "start_year": 2019
+        "start_year": 2019,
+        "variant": "by_date",
+        "chunk": "month"
       }
     },
     {

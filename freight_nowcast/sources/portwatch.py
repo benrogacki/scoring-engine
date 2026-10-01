@@ -86,11 +86,14 @@ def _field_hint(layer_url: str, field: str, getter) -> str:
 
 def fetch(series_id: str, frequency: str = "D", countries: Optional[Sequence[str]] = None,
           field: str = "portcalls", start_year: int = 2019, end_year: Optional[int] = None,
-          layer_url: str = LAYER_URL, getter: Optional[Callable[[str], bytes]] = None) -> Series:
+          layer_url: str = LAYER_URL, getter: Optional[Callable[[str], bytes]] = None,
+          variant: str = "full", chunk: str = "year") -> Series:
+    """``variant``/``chunk`` pin the query form for heavy aggregates (world totals of a
+    per-vessel-type field time out as one-year sums; ``by_date`` + ``month`` works)."""
     getter = getter or get
     end_year = end_year or datetime.now(timezone.utc).year
     obs: Dict[date, float] = {}
-    variant = {"v": VARIANTS[0]}
+    variant = {"v": variant}
 
     def query(y: int, m: Optional[int] = None) -> Dict[date, float]:
         last_exc: Optional[SourceError] = None
@@ -113,17 +116,24 @@ def fetch(series_id: str, frequency: str = "D", countries: Optional[Sequence[str
 
     for y in range(start_year, end_year + 1):
         try:
+            if chunk == "month":
+                raise SourceError("monthly chunks requested")
             obs.update(query(y))
         except SourceError:
             # heavy aggregates (e.g. world totals of a per-vessel-type field) can time
             # out server-side as one year; ask month by month instead
             for m in range(1, 13):
+                if y == end_year and m > datetime.now(timezone.utc).month:
+                    break
                 try:
                     obs.update(query(y, m))
                 except SourceError as exc:
-                    if y == end_year:
-                        break  # months not published yet
-                    raise SourceError(f"{exc}{_field_hint(layer_url, field, getter)}") from exc
+                    try:
+                        obs.update(query(y, m))  # one retry: these are usually server timeouts
+                    except SourceError:
+                        if y == end_year:
+                            continue  # recent months can lag; keep what we have
+                        raise SourceError(f"{exc}{_field_hint(layer_url, field, getter)}") from exc
     if not obs:
         raise SourceError(f"{series_id}: PortWatch returned no rows for {countries or 'world'}")
     days = sorted(obs)
