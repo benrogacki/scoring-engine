@@ -64,7 +64,9 @@ def turning_rows(r: NowcastResult) -> List[Dict[str, Any]]:
 
 def summary_markdown(r: NowcastResult, feed: Mapping[str, Any]) -> str:
     t1 = feed["tier1"]
-    lines = [f"# Freight nowcast — as of {r.as_of.isoformat()}", ""]
+    mode = ("**Synthetic demo data — not real statistics.**" if r.data_mode == "synthetic"
+            else f"Live data, fetched {r.manifest.get('updated_at') or 'n/a'}.")
+    lines = [f"# Freight nowcast — as of {r.as_of.isoformat()}", "", mode, ""]
     if not t1.get("latest_month"):
         return "\n".join(lines + ["No composite could be built."])
     prov = " (provisional: month-to-date or incomplete coverage)" if t1["provisional"] else ""
@@ -124,6 +126,10 @@ def summary_markdown(r: NowcastResult, feed: Mapping[str, Any]) -> str:
         lines += [f"| {k.replace('_', ' ')} | {v:+.2f} |" for k, v in
                   sorted(t2["tilt"]["sectors"].items(), key=lambda kv: -kv[1])]
         lines.append("")
+    lines += ["## Data", "", "| Series | Role | Last observation | Fetched | Origin |", "|---|---|---|---|---|"]
+    for sid, m in r.series_meta.items():
+        lines.append(f"| {m['label']} | {m['role']} | {m['last_observation']} | {m.get('fetched_at') or '–'} | {m['source']} |")
+    lines.append("")
     if r.warnings:
         lines += ["## Data warnings", ""] + [f"- {w}" for w in r.warnings] + [""]
     return "\n".join(lines)

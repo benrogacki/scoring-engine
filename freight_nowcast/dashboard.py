@@ -19,7 +19,11 @@ def payload(r: NowcastResult, cfg: Mapping[str, Any]) -> Dict[str, Any]:
     feed = build_feed(r, cfg)
     return {
         "as_of": r.as_of.isoformat(),
-        "synthetic": any("SYNTHETIC" in w for w in r.warnings),
+        "synthetic": r.data_mode == "synthetic",
+        "data_updated_at": r.manifest.get("updated_at"),
+        "vintages": [{"id": sid, "label": m["label"], "role": m["role"], "last": m["last_observation"],
+                      "fetched": m.get("fetched_at"), "origin": m["source"]}
+                     for sid, m in r.series_meta.items()],
         "composite": line(r.composite.composite, r.composite.provisional),
         "phases": {month_str(m): p for m, p in r.phases.items()},
         "turns": [t.as_row() for t in r.composite.turning_points if t.kind in ("peak", "trough")],

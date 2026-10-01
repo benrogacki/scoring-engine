@@ -1,0 +1,96 @@
+# Live freight nowcast: fetch real data from the publishers, run, publish.
+#
+# - Weekdays after the morning releases (Destatis toll index, PortWatch Tuesdays).
+# - On demand (Actions -> Freight nowcast -> Run workflow).
+# - On pushes that change the nowcaster, as a live smoke test of every source.
+#
+# Secrets (optional): DESTATIS_TOKEN — a free GENESIS-Online token. Without it
+# the GENESIS guest login is used, which is rate-limited.
+name: Freight nowcast
+
+on:
+  schedule:
+    - cron: "41 9 * * 1-5"
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: "Commit outputs to the freight-live branch"
+        type: boolean
+        default: true
+  push:
+    paths:
+      - "freight_nowcast/**"
+      - "config/freight_nowcast.json"
+      - ".github/workflows/freight-nowcast.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: freight-nowcast-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      DESTATIS_TOKEN: ${{ secrets.DESTATIS_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Unit tests
+        run: python -m unittest discover -s tests
+
+      - name: Restore live cache (keeps the last good copy of each series)
+        uses: actions/cache@v4
+        with:
+          path: data/freight
+          key: freight-cache-${{ github.run_id }}
+          restore-keys: freight-cache-
+
+      - name: Probe every source
+        run: python -m freight_nowcast probe | tee probe.log
+        continue-on-error: true
+
+      - name: Fetch and run on live data
+        run: python -m freight_nowcast live --out out/freight/live
+
+      - name: Job summary
+        if: always()
+        run: |
+          if [ -f out/freight/live/nowcast_summary.md ]; then cat out/freight/live/nowcast_summary.md >> "$GITHUB_STEP_SUMMARY"; fi
+          { echo; echo '<details><summary>Source probe</summary>'; echo; echo '```'; cat probe.log 2>/dev/null; echo '```'; echo '</details>'; } >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: freight-nowcast-live
+          path: |
+            out/freight/live
+            data/freight/live
+            probe.log
+          if-no-files-found: warn
+
+      - name: Publish to the freight-live branch
+        if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.publish)
+        run: |
+          git config user.name "freight-nowcast bot"
+          git config user.email "freight-nowcast@users.noreply.github.com"
+          git fetch origin freight-live || true
+          if git rev-parse --verify origin/freight-live >/dev/null 2>&1; then
+            git worktree add publish origin/freight-live
+          else
+            git worktree add --detach publish && (cd publish && git checkout --orphan freight-live && git rm -rfq .)
+          fi
+          rm -rf publish/live && mkdir -p publish/live
+          cp -r out/freight/live/. publish/live/
+          cp data/freight/live/_manifest.json publish/live/ 2>/dev/null || true
+          cd publish
+          git add -A
+          git commit -qm "Live freight nowcast $(date -u +%Y-%m-%dT%H:%MZ)" || { echo "no changes"; exit 0; }
+          git push origin HEAD:freight-live

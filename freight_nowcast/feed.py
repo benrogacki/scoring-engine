@@ -119,6 +119,8 @@ def build_feed(result: NowcastResult, cfg: Mapping[str, Any]) -> Dict[str, Any]:
         "schema": SCHEMA,
         "generated_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
         "as_of": result.as_of.isoformat(),
+        "data_mode": result.data_mode,
+        "data_updated_at": result.manifest.get("updated_at"),
         "tier1": {
             "signal": "real_economy_momentum",
             "read_alongside": "yield_curve",

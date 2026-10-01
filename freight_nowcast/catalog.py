@@ -10,6 +10,7 @@ DEFAULT_CATALOG_PATH = Path(__file__).resolve().parent.parent / "config" / "frei
 TRANSFORMS = {"mom", "yoy", "3m3m", "diff", "level"}
 FREQUENCIES = {"D", "W", "M"}
 ROLES = {"indicator", "target"}
+SOURCES = {"genesis", "destatis_daily", "portwatch", "sdmx", "csv"}
 
 
 class CatalogError(ValueError):
@@ -42,8 +43,8 @@ def check_catalog(cfg: Dict[str, Any]) -> None:
             errors.append(f"{sid}: transform must be one of {sorted(TRANSFORMS)}")
         if s.get("role") == "indicator" and s.get("geography") not in geos:
             errors.append(f"{sid}: geography {s.get('geography')!r} is not in geographies")
-        if s.get("source") not in {"genesis", "sdmx", "csv"}:
-            errors.append(f"{sid}: source must be genesis, sdmx or csv")
+        if s.get("source") not in SOURCES:
+            errors.append(f"{sid}: source must be one of {sorted(SOURCES)}")
     for p in cfg.get("validation") or []:
         for k in ("indicator", "target"):
             if p.get(k) not in ids:
@@ -54,5 +55,10 @@ def check_catalog(cfg: Dict[str, Any]) -> None:
         raise CatalogError("; ".join(errors))
 
 
+def enabled_series(cfg: Dict[str, Any]) -> List[Dict[str, Any]]:
+    """Catalog entries switched on (``"enabled": false`` keeps an alternative source on file)."""
+    return [s for s in cfg.get("series", []) if s.get("enabled", True)]
+
+
 def specs_by_id(cfg: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
-    return {s["id"]: copy.deepcopy(s) for s in cfg.get("series", [])}
+    return {s["id"]: copy.deepcopy(s) for s in enabled_series(cfg)}

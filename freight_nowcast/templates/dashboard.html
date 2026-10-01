@@ -42,6 +42,7 @@ h1 { font-size: 20px; margin: 0 0 2px; }
 h2 { font-size: 15px; margin: 0 0 10px; }
 .sub { color: var(--text-secondary); margin: 0 0 16px; }
 .banner { background: var(--banner-bg); color: var(--banner-ink); padding: 8px 12px; border-radius: 8px; margin-bottom: 16px; font-weight: 600; }
+.banner.live { background: var(--surface-1); color: var(--text-secondary); border: 1px solid var(--border); font-weight: 500; }
 .card { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin-bottom: 16px; }
 .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin-bottom: 16px; }
 .tile { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
@@ -122,6 +123,11 @@ li, .tile .n { overflow-wrap: anywhere; }
     <p class="note">Directional tilts in [−1, 1] for the capstone to size; scaled by conviction. Blue = overweight, red = underweight.</p>
   </section>
 
+  <section class="card">
+    <h2>Data</h2>
+    <div class="table-wrap"><table id="vintages"></table></div>
+  </section>
+
   <section class="card" id="warn-card" hidden>
     <h2>Data warnings</h2>
     <ul id="warnings"></ul>
@@ -135,7 +141,9 @@ const f = (x, nd = 2, signed = true) => x == null ? "–" : (signed && x > 0 ? "
 const t1 = D.feed.tier1, t2 = D.feed.tier2;
 
 $("sub").textContent = `As of ${D.as_of} · latest composite month ${t1.latest_month || "–"}`;
-if (D.synthetic) $("banner").innerHTML = '<div class="banner">Synthetic demo data — not real statistics.</div>';
+$("banner").innerHTML = D.synthetic
+  ? '<div class="banner">Synthetic demo data — not real statistics.</div>'
+  : `<div class="banner live">Live data · fetched ${esc(D.data_updated_at || "n/a")}</div>`;
 
 const tp = t1.turning_point;
 $("tiles").innerHTML = [
@@ -243,6 +251,8 @@ $("tilt").innerHTML = Object.entries(t2.tilt.sectors || {}).sort((a, b) => b[1] 
   const w = Math.abs(v) * 50, left = v >= 0 ? 50 : 50 - w;
   return `<div class="tilt-row"><span>${esc(k.replace(/_/g, " "))}</span><div class="tilt-track" title="${f(v)}"><div class="tilt-bar" style="left:${left}%;width:${w}%;background:${v >= 0 ? "var(--pos)" : "var(--neg)"}"></div><div class="tilt-mid"></div></div><span class="num" style="text-align:right">${f(v)}</span></div>`;
 }).join("");
+$("vintages").innerHTML = "<tr><th>Series</th><th>Role</th><th>Last observation</th><th>Fetched</th><th>Origin</th></tr>" +
+  D.vintages.map((v) => `<tr><td>${esc(v.label)}</td><td>${esc(v.role)}</td><td>${esc(v.last)}</td><td>${esc(v.fetched || "–")}</td><td>${esc(v.origin)}</td></tr>`).join("");
 if (D.warnings.length) { $("warn-card").hidden = false; $("warnings").innerHTML = D.warnings.map((w) => `<li>${esc(w)}</li>`).join(""); }
 </script>
 </body>

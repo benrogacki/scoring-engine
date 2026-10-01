@@ -7,6 +7,9 @@ API requires for POST requests:
     DESTATIS_USERNAME / DESTATIS_PASSWORD
     DESTATIS_GENESIS_URL         optional, overrides the base URL
 
+Without credentials the client falls back to the GENESIS guest login
+(``GAST``/``GAST``), which is rate-limited; a free account is more reliable.
+
 Tables are downloaded with ``data/tablefile`` as flat-file CSV (``ffcsv``): one
 row per cell, with each classifying variable as code/label/attribute columns.
 ``parse_ffcsv`` turns that into a single series by filtering on attribute codes
@@ -70,6 +73,7 @@ class GenesisClient:
         self.username, self.password = username, password
         self.base_url = base_url.rstrip("/")
         self.transport = transport or _urllib_post
+        self.guest = False
 
     @classmethod
     def from_env(cls, transport: Optional[Transport] = None) -> "GenesisClient":
@@ -80,8 +84,9 @@ class GenesisClient:
         user, pw = os.environ.get("DESTATIS_USERNAME"), os.environ.get("DESTATIS_PASSWORD")
         if user and pw:
             return cls(user, pw, base, transport)
-        raise SourceError("set DESTATIS_TOKEN (or DESTATIS_USERNAME and DESTATIS_PASSWORD) "
-                          "for GENESIS-Online; register free at genesis.destatis.de")
+        client = cls("GAST", "GAST", base, transport)
+        client.guest = True
+        return client
 
     def post(self, endpoint: str, form: Dict[str, str]) -> bytes:
         headers = {"Content-Type": "application/x-www-form-urlencoded",
@@ -108,7 +113,9 @@ class GenesisClient:
                 status = json.loads(text).get("Status", {})
             except json.JSONDecodeError:
                 status = {}
-            raise SourceError(f"GENESIS {name}: {status.get('Content') or text[:300]}")
+            hint = (" (guest login; set DESTATIS_TOKEN from a free genesis.destatis.de account)"
+                    if self.guest else "")
+            raise SourceError(f"GENESIS {name}: {status.get('Content') or text[:300]}{hint}")
         return text
 
 

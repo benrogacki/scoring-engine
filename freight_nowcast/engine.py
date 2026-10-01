@@ -6,7 +6,7 @@ from datetime import date
 from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional, Tuple
 
-from .catalog import specs_by_id
+from .catalog import enabled_series, specs_by_id
 from .composite import GeoComposite, IndicatorSignal, build_geographies, build_global, build_signal, phase_history
 from .series import Month, Monthly, Series
 from .sources import SourceError, read_cache
@@ -25,11 +25,13 @@ class NowcastResult:
     validation: List[PairResult]
     series_meta: Dict[str, Dict[str, Any]]
     warnings: List[str] = field(default_factory=list)
+    data_mode: str = "live"                      # live | synthetic
+    manifest: Dict[str, Any] = field(default_factory=dict)
 
 
 def load_series(cfg: Mapping[str, Any], cache_dir: Path) -> Tuple[Dict[str, Series], List[str]]:
     loaded, warnings = {}, []
-    for spec in cfg["series"]:
+    for spec in enabled_series(cfg):
         try:
             loaded[spec["id"]] = read_cache(cache_dir, spec["id"], spec.get("frequency", "M"), spec.get("source", ""))
         except SourceError as exc:
@@ -97,6 +99,15 @@ def run(cfg: Mapping[str, Any], cache_dir: Path, as_of: Optional[date] = None,
         series: Optional[Dict[str, Series]] = None) -> NowcastResult:
     as_of = as_of or date.today()
     warnings: List[str] = []
+    synthetic = (Path(cache_dir) / "_SYNTHETIC_DEMO_DATA").exists()
+    manifest: Dict[str, Any] = {}
+    if not synthetic and (Path(cache_dir) / "_manifest.json").exists():
+        from .live import read_manifest
+        manifest = read_manifest(cache_dir)
+        for sid, e in manifest.get("series", {}).items():
+            if e.get("status") == "failed" and sid in {s["id"] for s in enabled_series(cfg)}:
+                kept = f"; using cache from {e['last_good_fetch']}" if e.get("last_good_fetch") else ""
+                warnings.append(f"{sid}: last fetch failed ({e.get('error', '')[:160]}){kept}")
     if series is None:
         series, warnings = load_series(cfg, cache_dir)
     specs = specs_by_id(cfg)
@@ -116,7 +127,9 @@ def run(cfg: Mapping[str, Any], cache_dir: Path, as_of: Optional[date] = None,
                      "geography": spec.get("geography", ""), "source": s.source,
                      "last_observation": s.meta.get("extended_to") or (s.last_date.isoformat() if s.last_date else None),
                      "extended_by": s.meta.get("extended_by"),
-                     "latest_month_coverage": cov[max(cov)] if cov else None}
+                     "latest_month_coverage": cov[max(cov)] if cov else None,
+                     "fetched_at": manifest.get("series", {}).get(sid, {}).get("fetched_at")
+                     or manifest.get("series", {}).get(sid, {}).get("last_good_fetch")}
         if spec["role"] == "indicator":
             sig = build_signal(s, spec, zcfg, as_of)
             if not sig.z:
@@ -135,4 +148,5 @@ def run(cfg: Mapping[str, Any], cache_dir: Path, as_of: Optional[date] = None,
         geo_phases={c: phase_history(g.composite, horizon) for c, g in geos.items()},
         validation=run_validation(cfg.get("validation", []), monthly, specs),
         series_meta=meta, warnings=warnings,
+        data_mode="synthetic" if synthetic else "live", manifest=manifest,
     )

@@ -114,6 +114,8 @@ def generate(as_of: date, seed: int = 11, start: Tuple[int, int] = (2012, 1)) ->
 def write_demo_cache(cache_dir: Path, as_of: date, seed: int = 11) -> Dict[str, Series]:
     series = generate(as_of, seed)
     cache_dir = Path(cache_dir)
+    if (cache_dir / "_manifest.json").exists():
+        raise ValueError(f"{cache_dir} holds live data; write the demo to a separate cache")
     cache_dir.mkdir(parents=True, exist_ok=True)
     for s in series.values():
         write_cache(cache_dir, s)

@@ -6,6 +6,8 @@ is reproducible, and can be audited against the source.
 
 Sources:
 - ``genesis``  Destatis GENESIS-Online REST API (truck toll mileage, production)
+- ``destatis_daily``  Destatis working-daily toll index (xlsx download)
+- ``portwatch`` IMF PortWatch daily port calls (public ArcGIS API, no key)
 - ``sdmx``     any SDMX REST endpoint returning SDMX-CSV (OECD, Eurostat, ECB, IMF)
 - ``csv``      a file you downloaded (OECD AIS dashboard export, Baltic Dry,
                the aisstream.io port counts written by ``ais-listen``)
@@ -166,6 +168,12 @@ def fetch_series(spec: Mapping[str, Any], base_dir: Path = Path(".")) -> Series:
     if kind == "genesis":
         from . import genesis
         return genesis.fetch(sid, freq, **params)
+    if kind == "destatis_daily":
+        from . import destatis_daily
+        return destatis_daily.fetch(sid, freq, **params)
+    if kind == "portwatch":
+        from . import portwatch
+        return portwatch.fetch(sid, freq, **params)
     if kind == "sdmx":
         from . import sdmx
         return sdmx.fetch(sid, freq, **params)

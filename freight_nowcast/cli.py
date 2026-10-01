@@ -1,4 +1,4 @@
-"""Command line: ``freight-nowcast fetch | run | demo | inspect | ais-listen``."""
+"""Command line: ``freight-nowcast live | fetch | run | probe | demo | inspect | ais-listen``."""
 from __future__ import annotations
 
 import argparse
@@ -13,7 +13,8 @@ from .catalog import CatalogError, load_catalog
 from .dashboard import write_dashboard
 from .demo import write_demo_cache
 from .report import write_outputs
-from .sources import SourceError, fetch_series, write_cache
+from .live import fetch_all, probe, required_failures
+from .sources import SourceError
 
 
 def _date(value: str) -> date:
@@ -29,9 +30,18 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--catalog", type=Path, help="Series catalog JSON (default: config/freight_nowcast.json)")
     sub = p.add_subparsers(dest="command", required=True)
 
-    f = sub.add_parser("fetch", help="Download every series in the catalog into the cache")
+    f = sub.add_parser("fetch", help="Download every enabled series from its publisher into the live cache")
     f.add_argument("--cache", type=Path, help="Cache directory (default: catalog cache_dir)")
     f.add_argument("--only", nargs="*", help="Fetch only these series ids")
+
+    lv = sub.add_parser("live", help="fetch + run on real data in one step (what the scheduled job runs)")
+    lv.add_argument("--cache", type=Path)
+    lv.add_argument("--as-of", type=_date, default=date.today())
+    lv.add_argument("--out", type=Path, default=Path("out/freight/live"))
+    lv.add_argument("--strict", action="store_true", help="Exit 1 if a required series failed to fetch")
+
+    pr = sub.add_parser("probe", help="Try every source, print what came back and GENESIS table codes")
+    pr.add_argument("--only", nargs="*")
 
     r = sub.add_parser("run", help="Build z-scores, composites, turning points, validation and the capstone feed")
     r.add_argument("--cache", type=Path)
@@ -80,23 +90,23 @@ def main(argv: Optional[List[str]] = None) -> int:
         print(f"error: catalog: {exc}", file=sys.stderr)
         return 2
     base = Path(cfg["_base_dir"])
-    cache = getattr(args, "cache", None) or base / cfg.get("cache_dir", "data/freight")
+    cache = getattr(args, "cache", None) or base / cfg.get("cache_dir", "data/freight/live")
+    failed: list = []
 
-    if args.command == "fetch":
-        failed = 0
-        for spec in cfg["series"]:
-            if args.only and spec["id"] not in args.only:
-                continue
-            try:
-                s = fetch_series(spec, base)
-            except SourceError as exc:
-                tag = "skip" if spec.get("optional") else "FAIL"
-                failed += tag == "FAIL"
-                print(f"  {tag} {spec['id']}: {exc}")
-                continue
-            path = write_cache(cache, s)
-            print(f"  ok   {spec['id']}: {len(s.observations)} obs to {s.last_date} -> {path}")
-        return 1 if failed else 0
+    if args.command == "probe":
+        return 1 if probe(cfg, args.only) else 0
+
+    if args.command in ("fetch", "live"):
+        try:
+            manifest = fetch_all(cfg, cache, getattr(args, "only", None))
+        except SourceError as exc:
+            print(f"error: {exc}", file=sys.stderr)
+            return 2
+        failed = required_failures(cfg, manifest)
+        if failed:
+            print(f"  required series not fetched: {', '.join(failed)}")
+        if args.command == "fetch":
+            return 1 if failed else 0
 
     if args.command == "inspect":
         from .sources import genesis
@@ -122,7 +132,11 @@ def main(argv: Optional[List[str]] = None) -> int:
         return 0
 
     if args.command == "demo":
-        write_demo_cache(args.cache, args.as_of, args.seed)
+        try:
+            write_demo_cache(args.cache, args.as_of, args.seed)
+        except ValueError as exc:
+            print(f"error: {exc}", file=sys.stderr)
+            return 2
         print(f"Wrote synthetic demo series to {args.cache}/ (not real data)")
 
     try:
@@ -133,4 +147,6 @@ def main(argv: Optional[List[str]] = None) -> int:
     paths = write_outputs(result, cfg, args.out)
     paths["dashboard"] = write_dashboard(result, cfg, args.out / "dashboard.html")
     _print_result(paths, result)
+    if args.command == "live" and args.strict and failed:
+        return 1
     return 0

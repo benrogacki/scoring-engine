@@ -137,6 +137,8 @@ def run_validation(pairs: List[Mapping[str, Any]], monthly: Mapping[str, Monthly
     out = []
     for p in pairs:
         ind, tgt = p["indicator"], p["target"]
+        if ind not in specs or tgt not in specs:
+            continue  # pair uses a disabled (alternative) source
         if ind not in monthly or tgt not in monthly:
             missing = [s for s in (ind, tgt) if s not in monthly]
             r = PairResult(ind, tgt, p.get("transform", "mom"), 0)
