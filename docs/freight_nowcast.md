@@ -27,7 +27,7 @@ the stack is `capstone_feed.json`:
 | Command | `freight-nowcast live` (= `fetch` + `run`) | `freight-nowcast demo` |
 | Data | fetched from Destatis, IMF PortWatch, Eurostat (plus any CSV exports you add) | generated from one latent cycle with known links |
 | Cache | `data/freight/live/` with `_manifest.json` (what was fetched, when, from where) | `out/freight-demo-cache/`, marked `_SYNTHETIC_DEMO_DATA` |
-| Outputs | `out/freight/live/`; the scheduled job also publishes them to the `freight-live` branch | `examples/freight/output/` |
+| Outputs | `out/freight/live/`; the scheduled job publishes them to the `freight-live` branch; a snapshot is in `examples/freight/live/` | `examples/freight/output/` |
 | Labelled | "Live data · fetched …" plus a per-series data table | "Synthetic demo data — not real statistics" everywhere |
 
 The two caches cannot be mixed. `fetch` refuses a cache that holds demo data, and `demo` refuses
@@ -71,14 +71,14 @@ composite is reweighted over whatever is available.
 
 | Series | Source | How it gets in | Auto? |
 |---|---|---|---|
-| Truck toll mileage index, Germany (monthly, seasonally adjusted) | Destatis GENESIS table **42191-0001** | `genesis`: REST `genesisWS/rest/2020` `data/tablefile`, flat-file CSV; uses `DESTATIS_TOKEN`, otherwise the guest login | ✔ |
+| Truck toll mileage index, Germany (monthly, seasonally adjusted) | Destatis GENESIS table **42191-0001** | `genesis`: REST `genesisWS/rest/2020` `data/tablefile`, flat-file CSV; needs `DESTATIS_TOKEN` (the guest login gets HTTP 401). **Without a token** it falls back to the monthly mean of the Destatis daily index, which is the same index from the same publisher | ✔ |
 | Truck toll mileage index, working-daily | Destatis experimental statistics (xlsx) | `destatis_daily`: follows the xlsx link on the table page and reads the seasonally adjusted column; spliced onto the monthly index at the ragged edge | ✔ |
 | Port calls: Germany, euro area (EA20), world | IMF PortWatch (UN Global Platform AIS) | `portwatch`: public ArcGIS API, summed by day on the server, no key | ✔ |
 | Port calls (alternative) | OECD AIS vessel-tracking dashboard | CSV export; `oecd_*` entries are in the catalog with `"enabled": false`, so you can switch them on in place of PortWatch | manual |
 | Baltic Dry Index | Baltic Exchange (licensed) or a market-data export | CSV (`Date`, `Close`/`Price`) | manual |
 | Vessels in port, a handful of ports | aisstream.io free WebSocket | `ais-listen` → CSV | cron |
 | Manufacturing production, DE and euro area | Eurostat `sts_inpr_m` | `sdmx` | ✔ |
-| Exports, Germany | GENESIS 51000-0002 | `genesis` | ✔ |
+| Exports, Germany | GENESIS 51000-0002, or the Eurostat `ext_st_eu27_2020sitc` export volume index (`IVOL_SCA`) as fallback | `genesis`, falling back to `eurostat_jsonstat` (dimensions passed by name) | ✔ |
 | World trade volume | CPB World Trade Monitor | CSV | manual |
 
 Neither the Baltic Dry nor CPB world trade has a free, stable API. Drop an export at the path given
