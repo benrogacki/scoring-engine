@@ -60,6 +60,20 @@ def parse_response(payload: Dict) -> Dict[date, float]:
     return out
 
 
+def _field_hint(layer_url: str, field: str, getter) -> str:
+    """List the layer's numeric fields when a query fails (usually a wrong field name)."""
+    try:
+        meta = json.loads(getter(layer_url.rsplit("/query", 1)[0] + "?f=json").decode("utf-8"))
+        names = [f["name"] for f in meta.get("fields", [])
+                 if f.get("type") in ("esriFieldTypeDouble", "esriFieldTypeInteger", "esriFieldTypeSmallInteger",
+                                      "esriFieldTypeSingle", "esriFieldTypeBigInteger")]
+    except (SourceError, ValueError, KeyError):
+        return ""
+    if field in names:
+        return ""
+    return f" (field {field!r} not in layer; numeric fields: {names[:60]})"
+
+
 def fetch(series_id: str, frequency: str = "D", countries: Optional[Sequence[str]] = None,
           field: str = "portcalls", start_year: int = 2019, end_year: Optional[int] = None,
           layer_url: str = LAYER_URL, getter: Optional[Callable[[str], bytes]] = None) -> Series:
@@ -69,7 +83,10 @@ def fetch(series_id: str, frequency: str = "D", countries: Optional[Sequence[str
     for y in range(start_year, end_year + 1):
         url = build_query(countries, y, field, layer_url=layer_url)
         payload = json.loads(getter(url).decode("utf-8"))
-        part = parse_response(payload)
+        try:
+            part = parse_response(payload)
+        except SourceError as exc:
+            raise SourceError(f"{exc}{_field_hint(layer_url, field, getter)}") from exc
         if payload.get("exceededTransferLimit"):
             raise SourceError(f"PortWatch truncated the {y} response; narrow the query")
         obs.update(part)

@@ -39,10 +39,13 @@ def parse_yahoo(payload: Dict, symbol: str = ""):
     return sorted(out.items())
 
 
-def fetch_yahoo(series_id: str, frequency: str = "D", symbol: str = "BDRY", range_: str = "max",
+def fetch_yahoo(series_id: str, frequency: str = "D", symbol: str = "BDRY", start: str = "2000-01-01",
                 getter: Optional[Callable[[str], bytes]] = None) -> Series:
+    # explicit period1/period2 keeps daily bars (range=max gets downsampled)
+    p1 = int(datetime.fromisoformat(start).replace(tzinfo=timezone.utc).timestamp())
+    p2 = int(datetime.now(timezone.utc).timestamp())
     url = YAHOO_URL.format(symbol=urllib.parse.quote(symbol)) + "?" + urllib.parse.urlencode(
-        {"range": range_, "interval": "1d", "includeAdjustedClose": "true"})
+        {"period1": p1, "period2": p2, "interval": "1d", "includeAdjustedClose": "true"})
     raw = (getter or (lambda u: get(u, {"Accept": "application/json"})))(url)
     obs = parse_yahoo(json.loads(raw.decode("utf-8")), symbol)
     return Series(series_id, obs, frequency, f"yahoo:{symbol}", {"url": url})

@@ -472,6 +472,15 @@ class LiveSourceTests(unittest.TestCase):
         with self.assertRaisesRegex(SourceError, "labels"):
             cpb.parse_rows(rows, ("industrial",))
 
+    def test_cpb_release_pages(self):
+        from freight_nowcast.sources import cpb
+        html = '<a href="/en/world-trade-monitor/cpb-world-trade-monitor-may-2026">May</a>' \
+               '<a href="/en/wereldhandelsmonitor/cpb-wereldhandelsmonitor-februari-2026">Feb</a>'
+        pages = cpb.release_pages(html, date(2026, 10, 1), lookback=3)
+        self.assertEqual(pages[0], "https://www.cpb.nl/en/world-trade-monitor/cpb-world-trade-monitor-september-2026")
+        self.assertIn("https://www.cpb.nl/en/world-trade-monitor/cpb-world-trade-monitor-may-2026", pages)
+        self.assertEqual(pages[-1], "https://www.cpb.nl/en/wereldhandelsmonitor/cpb-wereldhandelsmonitor-februari-2026")
+
     def test_failed_fetch_keeps_last_good_copy(self):
         from freight_nowcast.live import fetch_all, required_failures
         with tempfile.TemporaryDirectory() as tmp:
