@@ -139,7 +139,11 @@ def fetch_eurostat_jsonstat(series_id: str, frequency: str, flow: str, dims: Map
         query.append(("sinceTimePeriod", start))
     url = JSONSTAT_URL.format(flow=flow) + "?" + urllib.parse.urlencode(query)
     try:
-        raw = (getter or _urllib_get)(url)
+        if getter:
+            raw = getter(url)
+        else:
+            from .http import get
+            raw = get(url, {"Accept": "application/json"})
     except SourceError as exc:
         raise SourceError(f"{exc} (check dimension names with a query that pins nothing but geo)") from exc
     obs = parse_jsonstat(json.loads(raw.decode("utf-8")), flow)
