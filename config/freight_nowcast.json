@@ -240,7 +240,7 @@
     },
     {
       "id": "world_dry_bulk_calls",
-      "label": "Dry-bulk port calls, world (IMF PortWatch)",
+      "label": "Dry-bulk port calls, major bulk traders (IMF PortWatch)",
       "role": "indicator",
       "mode": "sea",
       "geography": "WORLD",
@@ -253,9 +253,24 @@
       "params": {
         "field": "portcalls_dry_bulk",
         "start_year": 2019,
-        "variant": "by_date",
-        "chunk": "month"
-      }
+        "countries": [
+          "AUS",
+          "BRA",
+          "CHN",
+          "IDN",
+          "ZAF",
+          "CAN",
+          "USA",
+          "IND",
+          "JPN",
+          "KOR",
+          "RUS",
+          "UKR"
+        ],
+        "variant": "sum_only",
+        "chunk": "year"
+      },
+      "_note": "World totals of this field time out on the PortWatch server; the main dry-bulk exporters and importers carry the cycle."
     },
     {
       "id": "baltic_dry",
