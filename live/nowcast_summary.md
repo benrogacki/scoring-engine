@@ -1,6 +1,6 @@
 # Freight nowcast — as of 2026-10-01
 
-Live data, fetched 2026-10-01T09:52:13+00:00.
+Live data, fetched 2026-10-01T10:00:28+00:00.
 
 **Composite real-economy momentum: -0.11 z** in 2026-09 (provisional: month-to-date or incomplete coverage), falling over 3 months → **Contraction** (conviction: low).
 
@@ -71,12 +71,12 @@ Phase **Contraction**, conviction low; cyclicals minus defensives -0.66.
 
 | Series | Role | Last observation | Fetched | Origin |
 |---|---|---|---|---|
-| Truck toll mileage index (sa) | indicator | 2026-09-26 | 2026-10-01T09:52:02+00:00 | genesis |
-| Port calls, Germany (IMF PortWatch, AIS) | indicator | 2026-09-25 | 2026-10-01T09:52:08+00:00 | portwatch |
-| Port calls, euro-area ports (IMF PortWatch, AIS) | indicator | 2026-09-25 | 2026-10-01T09:52:08+00:00 | portwatch |
-| Port calls, world (IMF PortWatch, AIS) | indicator | 2026-09-25 | 2026-10-01T09:52:09+00:00 | portwatch |
-| Manufacturing production, Germany (sca) | target | 2026-07-01 | 2026-10-01T09:52:10+00:00 | sdmx |
-| Manufacturing production, euro area (sca) | target | 2026-07-01 | 2026-10-01T09:52:10+00:00 | sdmx |
+| Truck toll mileage index (sa) | indicator | 2026-09-26 | 2026-10-01T10:00:19+00:00 | destatis:daily-toll-xlsx |
+| Port calls, Germany (IMF PortWatch, AIS) | indicator | 2026-09-25 | 2026-10-01T10:00:24+00:00 | imf:portwatch |
+| Port calls, euro-area ports (IMF PortWatch, AIS) | indicator | 2026-09-25 | 2026-10-01T10:00:25+00:00 | imf:portwatch |
+| Port calls, world (IMF PortWatch, AIS) | indicator | 2026-09-25 | 2026-10-01T10:00:25+00:00 | imf:portwatch |
+| Manufacturing production, Germany (sca) | target | 2026-07-01 | 2026-10-01T10:00:25+00:00 | sdmx:eurostat |
+| Manufacturing production, euro area (sca) | target | 2026-07-01 | 2026-10-01T10:00:26+00:00 | sdmx:eurostat |
 
 ## Data warnings
 
