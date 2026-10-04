@@ -1,9 +1,9 @@
 {
   "schema": "freight_nowcast/capstone_feed@1",
-  "generated_at": "2026-10-04T13:30:15+00:00",
+  "generated_at": "2026-10-04T13:31:51+00:00",
   "as_of": "2026-10-04",
   "data_mode": "live",
-  "data_updated_at": "2026-10-04T13:30:14+00:00",
+  "data_updated_at": "2026-10-04T13:31:51+00:00",
   "tier1": {
     "signal": "real_economy_momentum",
     "read_alongside": "yield_curve",
@@ -33,7 +33,7 @@
       "us_cass_shipments->us_manufacturing_production": "partial",
       "us_rail_carloads->us_manufacturing_production": "evidenced",
       "us_port_calls->us_goods_imports": "partial",
-      "ea_port_calls->ea_exports": "not run",
+      "ea_port_calls->ea_exports": "partial",
       "gcc_port_calls->gcc_exports": "not evidenced",
       "hormuz_transits->gcc_exports": "not evidenced",
       "bab_el_mandeb_transits->world_trade_volume": "not evidenced"
@@ -76,7 +76,7 @@
         },
         "evidence": {
           "ea_port_calls->ea_manufacturing_production": "partial",
-          "ea_port_calls->ea_exports": "not run"
+          "ea_port_calls->ea_exports": "partial"
         },
         "evidenced_weight_share": 0.0,
         "conviction": "low"
@@ -578,27 +578,35 @@
       "indicator": "ea_port_calls",
       "target": "ea_exports",
       "transform": "yoy",
-      "n": 0,
-      "first": "",
-      "last": "",
-      "lead_profile": {},
-      "best_lead": null,
-      "best_corr": null,
-      "beta": null,
-      "beta_t": null,
-      "beta_p": null,
-      "r2": null,
-      "oos_n": 0,
-      "rmse_model": null,
-      "rmse_benchmark": null,
-      "rmse_ratio": null,
-      "dm_stat": null,
-      "dm_p": null,
-      "hit_rate": null,
-      "timing_advantage_days": null,
-      "verdict": "not run",
+      "n": 78,
+      "first": "2020-01",
+      "last": "2026-06",
+      "lead_profile": {
+        "-3": 0.431,
+        "-2": 0.548,
+        "-1": 0.689,
+        "0": 0.737,
+        "1": 0.583,
+        "2": 0.383,
+        "3": 0.211
+      },
+      "best_lead": 0,
+      "best_corr": 0.7371,
+      "beta": 1.6891,
+      "beta_t": 3.8741,
+      "beta_p": 0.0001,
+      "r2": 0.5433,
+      "oos_n": 42,
+      "rmse_model": 3.317,
+      "rmse_benchmark": 3.3157,
+      "rmse_ratio": 1.0004,
+      "dm_stat": 0.0034,
+      "dm_p": 0.5014,
+      "hit_rate": 0.6429,
+      "timing_advantage_days": 35,
+      "verdict": "partial",
       "notes": [
-        "missing data for ea_exports"
+        "significant in sample but no reliable out-of-sample gain"
       ]
     },
     {
@@ -711,7 +719,7 @@
       "last_observation": "2026-09-26",
       "extended_by": "de_toll_mileage_daily",
       "latest_month_coverage": 0.867,
-      "fetched_at": "2026-10-04T13:29:54+00:00"
+      "fetched_at": "2026-10-04T13:31:35+00:00"
     },
     "de_port_calls": {
       "label": "Port calls, Germany (IMF PortWatch, AIS)",
@@ -722,7 +730,7 @@
       "last_observation": "2026-09-25",
       "extended_by": null,
       "latest_month_coverage": 0.833,
-      "fetched_at": "2026-10-04T13:29:59+00:00"
+      "fetched_at": "2026-10-04T13:31:40+00:00"
     },
     "ea_port_calls": {
       "label": "Port calls, Eurozone ports (IMF PortWatch, AIS)",
@@ -733,7 +741,7 @@
       "last_observation": "2026-09-25",
       "extended_by": null,
       "latest_month_coverage": 0.833,
-      "fetched_at": "2026-10-04T13:29:59+00:00"
+      "fetched_at": "2026-10-04T13:31:41+00:00"
     },
     "world_port_calls": {
       "label": "Port calls, world (IMF PortWatch, AIS)",
@@ -744,7 +752,7 @@
       "last_observation": "2026-09-25",
       "extended_by": null,
       "latest_month_coverage": 0.833,
-      "fetched_at": "2026-10-04T13:29:59+00:00"
+      "fetched_at": "2026-10-04T13:31:41+00:00"
     },
     "dry_bulk_freight": {
       "label": "Dry-bulk freight (Breakwave BDRY, BDI futures)",
@@ -755,7 +763,7 @@
       "last_observation": "2026-10-02",
       "extended_by": null,
       "latest_month_coverage": 1.0,
-      "fetched_at": "2026-10-04T13:30:00+00:00"
+      "fetched_at": "2026-10-04T13:31:41+00:00"
     },
     "us_freight_tsi": {
       "label": "Freight Transportation Services Index (BTS)",
@@ -766,7 +774,7 @@
       "last_observation": "2026-07-01",
       "extended_by": null,
       "latest_month_coverage": 1.0,
-      "fetched_at": "2026-10-04T13:30:00+00:00"
+      "fetched_at": "2026-10-04T13:31:41+00:00"
     },
     "us_cass_shipments": {
       "label": "Cass Freight Index, shipments",
@@ -777,7 +785,7 @@
       "last_observation": "2026-08-01",
       "extended_by": null,
       "latest_month_coverage": 1.0,
-      "fetched_at": "2026-10-04T13:30:00+00:00"
+      "fetched_at": "2026-10-04T13:31:41+00:00"
     },
     "us_rail_carloads": {
       "label": "Rail freight carloads",
@@ -788,7 +796,7 @@
       "last_observation": "2026-07-01",
       "extended_by": null,
       "latest_month_coverage": 1.0,
-      "fetched_at": "2026-10-04T13:30:00+00:00"
+      "fetched_at": "2026-10-04T13:31:42+00:00"
     },
     "us_port_calls": {
       "label": "Port calls, United States (IMF PortWatch, AIS)",
@@ -799,7 +807,7 @@
       "last_observation": "2026-09-25",
       "extended_by": null,
       "latest_month_coverage": 0.833,
-      "fetched_at": "2026-10-04T13:30:01+00:00"
+      "fetched_at": "2026-10-04T13:31:42+00:00"
     },
     "gcc_port_calls": {
       "label": "Port calls, Gulf states (IMF PortWatch, AIS)",
@@ -810,7 +818,7 @@
       "last_observation": "2026-09-25",
       "extended_by": null,
       "latest_month_coverage": 0.833,
-      "fetched_at": "2026-10-04T13:30:01+00:00"
+      "fetched_at": "2026-10-04T13:31:42+00:00"
     },
     "hormuz_transits": {
       "label": "Strait of Hormuz transits (IMF PortWatch)",
@@ -821,7 +829,7 @@
       "last_observation": "2026-09-27",
       "extended_by": null,
       "latest_month_coverage": 0.9,
-      "fetched_at": "2026-10-04T13:30:01+00:00"
+      "fetched_at": "2026-10-04T13:31:42+00:00"
     },
     "bab_el_mandeb_transits": {
       "label": "Bab el-Mandeb transits (IMF PortWatch)",
@@ -832,7 +840,7 @@
       "last_observation": "2026-09-27",
       "extended_by": null,
       "latest_month_coverage": 0.9,
-      "fetched_at": "2026-10-04T13:30:01+00:00"
+      "fetched_at": "2026-10-04T13:31:43+00:00"
     },
     "de_manufacturing_production": {
       "label": "Manufacturing production, Germany (sca)",
@@ -843,7 +851,7 @@
       "last_observation": "2026-07-01",
       "extended_by": null,
       "latest_month_coverage": 1.0,
-      "fetched_at": "2026-10-04T13:30:02+00:00"
+      "fetched_at": "2026-10-04T13:31:43+00:00"
     },
     "ea_manufacturing_production": {
       "label": "Manufacturing production, euro area (sca)",
@@ -854,7 +862,7 @@
       "last_observation": "2026-07-01",
       "extended_by": null,
       "latest_month_coverage": 1.0,
-      "fetched_at": "2026-10-04T13:30:02+00:00"
+      "fetched_at": "2026-10-04T13:31:43+00:00"
     },
     "de_exports": {
       "label": "Exports, Germany (foreign trade statistics)",
@@ -865,7 +873,7 @@
       "last_observation": "2026-06-01",
       "extended_by": null,
       "latest_month_coverage": 1.0,
-      "fetched_at": "2026-10-04T13:30:03+00:00"
+      "fetched_at": "2026-10-04T13:31:44+00:00"
     },
     "world_trade_volume": {
       "label": "World trade volume (CPB World Trade Monitor)",
@@ -876,7 +884,7 @@
       "last_observation": "2026-07-01",
       "extended_by": null,
       "latest_month_coverage": 1.0,
-      "fetched_at": "2026-10-04T13:30:05+00:00"
+      "fetched_at": "2026-10-04T13:31:46+00:00"
     },
     "us_manufacturing_production": {
       "label": "Manufacturing production, United States",
@@ -887,7 +895,7 @@
       "last_observation": "2026-08-01",
       "extended_by": null,
       "latest_month_coverage": 1.0,
-      "fetched_at": "2026-10-04T13:30:08+00:00"
+      "fetched_at": "2026-10-04T13:31:49+00:00"
     },
     "us_goods_imports": {
       "label": "Goods imports, United States (BOP basis)",
@@ -898,7 +906,18 @@
       "last_observation": "2026-07-01",
       "extended_by": null,
       "latest_month_coverage": 1.0,
-      "fetched_at": "2026-10-04T13:30:08+00:00"
+      "fetched_at": "2026-10-04T13:31:49+00:00"
+    },
+    "ea_exports": {
+      "label": "Extra-EU export volume, sa (Eurozone proxy)",
+      "role": "target",
+      "mode": "",
+      "geography": "EA",
+      "source": "eurostat:jsonstat",
+      "last_observation": "2026-06-01",
+      "extended_by": null,
+      "latest_month_coverage": 1.0,
+      "fetched_at": "2026-10-04T13:31:49+00:00"
     },
     "gcc_exports": {
       "label": "Merchandise exports, Saudi Arabia (IMF IMTS)",
@@ -909,11 +928,10 @@
       "last_observation": "2026-06-01",
       "extended_by": null,
       "latest_month_coverage": 1.0,
-      "fetched_at": "2026-10-04T13:30:11+00:00"
+      "fetched_at": "2026-10-04T13:31:50+00:00"
     }
   },
   "warnings": [
-    "de_ais_stationary: optional, no data cached yet (skipped)",
-    "ea_exports: optional, no data cached yet (skipped)"
+    "de_ais_stationary: optional, no data cached yet (skipped)"
   ]
 }
