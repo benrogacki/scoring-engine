@@ -485,6 +485,21 @@ class LiveSourceTests(unittest.TestCase):
         self.assertIn("https://www.cpb.nl/en/world-trade-monitor/cpb-world-trade-monitor-may-2026", pages)
         self.assertEqual(pages[-1], "https://www.cpb.nl/en/wereldhandelsmonitor/cpb-wereldhandelsmonitor-februari-2026")
 
+    def test_new_releases_and_fingerprint(self):
+        from freight_nowcast.live import new_releases
+        old = {"series": {"a": {"status": "ok", "last": "2026-09-01", "observations": 10},
+                          "b": {"status": "ok", "last": "2026-08-01", "observations": 5}}}
+        new = {"series": {"a": {"status": "ok", "last": "2026-09-01", "observations": 10},
+                          "b": {"status": "ok", "last": "2026-09-01", "observations": 6},
+                          "c": {"status": "failed"}}}
+        self.assertEqual(new_releases(old, new), ["b: 2026-08-01 -> 2026-09-01"])
+        with tempfile.TemporaryDirectory() as tmp:
+            out = Path(tmp) / "o"
+            main(["demo", "--as-of", AS_OF.isoformat(), "--cache", str(Path(tmp) / "c"), "--out", str(out)])
+            first = (out / "data_fingerprint.txt").read_text()
+            main(["run", "--as-of", AS_OF.isoformat(), "--cache", str(Path(tmp) / "c"), "--out", str(out)])
+            self.assertEqual(first, (out / "data_fingerprint.txt").read_text())  # same data, same hash
+
     def test_failed_fetch_keeps_last_good_copy(self):
         from freight_nowcast.live import fetch_all, required_failures
         with tempfile.TemporaryDirectory() as tmp:

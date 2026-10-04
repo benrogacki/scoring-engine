@@ -1,8 +1,15 @@
 # Live freight nowcast: fetch real data from the publishers, run, publish.
 #
-# - Weekdays after the morning releases (Destatis toll index, PortWatch Tuesdays).
-# - On demand (Actions -> Freight nowcast -> Run workflow).
-# - On pushes that change the nowcaster, as a live smoke test of every source.
+# Publish-on-release: the schedule checks every 3 hours, but a run only commits
+# to freight-live (and redeploys the Pages dashboard) when the numbers changed,
+# i.e. a source released new data or revised old data. The commit message lists
+# which series moved. Sources release on their own calendars (PortWatch
+# Tuesdays, Destatis daily toll index Thursdays, Eurostat/FRED/CPB monthly), so
+# polling catches each release within a few hours.
+#
+# Also runs on demand (Actions -> Freight nowcast -> Run workflow) and on pushes
+# that change the nowcaster (a live smoke test of every source); those always
+# publish. Scheduled runs only fire from the default branch.
 #
 # Secrets (optional): DESTATIS_TOKEN — a free GENESIS-Online token. Without it
 # the GENESIS guest login is used, which is rate-limited.
@@ -10,7 +17,7 @@ name: Freight nowcast
 
 on:
   schedule:
-    - cron: "41 9 * * 1-5"
+    - cron: "17 */3 * * *"
   workflow_dispatch:
     inputs:
       publish:
@@ -34,6 +41,8 @@ jobs:
   live:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    outputs:
+      changed: ${{ steps.publish.outputs.changed }}
     env:
       DESTATIS_TOKEN: ${{ secrets.DESTATIS_TOKEN }}
     steps:
@@ -90,7 +99,8 @@ jobs:
         with:
           path: site
 
-      - name: Publish to the freight-live branch
+      - name: Publish to the freight-live branch (only when the numbers changed)
+        id: publish
         if: github.event_name != 'workflow_dispatch' || inputs.publish
         run: |
           git config user.name "freight-nowcast bot"
@@ -101,12 +111,24 @@ jobs:
           else
             git worktree add --detach publish && (cd publish && git checkout --orphan freight-live && git rm -rfq .)
           fi
+          new=$(cat out/freight/live/data_fingerprint.txt 2>/dev/null || echo missing)
+          old=$(cat publish/live/data_fingerprint.txt 2>/dev/null || echo none)
+          python -m freight_nowcast changes publish/live/_manifest.json data/freight/live/_manifest.json > releases.txt || true
+          if [ "$new" = "$old" ] && [ "${{ github.event_name }}" = "schedule" ]; then
+            echo "No new data since the last publish; nothing to do."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            { echo; echo "**No new data since the last publish.**"; } >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+          { echo; echo "### New data in this run"; echo; sed 's/^/- /' releases.txt; } >> "$GITHUB_STEP_SUMMARY"
           rm -rf publish/live && mkdir -p publish/live
           cp -r out/freight/live/. publish/live/
           cp data/freight/live/_manifest.json publish/live/ 2>/dev/null || true
           cd publish
           git add -A
-          git commit -qm "Live freight nowcast $(date -u +%Y-%m-%dT%H:%MZ)" || { echo "no changes"; exit 0; }
+          git commit -qm "Live freight nowcast $(date -u +%Y-%m-%dT%H:%MZ)" -m "New data:" -m "$(cat ../releases.txt)" \
+            || { echo "no changes"; exit 0; }
           git push origin HEAD:freight-live
 
   # Serves the live dashboard on GitHub Pages. Needs Pages enabled once
@@ -115,7 +137,9 @@ jobs:
   # branches skip this without failing the workflow.
   pages:
     needs: live
-    if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+    if: >-
+      needs.live.outputs.changed == 'true' &&
+      github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
     runs-on: ubuntu-latest
     continue-on-error: true
     permissions:

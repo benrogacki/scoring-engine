@@ -47,13 +47,22 @@ If a publisher is down, the last good copy of that series stays in the cache. Th
 outputs record the failure as a warning. A required series that fails makes `fetch` (and
 `live --strict`) exit with code 1.
 
-**Scheduled live run.** [`.github/workflows/freight-nowcast.yml`](../.github/workflows/freight-nowcast.yml)
-runs the live nowcast on weekdays at 09:41 UTC, on demand (Actions → *Freight nowcast* → *Run
-workflow*), and on any push that changes the nowcaster. Each run:
+**Automatic publishing.** [`.github/workflows/freight-nowcast.yml`](../.github/workflows/freight-nowcast.yml)
+checks every source every 3 hours. It republishes only when the numbers change: a source has
+released new data or revised old data. Each run:
 
 1. runs the unit tests and probes every source
-2. writes the summary to the job page and uploads the outputs and cache as an artifact
-3. on scheduled and manual runs, commits the outputs to the **`freight-live`** branch
+2. fetches the data and runs the nowcast
+3. compares a fingerprint of the outputs with the last published one
+4. if they differ, commits the outputs to the **`freight-live`** branch, with a message listing the
+   series that moved (`freight-nowcast changes old.json new.json`), and redeploys the Pages
+   dashboard
+
+Sources release on their own calendars (PortWatch on Tuesdays, the Destatis daily toll index on
+Thursdays, Eurostat, FRED, IMF and CPB monthly), so each release shows up within about three hours.
+Manual runs (Actions → *Freight nowcast* → *Run workflow*) and pushes that change the nowcaster
+always publish. GitHub only runs schedules from the **default branch**, so automatic publishing
+starts once this is merged.
 
 The Actions cache carries the data between runs.
 
@@ -84,6 +93,13 @@ composite is reweighted over whatever is available.
 | Dry-bulk port calls, world | IMF PortWatch, `portcalls_dry_bulk` | `portwatch` | ✔ |
 | Baltic Dry Index (licensed) | Baltic Exchange | CSV; `baltic_dry` is kept with `"enabled": false`. Switch it on instead of `dry_bulk_freight` if you have a licence | manual |
 | Vessels in port, a handful of ports | aisstream.io free WebSocket | `ais-listen` → CSV | cron |
+| **United States:** Freight Transportation Services Index (BTS), Cass Freight Index shipments, rail carloads | FRED (`TSIFRGHT`, `FRGSHPUSM649NCIS`, `RAILFRTCARLOADSD11`) | `fred` (fredgraph.csv, no key) | ✔ |
+| **United States:** port calls | IMF PortWatch | `portwatch` | ✔ |
+| **Arabia (GCC):** port calls for Saudi Arabia, UAE, Qatar, Kuwait, Oman, Bahrain | IMF PortWatch | `portwatch` | ✔ |
+| **Arabia (GCC):** Strait of Hormuz and Bab el-Mandeb transits | IMF PortWatch chokepoints layer (`n_total`) | `portwatch` with `layer: chokepoints` | ✔ |
+| US manufacturing production, US goods imports | FRED (`IPMAN`, `BOPGIMP`) | `fred` | ✔ |
+| Saudi merchandise exports | IMF IMTS (`SAU.XG_FOB_USD.G001.M`) | `sdmx` with `agency: imf` | ✔ |
+| Eurozone exports (proxy) | Eurostat extra-EU export volume, sa | `eurostat_jsonstat` | ✔ |
 | Manufacturing production, DE and euro area | Eurostat `sts_inpr_m` | `sdmx` | ✔ |
 | Exports, Germany | GENESIS 51000-0002, or the Eurostat `ext_st_eu27_2020sitc` export volume index (`IVOL_SCA`) as fallback | `genesis`, falling back to `eurostat_jsonstat` (dimensions passed by name) | ✔ |
 | World trade volume | CPB World Trade Monitor, row `tgz_w1_qnmi_sn` (world trade volume, seasonally adjusted) | `cpb`: the monitor is a free monthly xlsx with no API, so the connector follows the newest release page; if CPB is unreachable it falls back to Eurostat extra-EU export volume (`eurostat_jsonstat`) | ✔ |
@@ -154,7 +170,7 @@ real-time reader would have seen, apart from data revisions.
 
 **Composites.** A geography's composite is the weighted mean of the z-scores available that month.
 It needs at least 50% of the geography's weight to be present. The overall composite weights the
-geographies (DE 0.4, euro area 0.3, world 0.3).
+geographies: Germany 0.2, Eurozone 0.25, United States 0.3, Arabia (GCC) 0.1, world sea trade 0.15.
 
 **Cycle phase.** The phase combines the level against zero with the direction over 3 months:
 

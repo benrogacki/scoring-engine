@@ -79,6 +79,20 @@ def fetch_all(cfg: Mapping[str, Any], cache_dir: Path, only: Optional[List[str]]
     return manifest
 
 
+def new_releases(old: Mapping[str, Any], new: Mapping[str, Any]) -> List[str]:
+    """Series whose latest observation or observation count moved between two manifests."""
+    out = []
+    old_s, new_s = old.get("series", {}), new.get("series", {})
+    for sid, e in new_s.items():
+        if e.get("status") != "ok":
+            continue
+        prev = old_s.get(sid, {})
+        if (e.get("last"), e.get("observations")) != (prev.get("last"), prev.get("observations")):
+            was = prev.get("last") or "none"
+            out.append(f"{sid}: {was} -> {e.get('last')}")
+    return out
+
+
 def required_failures(cfg: Mapping[str, Any], manifest: Mapping[str, Any]) -> List[str]:
     entries = manifest.get("series", {})
     return [s["id"] for s in enabled_series(cfg)

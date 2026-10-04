@@ -585,7 +585,7 @@
     },
     {
       "id": "ea_exports",
-      "label": "Extra-euro-area export volume (sa)",
+      "label": "Extra-EU export volume, sa (Eurozone proxy)",
       "role": "target",
       "geography": "EA",
       "frequency": "M",
@@ -595,43 +595,14 @@
       "params": {
         "flow": "ei_eteu27_2020_m",
         "dims": {
-          "geo": "EA20",
+          "geo": "EU27_2020",
           "stk_flow": "EXP",
-          "partner": "EXT_EA20",
+          "partner": "EXT_EU27_2020",
           "indic": "ET-T",
           "unit": "IVOL-SA"
         }
       },
-      "fallback": [
-        {
-          "source": "eurostat_jsonstat",
-          "frequency": "M",
-          "params": {
-            "flow": "ei_eteu27_2020_m",
-            "dims": {
-              "geo": "EA20",
-              "stk_flow": "EXP",
-              "partner": "WORLD",
-              "indic": "ET-T",
-              "unit": "IVOL-SA"
-            }
-          }
-        },
-        {
-          "source": "eurostat_jsonstat",
-          "frequency": "M",
-          "params": {
-            "flow": "ei_eteu27_2020_m",
-            "dims": {
-              "geo": "EA20",
-              "stk_flow": "EXP",
-              "partner": "EXT_EA20",
-              "indic": "ET-T",
-              "unit": "MIO-EUR-SA"
-            }
-          }
-        }
-      ]
+      "_note": "Eurostat's monthly trade dataset has no euro-area aggregate; EU-27 extra-EU exports (mostly euro-area exporters) stand in."
     },
     {
       "id": "gcc_exports",
@@ -659,8 +630,7 @@
             "start": "2024-01"
           }
         }
-      ],
-      "_verify": "IMF IMTS dimension codes (country.indicator.counterpart.frequency)"
+      ]
     }
   ],
   "validation": [

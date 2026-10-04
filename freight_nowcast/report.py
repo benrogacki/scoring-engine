@@ -153,4 +153,19 @@ def write_outputs(r: NowcastResult, cfg: Mapping[str, Any], out_dir: Path) -> Di
     paths["capstone_feed"] = out_dir / "capstone_feed.json"
     (out_dir / "nowcast_summary.md").write_text(summary_markdown(r, feed), encoding="utf-8")
     paths["summary"] = out_dir / "nowcast_summary.md"
+    (out_dir / "data_fingerprint.txt").write_text(data_fingerprint(out_dir) + "\n", encoding="utf-8")
+    paths["fingerprint"] = out_dir / "data_fingerprint.txt"
     return paths
+
+
+def data_fingerprint(out_dir: Path) -> str:
+    """Hash of the outputs that carry no timestamps; it changes only when the numbers do
+    (a new release, a revision, or a method change), so a scheduler can publish on change."""
+    import hashlib
+
+    h = hashlib.sha256()
+    for name in ("composite.csv", "indicator_panel.csv", "turning_points.csv", "validation.json"):
+        path = Path(out_dir) / name
+        if path.exists():
+            h.update(name.encode() + b"\0" + path.read_bytes())
+    return h.hexdigest()

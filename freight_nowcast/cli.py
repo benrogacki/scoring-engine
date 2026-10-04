@@ -43,6 +43,10 @@ def build_parser() -> argparse.ArgumentParser:
     pr = sub.add_parser("probe", help="Try every source, print what came back and GENESIS table codes")
     pr.add_argument("--only", nargs="*")
 
+    ch = sub.add_parser("changes", help="List series with new data between two fetch manifests")
+    ch.add_argument("old", type=Path, help="Previous _manifest.json (missing file = everything is new)")
+    ch.add_argument("new", type=Path, help="Current _manifest.json")
+
     r = sub.add_parser("run", help="Build z-scores, composites, turning points, validation and the capstone feed")
     r.add_argument("--cache", type=Path)
     r.add_argument("--as-of", type=_date, default=date.today())
@@ -92,6 +96,13 @@ def main(argv: Optional[List[str]] = None) -> int:
     base = Path(cfg["_base_dir"])
     cache = getattr(args, "cache", None) or base / cfg.get("cache_dir", "data/freight/live")
     failed: list = []
+
+    if args.command == "changes":
+        from .live import new_releases
+        old = json.loads(args.old.read_text(encoding="utf-8")) if args.old.exists() else {}
+        for line in new_releases(old, json.loads(args.new.read_text(encoding="utf-8"))):
+            print(line)
+        return 0
 
     if args.command == "probe":
         return 1 if probe(cfg, args.only) else 0

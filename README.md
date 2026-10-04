@@ -201,8 +201,9 @@ python -m freight_nowcast live --out out/freight/live                      # rea
 python -m freight_nowcast demo --as-of 2026-09-30 --out out/freight-demo   # synthetic sandbox, offline
 ```
 
-A scheduled GitHub Actions job runs the live nowcast every weekday and publishes it to the
-`freight-live` branch.
+Geographies: Germany, Eurozone, United States, Arabia (GCC) and world sea trade. A GitHub Actions job
+checks every source every 3 hours. When a source has released new data, it republishes the nowcast to
+the `freight-live` branch and the Pages dashboard.
 
 See [`docs/freight_nowcast.md`](docs/freight_nowcast.md) for sources, method, validation and the
 feed schema, and [`examples/freight/output/`](examples/freight/output/) for a demo run.
