@@ -88,8 +88,8 @@ def build_thesis(r: NowcastResult, feed: Mapping[str, Any]) -> Dict[str, Any]:
             text = (f"The world is moving at different speeds. {hi['label']} is the strongest "
                     f"({hi['composite_z']:+.1f} z) and {lo['label']} the weakest ({lo['composite_z']:+.1f} z), "
                     f"a gap of {spread:.1f} standard deviations. ")
-            implications.append(f"Growth is uneven: expect {hi['label']}-facing activity to outperform "
-                                f"{lo['label']}-facing activity while the gap persists.")
+            implications.append(f"Growth is uneven: activity tied to {hi['label']} should keep outperforming "
+                                f"activity tied to {lo['label']} while the gap persists.")
         elif spread >= 0.75:
             text = (f"Regions are diverging: {hi['label']} ({hi['composite_z']:+.1f} z) is running ahead of "
                     f"{lo['label']} ({lo['composite_z']:+.1f} z). ")
@@ -160,6 +160,10 @@ def build_thesis(r: NowcastResult, feed: Mapping[str, Any]) -> Dict[str, Any]:
     }
     if phase in phase_impl:
         implications.insert(0, phase_impl[phase])
+    energy_shock = any(s.spec.get("chokepoint_energy") and _shock(s, -40.0) for s in _by_kind(r, "chokepoint"))
+    if phase in ("Recovery", "Expansion") and energy_shock:
+        implications.insert(1, "The upturn is fragile: it is running alongside an energy-route shock. If higher "
+                               "energy and freight costs feed through, the recovery could stall before official data confirms it.")
     tilt = (t2.get("tilt") or {}).get("cyclical_minus_defensive")
     if tilt is not None:
         side = "cyclicals over defensives" if tilt > 0 else "defensives over cyclicals"
