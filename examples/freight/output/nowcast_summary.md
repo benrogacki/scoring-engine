@@ -1,8 +1,32 @@
-# Freight nowcast — as of 2026-09-30
+# Global Freight Activity Tracker — as of 2026-09-30
 
 **Synthetic demo data — not real statistics.**
 
 **Composite real-economy momentum: -0.99 z** in 2026-08 (provisional: month-to-date or incomplete coverage), falling over 3 months → **Contraction** (conviction: low).
+
+## What this could mean for the global economy
+
+**Freight data says the global goods economy is running below trend and weakening (composite -0.99 z, falling over three months).**
+
+**Where.** The world is moving at different speeds. Eurozone is the strongest (+0.5 z) and Germany the weakest (-1.2 z), a gap of 1.7 standard deviations. By region: Eurozone +0.5 z (expansion); United States -1.0 z (contraction); Arabia (GCC) -1.1 z (contraction); World sea trade -1.1 z (contraction); Germany -1.2 z (contraction).
+
+**Costs vs volumes.** Freight rates (-17% y/y) and volumes (-2.1% y/y) are falling together: demand is weakening.
+
+Implications:
+
+- Growth: a goods-sector downturn; official production and trade data are likely to print weak in coming releases.
+- Growth is uneven: expect Eurozone-facing activity to outperform Germany-facing activity while the gap persists.
+- Disinflationary for goods: weak demand is pulling freight costs and volumes down.
+- Positioning: the cycle phase favours defensives over cyclicals (tilt -0.66, scaled by low conviction).
+
+What to watch:
+
+- No turning point in the last six months; a 0.5 z move off the recent extreme sustained for two months would flag one.
+- Official data lags the freight data: Manufacturing production, Germany (sca) is only available to July 2026. The next official releases will confirm or contradict this read.
+
+*Conviction is low. 3 of 13 indicator-to-official-data links pass the out-of-sample evidence test and the latest month is provisional (month-to-date data). Treat this as a hypothesis the next official releases will test.*
+
+<sub>Written automatically from the latest data by fixed rules on every run. It describes what the freight data is consistent with; it is not a forecast or investment advice.</sub>
 
 ## By geography
 
@@ -11,7 +35,7 @@
 | Germany (DE) | 2026-09* | -1.22 | -1.05 | Contraction | provisional peak 2026-05 | medium | 67% |
 | Eurozone (EA) | 2026-07 | +0.47 | +0.49 | Expansion | provisional trough 2026-03 | low | 100% |
 | United States (US) | 2026-08* | -1.04 | -0.49 | Contraction | confirmed trough 2025-11 | medium | 69% |
-| Arabia (GCC) (GCC) | 2026-07 | -1.10 | -0.28 | Contraction |  | medium | 100% |
+| Arabia (GCC) | 2026-07 | -1.10 | -0.28 | Contraction |  | medium | 100% |
 | World sea trade (WORLD) | 2026-07 | -1.10 | -0.54 | Contraction |  | medium | 100% |
 
 \* provisional
@@ -112,8 +136,8 @@ Phase **Contraction**, conviction low; cyclicals minus defensives -0.66.
 | World trade volume (CPB World Trade Monitor) | target | 2026-07-01 | – | cpb |
 | Manufacturing production, United States | target | 2026-07-01 | – | fred |
 | Goods imports, United States (BOP basis) | target | 2026-07-01 | – | fred |
-| Extra-euro-area export volume (sa) | target | 2026-07-01 | – | eurostat_jsonstat |
-| Merchandise exports, Saudi Arabia | target | 2026-07-01 | – | fred |
+| Extra-EU export volume, sa (Eurozone proxy) | target | 2026-07-01 | – | eurostat_jsonstat |
+| Merchandise exports, Saudi Arabia (IMF IMTS) | target | 2026-07-01 | – | sdmx |
 
 ## Data warnings
 

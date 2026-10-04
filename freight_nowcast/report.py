@@ -66,7 +66,7 @@ def summary_markdown(r: NowcastResult, feed: Mapping[str, Any]) -> str:
     t1 = feed["tier1"]
     mode = ("**Synthetic demo data — not real statistics.**" if r.data_mode == "synthetic"
             else f"Live data, fetched {r.manifest.get('updated_at') or 'n/a'}.")
-    lines = [f"# Freight nowcast — as of {r.as_of.isoformat()}", "", mode, ""]
+    lines = [f"# Global Freight Activity Tracker — as of {r.as_of.isoformat()}", "", mode, ""]
     if not t1.get("latest_month"):
         return "\n".join(lines + ["No composite could be built."])
     prov = " (provisional: month-to-date or incomplete coverage)" if t1["provisional"] else ""
@@ -78,6 +78,9 @@ def summary_markdown(r: NowcastResult, feed: Mapping[str, Any]) -> str:
     if t1.get("turning_point"):
         tp = t1["turning_point"]
         lines += [f"⚑ Turning point: **{tp['status']} {tp['kind']}** at {tp['month']} (flagged {tp['detected']}).", ""]
+    if feed.get("thesis"):
+        from .thesis import thesis_markdown
+        lines += thesis_markdown(feed["thesis"])
     lines += ["## By geography", "", "| Geography | Month | z | 3m change | Phase | Turning point | Conviction | Coverage |",
               "|---|---|---|---|---|---|---|---|"]
     for code, g in t1["by_geography"].items():

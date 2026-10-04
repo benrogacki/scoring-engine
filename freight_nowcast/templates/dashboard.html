@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Freight Nowcast</title>
+<title>Global Freight Activity Tracker</title>
 <style>
 :root {
   color-scheme: light;
@@ -53,6 +53,16 @@ h2 { font-size: 15px; margin: 0 0 10px; }
 .downloads a:hover { text-decoration: underline; }
 .downloads span { display: block; color: var(--text-muted); font-size: 12px; }
 #footer { margin-top: 8px; }
+.tagline { color: var(--text-secondary); margin: 0 0 4px; max-width: 72ch; }
+.thesis-head { font-size: 17px; font-weight: 650; line-height: 1.4; margin: 0 0 12px; max-width: 75ch; text-wrap: balance; }
+.thesis-grid { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 20px; }
+.thesis-grid > * { min-width: 0; }
+.thesis-grid p { margin: 0 0 10px; max-width: 70ch; }
+.thesis-grid b { color: var(--text-primary); }
+.thesis h3 { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--text-secondary); margin: 0 0 6px; }
+.thesis ul { margin: 0 0 14px; padding-left: 18px; }
+.thesis li { margin-bottom: 6px; }
+@media (max-width: 760px) { .thesis-grid { grid-template-columns: 1fr; } }
 .card { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin-bottom: 16px; }
 .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin-bottom: 16px; }
 .tile { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
@@ -93,11 +103,28 @@ li, .tile .n { overflow-wrap: anywhere; }
 </head>
 <body>
 <main>
-  <h1>Freight nowcast</h1>
+  <h1>Global Freight Activity Tracker</h1>
+  <p class="tagline">Where the real economy is heading, read from trucks, trains, ships and shipping lanes across Germany, the Eurozone, the United States, the Gulf and world trade.</p>
   <p class="sub" id="sub"></p>
   <div id="banner"></div>
-  <nav class="toc" aria-label="Sections"><a href="#s-composite">Composite</a><a href="#s-geo">Geographies</a><a href="#s-ind">Indicators</a><a href="#s-evidence">Evidence</a><a href="#s-tilt">Tier 2 tilt</a><a href="#s-sources">Sources</a></nav>
+  <nav class="toc" aria-label="Sections"><a href="#s-thesis">What it means</a><a href="#s-composite">Composite</a><a href="#s-geo">Geographies</a><a href="#s-ind">Indicators</a><a href="#s-evidence">Evidence</a><a href="#s-tilt">Tier 2 tilt</a><a href="#s-sources">Sources</a></nav>
   <div class="tiles" id="tiles"></div>
+
+  <section class="card thesis" id="s-thesis">
+    <h2>What this could mean for the global economy</h2>
+    <p class="thesis-head" id="th-head"></p>
+    <div class="thesis-grid">
+      <div id="th-sections"></div>
+      <div>
+        <h3>Implications</h3>
+        <ul id="th-impl"></ul>
+        <h3>What to watch</h3>
+        <ul id="th-watch"></ul>
+      </div>
+    </div>
+    <p class="note" id="th-conf"></p>
+    <p class="note" id="th-method"></p>
+  </section>
 
   <section class="card" id="s-composite">
     <div class="row">
@@ -306,6 +333,14 @@ $("sources").innerHTML = "<tr><th>Series</th><th>Role</th><th>Status</th><th>Las
     }, 600000);
   } catch (e) { /* not hosted with its data files */ }
 })();
+
+const TH = D.feed.thesis || {};
+$("th-head").textContent = TH.headline || "";
+$("th-sections").innerHTML = (TH.sections || []).map((s) => `<p><b>${esc(s.title)}.</b> ${esc(s.text)}</p>`).join("");
+$("th-impl").innerHTML = (TH.implications || []).map((x) => `<li>${esc(x)}</li>`).join("");
+$("th-watch").innerHTML = (TH.watch || []).map((x) => `<li>${esc(x)}</li>`).join("");
+$("th-conf").textContent = TH.confidence || "";
+$("th-method").textContent = TH.method || "";
 
 if (D.warnings.length) { $("warn-card").hidden = false; $("warnings").innerHTML = D.warnings.map((w) => `<li>${esc(w)}</li>`).join(""); }
 </script>

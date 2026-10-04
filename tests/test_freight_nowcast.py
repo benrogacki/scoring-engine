@@ -147,6 +147,41 @@ class TurningPointTests(unittest.TestCase):
         self.assertFalse(prov[ms[5]])
         self.assertTrue(prov[ms[9]])    # b not yet published
 
+    def test_thesis_flags_chokepoint_shock_and_rate_squeeze(self):
+        from freight_nowcast.composite import IndicatorSignal
+        from freight_nowcast.thesis import _shock, build_thesis
+        ms = months(30, (2024, 1))
+        mon = {m: 0.0 for m in ms}
+        lvl = {m: 80.0 for m in ms}
+        for m in ms[-7:]:
+            mon[m], lvl[m] = -95.0, 4.0
+        hormuz = IndicatorSignal({"id": "h", "label": "Strait of Hormuz transits (IMF PortWatch)", "kind": "chokepoint",
+                                  "chokepoint_energy": True, "chokepoint_note": "carries oil"},
+                                 lvl, {}, mon, {m: -3.0 for m in ms})
+        s = _shock(hormuz, -40.0)
+        self.assertEqual((s["since"], s["months"]), (ms[-7], 7))
+        self.assertAlmostEqual(s["level_drop"], -95.0)
+        rate = IndicatorSignal({"id": "r", "label": "Dry-bulk freight", "kind": "freight_rate"}, {}, {},
+                               {ms[-1]: 90.0}, {ms[-1]: 1.0})
+        vol = IndicatorSignal({"id": "v", "label": "Port calls, world", "kind": "global_volume"}, {}, {},
+                              {ms[-1]: -6.0}, {ms[-1]: -1.5})
+
+        class R:  # minimal NowcastResult stand-in
+            signals, validation, series_meta = [hormuz, rate, vol], [], {}
+
+        feed = {"tier1": {"latest_month": "2026-06", "composite_z": -0.4, "phase": "Contraction", "direction": "falling",
+                          "conviction": "low", "provisional": False, "turning_point": None,
+                          "by_geography": {"A": {"label": "A", "composite_z": 1.0, "phase": "Expansion"},
+                                           "B": {"label": "B", "composite_z": -1.0, "phase": "Contraction"}}},
+                "tier2": {"tilt": {"cyclical_minus_defensive": -0.6}, "conviction": "low"}}
+        th = build_thesis(R(), feed)
+        text = th["headline"] + " ".join(x["text"] for x in th["sections"]) + " ".join(th["implications"])
+        self.assertIn("below trend", th["headline"])
+        self.assertIn("supply squeeze", text)
+        self.assertIn("Strait of Hormuz is down 95%", text)
+        self.assertIn("Energy supply risk", text)
+        self.assertIn("different speeds", text)
+
     def test_phase_clock(self):
         x = {(2026, 1): -1.0, (2026, 4): -0.5, (2026, 7): 0.5, (2026, 10): 0.2}
         self.assertEqual(phase(x, (2026, 4)), "Recovery")

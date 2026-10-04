@@ -1,4 +1,6 @@
-# Freight nowcaster
+# Global Freight Activity Tracker
+
+*(Python package `freight_nowcast`.)*
 
 `freight_nowcast` measures real-economy momentum from published freight series. It does not
 run its own AIS pipeline. It reads series that publishers have already aggregated, turns each one
@@ -19,6 +21,24 @@ the stack is `capstone_feed.json`:
  aisstream.io ─────── vessels in port, a few ports (optional) ──────┘   (no look-ahead)    + turning points   ├─ validation.json  (evidence)
  Eurostat / GENESIS / CPB ── production & trade (validation targets) ─────────────────────────────────────►└─ nowcast_summary.md, dashboard.html
 ```
+
+## What the dashboard says
+
+The dashboard opens with **What this could mean for the global economy**, a short thesis that
+`thesis.py` rewrites from the latest numbers on every run. It covers:
+
+- the overall direction
+- where the regions diverge
+- freight costs against freight volumes: rising rates on falling volumes means a supply squeeze,
+  not a demand boom
+- chokepoint shocks such as the Strait of Hormuz: when they began and how deep they are
+- the implications for growth, inflation, trade and positioning
+- what would confirm or overturn the read
+- how much of it passes the evidence test
+
+The rules key off a `kind` tag on catalog series (`freight_rate`, `global_volume`, `chokepoint`).
+They state what the data is consistent with, not a forecast. The same text goes into
+`nowcast_summary.md` and `capstone_feed.json` (`thesis`).
 
 ## Two modes: live and sandbox
 
