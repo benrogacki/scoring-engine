@@ -1,9 +1,9 @@
 {
   "schema": "freight_nowcast/capstone_feed@1",
-  "generated_at": "2026-10-04T13:56:26+00:00",
+  "generated_at": "2026-10-04T14:04:02+00:00",
   "as_of": "2026-10-04",
   "data_mode": "live",
-  "data_updated_at": "2026-10-04T13:56:25+00:00",
+  "data_updated_at": "2026-10-04T14:04:01+00:00",
   "tier1": {
     "signal": "real_economy_momentum",
     "read_alongside": "yield_curve",
@@ -719,7 +719,7 @@
       "last_observation": "2026-09-26",
       "extended_by": "de_toll_mileage_daily",
       "latest_month_coverage": 0.867,
-      "fetched_at": "2026-10-04T13:56:06+00:00"
+      "fetched_at": "2026-10-04T14:03:44+00:00"
     },
     "de_port_calls": {
       "label": "Port calls, Germany (IMF PortWatch, AIS)",
@@ -730,7 +730,7 @@
       "last_observation": "2026-09-25",
       "extended_by": null,
       "latest_month_coverage": 0.833,
-      "fetched_at": "2026-10-04T13:56:11+00:00"
+      "fetched_at": "2026-10-04T14:03:49+00:00"
     },
     "ea_port_calls": {
       "label": "Port calls, Eurozone ports (IMF PortWatch, AIS)",
@@ -741,7 +741,7 @@
       "last_observation": "2026-09-25",
       "extended_by": null,
       "latest_month_coverage": 0.833,
-      "fetched_at": "2026-10-04T13:56:12+00:00"
+      "fetched_at": "2026-10-04T14:03:50+00:00"
     },
     "world_port_calls": {
       "label": "Port calls, world (IMF PortWatch, AIS)",
@@ -752,7 +752,7 @@
       "last_observation": "2026-09-25",
       "extended_by": null,
       "latest_month_coverage": 0.833,
-      "fetched_at": "2026-10-04T13:56:12+00:00"
+      "fetched_at": "2026-10-04T14:03:50+00:00"
     },
     "dry_bulk_freight": {
       "label": "Dry-bulk freight (Breakwave BDRY, BDI futures)",
@@ -763,7 +763,7 @@
       "last_observation": "2026-10-02",
       "extended_by": null,
       "latest_month_coverage": 1.0,
-      "fetched_at": "2026-10-04T13:56:13+00:00"
+      "fetched_at": "2026-10-04T14:03:52+00:00"
     },
     "us_freight_tsi": {
       "label": "Freight Transportation Services Index (BTS)",
@@ -774,7 +774,7 @@
       "last_observation": "2026-07-01",
       "extended_by": null,
       "latest_month_coverage": 1.0,
-      "fetched_at": "2026-10-04T13:56:13+00:00"
+      "fetched_at": "2026-10-04T14:03:52+00:00"
     },
     "us_cass_shipments": {
       "label": "Cass Freight Index, shipments",
@@ -785,7 +785,7 @@
       "last_observation": "2026-08-01",
       "extended_by": null,
       "latest_month_coverage": 1.0,
-      "fetched_at": "2026-10-04T13:56:13+00:00"
+      "fetched_at": "2026-10-04T14:03:52+00:00"
     },
     "us_rail_carloads": {
       "label": "Rail freight carloads",
@@ -796,7 +796,7 @@
       "last_observation": "2026-07-01",
       "extended_by": null,
       "latest_month_coverage": 1.0,
-      "fetched_at": "2026-10-04T13:56:13+00:00"
+      "fetched_at": "2026-10-04T14:03:52+00:00"
     },
     "us_port_calls": {
       "label": "Port calls, United States (IMF PortWatch, AIS)",
@@ -807,7 +807,7 @@
       "last_observation": "2026-09-25",
       "extended_by": null,
       "latest_month_coverage": 0.833,
-      "fetched_at": "2026-10-04T13:56:14+00:00"
+      "fetched_at": "2026-10-04T14:03:52+00:00"
     },
     "gcc_port_calls": {
       "label": "Port calls, Gulf states (IMF PortWatch, AIS)",
@@ -818,7 +818,7 @@
       "last_observation": "2026-09-25",
       "extended_by": null,
       "latest_month_coverage": 0.833,
-      "fetched_at": "2026-10-04T13:56:14+00:00"
+      "fetched_at": "2026-10-04T14:03:52+00:00"
     },
     "hormuz_transits": {
       "label": "Strait of Hormuz transits (IMF PortWatch)",
@@ -829,7 +829,7 @@
       "last_observation": "2026-09-27",
       "extended_by": null,
       "latest_month_coverage": 0.9,
-      "fetched_at": "2026-10-04T13:56:15+00:00"
+      "fetched_at": "2026-10-04T14:03:53+00:00"
     },
     "bab_el_mandeb_transits": {
       "label": "Bab el-Mandeb transits (IMF PortWatch)",
@@ -840,7 +840,7 @@
       "last_observation": "2026-09-27",
       "extended_by": null,
       "latest_month_coverage": 0.9,
-      "fetched_at": "2026-10-04T13:56:15+00:00"
+      "fetched_at": "2026-10-04T14:03:53+00:00"
     },
     "de_manufacturing_production": {
       "label": "Manufacturing production, Germany (sca)",
@@ -851,7 +851,7 @@
       "last_observation": "2026-07-01",
       "extended_by": null,
       "latest_month_coverage": 1.0,
-      "fetched_at": "2026-10-04T13:56:16+00:00"
+      "fetched_at": "2026-10-04T14:03:54+00:00"
     },
     "ea_manufacturing_production": {
       "label": "Manufacturing production, euro area (sca)",
@@ -862,7 +862,7 @@
       "last_observation": "2026-07-01",
       "extended_by": null,
       "latest_month_coverage": 1.0,
-      "fetched_at": "2026-10-04T13:56:16+00:00"
+      "fetched_at": "2026-10-04T14:03:54+00:00"
     },
     "de_exports": {
       "label": "Exports, Germany (foreign trade statistics)",
@@ -873,7 +873,7 @@
       "last_observation": "2026-06-01",
       "extended_by": null,
       "latest_month_coverage": 1.0,
-      "fetched_at": "2026-10-04T13:56:17+00:00"
+      "fetched_at": "2026-10-04T14:03:55+00:00"
     },
     "world_trade_volume": {
       "label": "World trade volume (CPB World Trade Monitor)",
@@ -884,7 +884,7 @@
       "last_observation": "2026-07-01",
       "extended_by": null,
       "latest_month_coverage": 1.0,
-      "fetched_at": "2026-10-04T13:56:19+00:00"
+      "fetched_at": "2026-10-04T14:03:56+00:00"
     },
     "us_manufacturing_production": {
       "label": "Manufacturing production, United States",
@@ -895,7 +895,7 @@
       "last_observation": "2026-08-01",
       "extended_by": null,
       "latest_month_coverage": 1.0,
-      "fetched_at": "2026-10-04T13:56:23+00:00"
+      "fetched_at": "2026-10-04T14:04:00+00:00"
     },
     "us_goods_imports": {
       "label": "Goods imports, United States (BOP basis)",
@@ -906,7 +906,7 @@
       "last_observation": "2026-07-01",
       "extended_by": null,
       "latest_month_coverage": 1.0,
-      "fetched_at": "2026-10-04T13:56:23+00:00"
+      "fetched_at": "2026-10-04T14:04:00+00:00"
     },
     "ea_exports": {
       "label": "Extra-EU export volume, sa (Eurozone proxy)",
@@ -917,7 +917,7 @@
       "last_observation": "2026-06-01",
       "extended_by": null,
       "latest_month_coverage": 1.0,
-      "fetched_at": "2026-10-04T13:56:23+00:00"
+      "fetched_at": "2026-10-04T14:04:00+00:00"
     },
     "gcc_exports": {
       "label": "Merchandise exports, Saudi Arabia (IMF IMTS)",
@@ -928,10 +928,41 @@
       "last_observation": "2026-06-01",
       "extended_by": null,
       "latest_month_coverage": 1.0,
-      "fetched_at": "2026-10-04T13:56:23+00:00"
+      "fetched_at": "2026-10-04T14:04:00+00:00"
     }
   },
   "warnings": [
     "de_ais_stationary: optional, no data cached yet (skipped)"
-  ]
+  ],
+  "thesis": {
+    "headline": "Freight data says the global goods economy is below trend but turning up (composite -0.20 z, rising over three months).",
+    "sections": [
+      {
+        "title": "Where",
+        "text": "The world is moving at different speeds. Germany is the strongest (+1.1 z) and Arabia (GCC) the weakest (-2.3 z), a gap of 3.3 standard deviations. By region: Germany +1.1 z (expansion); Eurozone +0.1 z (expansion); United States -0.3 z (contraction); World sea trade -1.0 z (contraction); Arabia (GCC) -2.3 z (contraction)."
+      },
+      {
+        "title": "Costs vs volumes",
+        "text": "Shipping is getting dearer while less cargo moves: Dry-bulk freight (Breakwave BDRY, BDI futures) +94% y/y (+0.8 z) against Port calls, world (IMF PortWatch, AIS) -6.4% y/y (-1.9 z). Rising rates on falling volumes point to a supply squeeze (lost capacity, rerouting, longer voyages), not a demand boom."
+      },
+      {
+        "title": "Chokepoints",
+        "text": "Traffic through the Strait of Hormuz is down 96% on a year ago (-94% against the three months before). The fall began in March 2026 and has lasted 7 months. The Strait of Hormuz normally carries about a fifth of the world's oil and much of its LNG. Bab el-Mandeb transits are down 23% y/y."
+      }
+    ],
+    "implications": [
+      "Growth: the trough may be behind us; official production and trade data should start to improve if the turn holds.",
+      "Growth is uneven: expect Germany-facing activity to outperform Arabia (GCC)-facing activity while the gap persists.",
+      "Cost-push pressure on traded goods: higher freight costs feed into import prices and goods inflation with a lag of a few months, while real trade volumes soften.",
+      "Energy supply risk: a sustained Strait of Hormuz disruption tightens oil and LNG supply, raising energy prices and the inflation outlook for importers (Europe and Asia most exposed), while cutting Gulf export volumes.",
+      "Positioning: the cycle phase favours cyclicals over defensives (tilt +0.61, scaled by low conviction)."
+    ],
+    "watch": [
+      "The confirmed trough in January 2026: a move of 0.5 z the other way sustained for two months would flag a new turn.",
+      "Strait of Hormuz transits: a recovery towards pre-March levels would ease the energy and freight-cost pressure.",
+      "Official data lags the freight data: Exports, Germany (foreign trade statistics) is only available to June 2026. The next official releases will confirm or contradict this read."
+    ],
+    "confidence": "Conviction is low. 3 of 13 indicator-to-official-data links pass the out-of-sample evidence test and the latest month is provisional (month-to-date data). Treat this as a hypothesis the next official releases will test.",
+    "method": "Written automatically from the latest data by fixed rules on every run. It describes what the freight data is consistent with; it is not a forecast or investment advice."
+  }
 }
