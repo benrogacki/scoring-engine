@@ -1,9 +1,9 @@
 {
   "schema": "freight_nowcast/capstone_feed@1",
-  "generated_at": "2026-10-04T13:28:24+00:00",
+  "generated_at": "2026-10-04T13:30:15+00:00",
   "as_of": "2026-10-04",
   "data_mode": "live",
-  "data_updated_at": "2026-10-04T13:28:22+00:00",
+  "data_updated_at": "2026-10-04T13:30:14+00:00",
   "tier1": {
     "signal": "real_economy_momentum",
     "read_alongside": "yield_curve",
@@ -34,8 +34,8 @@
       "us_rail_carloads->us_manufacturing_production": "evidenced",
       "us_port_calls->us_goods_imports": "partial",
       "ea_port_calls->ea_exports": "not run",
-      "gcc_port_calls->gcc_exports": "not run",
-      "hormuz_transits->gcc_exports": "not run",
+      "gcc_port_calls->gcc_exports": "not evidenced",
+      "hormuz_transits->gcc_exports": "not evidenced",
       "bab_el_mandeb_transits->world_trade_volume": "not evidenced"
     },
     "evidenced_weight_share": 0.21,
@@ -117,8 +117,8 @@
         "coverage": 1.0,
         "turning_point": null,
         "evidence": {
-          "gcc_port_calls->gcc_exports": "not run",
-          "hormuz_transits->gcc_exports": "not run",
+          "gcc_port_calls->gcc_exports": "not evidenced",
+          "hormuz_transits->gcc_exports": "not evidenced",
           "bab_el_mandeb_transits->world_trade_volume": "not evidenced"
         },
         "evidenced_weight_share": 0.0,
@@ -605,55 +605,67 @@
       "indicator": "gcc_port_calls",
       "target": "gcc_exports",
       "transform": "yoy",
-      "n": 0,
-      "first": "",
-      "last": "",
-      "lead_profile": {},
-      "best_lead": null,
-      "best_corr": null,
-      "beta": null,
-      "beta_t": null,
-      "beta_p": null,
-      "r2": null,
-      "oos_n": 0,
-      "rmse_model": null,
-      "rmse_benchmark": null,
-      "rmse_ratio": null,
-      "dm_stat": null,
-      "dm_p": null,
-      "hit_rate": null,
-      "timing_advantage_days": null,
-      "verdict": "not run",
-      "notes": [
-        "missing data for gcc_exports"
-      ]
+      "n": 78,
+      "first": "2020-01",
+      "last": "2026-06",
+      "lead_profile": {
+        "-3": 0.059,
+        "-2": 0.059,
+        "-1": 0.049,
+        "0": 0.025,
+        "1": 0.036,
+        "2": 0.024,
+        "3": -0.014
+      },
+      "best_lead": 1,
+      "best_corr": 0.0359,
+      "beta": 0.0714,
+      "beta_t": 0.2833,
+      "beta_p": 0.777,
+      "r2": 0.0006,
+      "oos_n": 42,
+      "rmse_model": 9.1315,
+      "rmse_benchmark": 7.6306,
+      "rmse_ratio": 1.1967,
+      "dm_stat": 1.4707,
+      "dm_p": 0.9293,
+      "hit_rate": 0.5238,
+      "timing_advantage_days": 50,
+      "verdict": "not evidenced",
+      "notes": []
     },
     {
       "indicator": "hormuz_transits",
       "target": "gcc_exports",
       "transform": "yoy",
-      "n": 0,
-      "first": "",
-      "last": "",
-      "lead_profile": {},
-      "best_lead": null,
-      "best_corr": null,
-      "beta": null,
-      "beta_t": null,
-      "beta_p": null,
-      "r2": null,
-      "oos_n": 0,
-      "rmse_model": null,
-      "rmse_benchmark": null,
-      "rmse_ratio": null,
-      "dm_stat": null,
-      "dm_p": null,
-      "hit_rate": null,
-      "timing_advantage_days": null,
-      "verdict": "not run",
-      "notes": [
-        "missing data for gcc_exports"
-      ]
+      "n": 78,
+      "first": "2020-01",
+      "last": "2026-06",
+      "lead_profile": {
+        "-3": 0.114,
+        "-2": 0.128,
+        "-1": 0.146,
+        "0": 0.184,
+        "1": 0.264,
+        "2": 0.319,
+        "3": 0.36
+      },
+      "best_lead": 3,
+      "best_corr": 0.3598,
+      "beta": 0.2961,
+      "beta_t": 1.1816,
+      "beta_p": 0.2373,
+      "r2": 0.034,
+      "oos_n": 42,
+      "rmse_model": 9.8578,
+      "rmse_benchmark": 7.6306,
+      "rmse_ratio": 1.2919,
+      "dm_stat": 1.0609,
+      "dm_p": 0.8556,
+      "hit_rate": 0.5714,
+      "timing_advantage_days": 50,
+      "verdict": "not evidenced",
+      "notes": []
     },
     {
       "indicator": "bab_el_mandeb_transits",
@@ -699,7 +711,7 @@
       "last_observation": "2026-09-26",
       "extended_by": "de_toll_mileage_daily",
       "latest_month_coverage": 0.867,
-      "fetched_at": "2026-10-04T13:27:57+00:00"
+      "fetched_at": "2026-10-04T13:29:54+00:00"
     },
     "de_port_calls": {
       "label": "Port calls, Germany (IMF PortWatch, AIS)",
@@ -710,7 +722,7 @@
       "last_observation": "2026-09-25",
       "extended_by": null,
       "latest_month_coverage": 0.833,
-      "fetched_at": "2026-10-04T13:28:05+00:00"
+      "fetched_at": "2026-10-04T13:29:59+00:00"
     },
     "ea_port_calls": {
       "label": "Port calls, Eurozone ports (IMF PortWatch, AIS)",
@@ -721,7 +733,7 @@
       "last_observation": "2026-09-25",
       "extended_by": null,
       "latest_month_coverage": 0.833,
-      "fetched_at": "2026-10-04T13:28:06+00:00"
+      "fetched_at": "2026-10-04T13:29:59+00:00"
     },
     "world_port_calls": {
       "label": "Port calls, world (IMF PortWatch, AIS)",
@@ -732,7 +744,7 @@
       "last_observation": "2026-09-25",
       "extended_by": null,
       "latest_month_coverage": 0.833,
-      "fetched_at": "2026-10-04T13:28:07+00:00"
+      "fetched_at": "2026-10-04T13:29:59+00:00"
     },
     "dry_bulk_freight": {
       "label": "Dry-bulk freight (Breakwave BDRY, BDI futures)",
@@ -743,7 +755,7 @@
       "last_observation": "2026-10-02",
       "extended_by": null,
       "latest_month_coverage": 1.0,
-      "fetched_at": "2026-10-04T13:28:08+00:00"
+      "fetched_at": "2026-10-04T13:30:00+00:00"
     },
     "us_freight_tsi": {
       "label": "Freight Transportation Services Index (BTS)",
@@ -754,7 +766,7 @@
       "last_observation": "2026-07-01",
       "extended_by": null,
       "latest_month_coverage": 1.0,
-      "fetched_at": "2026-10-04T13:28:08+00:00"
+      "fetched_at": "2026-10-04T13:30:00+00:00"
     },
     "us_cass_shipments": {
       "label": "Cass Freight Index, shipments",
@@ -765,7 +777,7 @@
       "last_observation": "2026-08-01",
       "extended_by": null,
       "latest_month_coverage": 1.0,
-      "fetched_at": "2026-10-04T13:28:08+00:00"
+      "fetched_at": "2026-10-04T13:30:00+00:00"
     },
     "us_rail_carloads": {
       "label": "Rail freight carloads",
@@ -776,7 +788,7 @@
       "last_observation": "2026-07-01",
       "extended_by": null,
       "latest_month_coverage": 1.0,
-      "fetched_at": "2026-10-04T13:28:08+00:00"
+      "fetched_at": "2026-10-04T13:30:00+00:00"
     },
     "us_port_calls": {
       "label": "Port calls, United States (IMF PortWatch, AIS)",
@@ -787,7 +799,7 @@
       "last_observation": "2026-09-25",
       "extended_by": null,
       "latest_month_coverage": 0.833,
-      "fetched_at": "2026-10-04T13:28:08+00:00"
+      "fetched_at": "2026-10-04T13:30:01+00:00"
     },
     "gcc_port_calls": {
       "label": "Port calls, Gulf states (IMF PortWatch, AIS)",
@@ -798,7 +810,7 @@
       "last_observation": "2026-09-25",
       "extended_by": null,
       "latest_month_coverage": 0.833,
-      "fetched_at": "2026-10-04T13:28:09+00:00"
+      "fetched_at": "2026-10-04T13:30:01+00:00"
     },
     "hormuz_transits": {
       "label": "Strait of Hormuz transits (IMF PortWatch)",
@@ -809,7 +821,7 @@
       "last_observation": "2026-09-27",
       "extended_by": null,
       "latest_month_coverage": 0.9,
-      "fetched_at": "2026-10-04T13:28:10+00:00"
+      "fetched_at": "2026-10-04T13:30:01+00:00"
     },
     "bab_el_mandeb_transits": {
       "label": "Bab el-Mandeb transits (IMF PortWatch)",
@@ -820,7 +832,7 @@
       "last_observation": "2026-09-27",
       "extended_by": null,
       "latest_month_coverage": 0.9,
-      "fetched_at": "2026-10-04T13:28:12+00:00"
+      "fetched_at": "2026-10-04T13:30:01+00:00"
     },
     "de_manufacturing_production": {
       "label": "Manufacturing production, Germany (sca)",
@@ -831,7 +843,7 @@
       "last_observation": "2026-07-01",
       "extended_by": null,
       "latest_month_coverage": 1.0,
-      "fetched_at": "2026-10-04T13:28:13+00:00"
+      "fetched_at": "2026-10-04T13:30:02+00:00"
     },
     "ea_manufacturing_production": {
       "label": "Manufacturing production, euro area (sca)",
@@ -842,7 +854,7 @@
       "last_observation": "2026-07-01",
       "extended_by": null,
       "latest_month_coverage": 1.0,
-      "fetched_at": "2026-10-04T13:28:13+00:00"
+      "fetched_at": "2026-10-04T13:30:02+00:00"
     },
     "de_exports": {
       "label": "Exports, Germany (foreign trade statistics)",
@@ -853,7 +865,7 @@
       "last_observation": "2026-06-01",
       "extended_by": null,
       "latest_month_coverage": 1.0,
-      "fetched_at": "2026-10-04T13:28:14+00:00"
+      "fetched_at": "2026-10-04T13:30:03+00:00"
     },
     "world_trade_volume": {
       "label": "World trade volume (CPB World Trade Monitor)",
@@ -864,7 +876,7 @@
       "last_observation": "2026-07-01",
       "extended_by": null,
       "latest_month_coverage": 1.0,
-      "fetched_at": "2026-10-04T13:28:16+00:00"
+      "fetched_at": "2026-10-04T13:30:05+00:00"
     },
     "us_manufacturing_production": {
       "label": "Manufacturing production, United States",
@@ -875,7 +887,7 @@
       "last_observation": "2026-08-01",
       "extended_by": null,
       "latest_month_coverage": 1.0,
-      "fetched_at": "2026-10-04T13:28:21+00:00"
+      "fetched_at": "2026-10-04T13:30:08+00:00"
     },
     "us_goods_imports": {
       "label": "Goods imports, United States (BOP basis)",
@@ -886,12 +898,22 @@
       "last_observation": "2026-07-01",
       "extended_by": null,
       "latest_month_coverage": 1.0,
-      "fetched_at": "2026-10-04T13:28:21+00:00"
+      "fetched_at": "2026-10-04T13:30:08+00:00"
+    },
+    "gcc_exports": {
+      "label": "Merchandise exports, Saudi Arabia (IMF IMTS)",
+      "role": "target",
+      "mode": "",
+      "geography": "GCC",
+      "source": "sdmx:imf",
+      "last_observation": "2026-06-01",
+      "extended_by": null,
+      "latest_month_coverage": 1.0,
+      "fetched_at": "2026-10-04T13:30:11+00:00"
     }
   },
   "warnings": [
     "de_ais_stationary: optional, no data cached yet (skipped)",
-    "ea_exports: optional, no data cached yet (skipped)",
-    "gcc_exports: optional, no data cached yet (skipped)"
+    "ea_exports: optional, no data cached yet (skipped)"
   ]
 }
