@@ -85,7 +85,8 @@ def summary_markdown(r: NowcastResult, feed: Mapping[str, Any]) -> str:
             continue
         tp = g["turning_point"]
         tp_s = f"{tp['status']} {tp['kind']} {tp['month']}" if tp else ""
-        lines.append(f"| {g['label']} ({code}) | {g['latest_month']}{'*' if g['provisional'] else ''} | "
+        name = g["label"] if f"({code})" in g["label"] else f"{g['label']} ({code})"
+        lines.append(f"| {name} | {g['latest_month']}{'*' if g['provisional'] else ''} | "
                      f"{_fmt(g['composite_z'])} | {_fmt(g['change_3m'])} | {g['phase'] or '–'} | {tp_s} | "
                      f"{g['conviction']} | {g['coverage']:.0%} |")
     lines += ["", "\\* provisional", "", "## Indicators (latest)", "",
