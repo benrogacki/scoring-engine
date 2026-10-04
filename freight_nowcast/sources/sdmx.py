@@ -32,6 +32,7 @@ AGENCIES = {
     "eurostat": ("https://ec.europa.eu/eurostat/api/dissemination/sdmx/2.1/data/{flow}/{key}",
                  {"format": "SDMX-CSV"}),
     "ecb": ("https://data-api.ecb.europa.eu/service/data/{flow}/{key}", {"format": "csvdata"}),
+    "imf": ("https://api.imf.org/external/sdmx/2.1/data/{flow}/{key}", {}),
 }
 _NON_DIMENSIONS = {"time_period", "obs_value", "obs_status", "obs_flag", "conf_status", "unit_mult",
                    "decimals", "dataflow", "structure", "structure_id", "action", "obs_conf",

@@ -601,30 +601,66 @@
           "indic": "ET-T",
           "unit": "IVOL-SA"
         }
-      }
+      },
+      "fallback": [
+        {
+          "source": "eurostat_jsonstat",
+          "frequency": "M",
+          "params": {
+            "flow": "ei_eteu27_2020_m",
+            "dims": {
+              "geo": "EA20",
+              "stk_flow": "EXP",
+              "partner": "WORLD",
+              "indic": "ET-T",
+              "unit": "IVOL-SA"
+            }
+          }
+        },
+        {
+          "source": "eurostat_jsonstat",
+          "frequency": "M",
+          "params": {
+            "flow": "ei_eteu27_2020_m",
+            "dims": {
+              "geo": "EA20",
+              "stk_flow": "EXP",
+              "partner": "EXT_EA20",
+              "indic": "ET-T",
+              "unit": "MIO-EUR-SA"
+            }
+          }
+        }
+      ]
     },
     {
       "id": "gcc_exports",
-      "label": "Merchandise exports, Saudi Arabia",
+      "label": "Merchandise exports, Saudi Arabia (IMF IMTS)",
       "role": "target",
       "geography": "GCC",
       "frequency": "M",
       "optional": true,
       "publication_lag_days": 60,
-      "source": "fred",
+      "source": "sdmx",
       "params": {
-        "fred_id": "XTEXVA01SAM667S"
+        "agency": "imf",
+        "flow": "IMF.STA,IMTS",
+        "key": "SAU.XG_FOB_USD.G001.M",
+        "start": "2015-01"
       },
       "fallback": [
         {
-          "source": "fred",
+          "source": "sdmx",
           "frequency": "M",
           "params": {
-            "fred_id": "XTEXVA01SAM664S"
+            "agency": "imf",
+            "flow": "IMF.STA,IMTS",
+            "key": "SAU..G001.M",
+            "start": "2024-01"
           }
         }
       ],
-      "_verify": "OECD MEI series on FRED; may be discontinued"
+      "_verify": "IMF IMTS dimension codes (country.indicator.counterpart.frequency)"
     }
   ],
   "validation": [
