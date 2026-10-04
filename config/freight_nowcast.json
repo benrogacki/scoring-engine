@@ -22,15 +22,23 @@
   "geographies": {
     "DE": {
       "label": "Germany",
-      "weight": 0.4
+      "weight": 0.2
     },
     "EA": {
-      "label": "Euro area",
+      "label": "Eurozone",
+      "weight": 0.25
+    },
+    "US": {
+      "label": "United States",
       "weight": 0.3
+    },
+    "GCC": {
+      "label": "Arabia (GCC)",
+      "weight": 0.1
     },
     "WORLD": {
       "label": "World sea trade",
-      "weight": 0.3
+      "weight": 0.15
     }
   },
   "series": [
@@ -114,7 +122,7 @@
     },
     {
       "id": "ea_port_calls",
-      "label": "Port calls, euro-area ports (IMF PortWatch, AIS)",
+      "label": "Port calls, Eurozone ports (IMF PortWatch, AIS)",
       "role": "indicator",
       "mode": "sea",
       "geography": "EA",
@@ -313,6 +321,139 @@
       "how_to_get": "Written by `freight-nowcast ais-listen` (needs AISSTREAM_API_KEY; cron it daily). Enters the composite once it has 3 years of history."
     },
     {
+      "id": "us_freight_tsi",
+      "label": "Freight Transportation Services Index (BTS)",
+      "role": "indicator",
+      "mode": "road/rail",
+      "geography": "US",
+      "frequency": "M",
+      "transform": "3m3m",
+      "weight": 1.0,
+      "publication_lag_days": 45,
+      "source": "fred",
+      "params": {
+        "fred_id": "TSIFRGHT"
+      }
+    },
+    {
+      "id": "us_cass_shipments",
+      "label": "Cass Freight Index, shipments",
+      "role": "indicator",
+      "mode": "road",
+      "geography": "US",
+      "frequency": "M",
+      "transform": "yoy",
+      "weight": 0.75,
+      "optional": true,
+      "publication_lag_days": 15,
+      "source": "fred",
+      "params": {
+        "fred_id": "FRGSHPUSM649NCIS"
+      }
+    },
+    {
+      "id": "us_rail_carloads",
+      "label": "Rail freight carloads",
+      "role": "indicator",
+      "mode": "rail",
+      "geography": "US",
+      "frequency": "M",
+      "transform": "3m3m",
+      "weight": 0.5,
+      "optional": true,
+      "publication_lag_days": 40,
+      "source": "fred",
+      "params": {
+        "fred_id": "RAILFRTCARLOADSD11"
+      }
+    },
+    {
+      "id": "us_port_calls",
+      "label": "Port calls, United States (IMF PortWatch, AIS)",
+      "role": "indicator",
+      "mode": "sea",
+      "geography": "US",
+      "frequency": "D",
+      "transform": "yoy",
+      "weight": 1.0,
+      "optional": true,
+      "publication_lag_days": 10,
+      "source": "portwatch",
+      "params": {
+        "countries": [
+          "USA"
+        ],
+        "start_year": 2019
+      }
+    },
+    {
+      "id": "gcc_port_calls",
+      "label": "Port calls, Gulf states (IMF PortWatch, AIS)",
+      "role": "indicator",
+      "mode": "sea",
+      "geography": "GCC",
+      "frequency": "D",
+      "transform": "yoy",
+      "weight": 1.0,
+      "optional": true,
+      "publication_lag_days": 10,
+      "source": "portwatch",
+      "params": {
+        "countries": [
+          "SAU",
+          "ARE",
+          "QAT",
+          "KWT",
+          "OMN",
+          "BHR"
+        ],
+        "start_year": 2019
+      },
+      "_note": "Saudi Arabia, UAE, Qatar, Kuwait, Oman, Bahrain."
+    },
+    {
+      "id": "hormuz_transits",
+      "label": "Strait of Hormuz transits (IMF PortWatch)",
+      "role": "indicator",
+      "mode": "sea",
+      "geography": "GCC",
+      "frequency": "D",
+      "transform": "yoy",
+      "weight": 0.75,
+      "optional": true,
+      "publication_lag_days": 10,
+      "source": "portwatch",
+      "params": {
+        "layer": "chokepoints",
+        "names": [
+          "Strait of Hormuz"
+        ],
+        "field": "n_total",
+        "start_year": 2019
+      }
+    },
+    {
+      "id": "bab_el_mandeb_transits",
+      "label": "Bab el-Mandeb transits (IMF PortWatch)",
+      "role": "indicator",
+      "mode": "sea",
+      "geography": "GCC",
+      "frequency": "D",
+      "transform": "yoy",
+      "weight": 0.5,
+      "optional": true,
+      "publication_lag_days": 10,
+      "source": "portwatch",
+      "params": {
+        "layer": "chokepoints",
+        "names": [
+          "Bab el-Mandeb Strait"
+        ],
+        "field": "n_total",
+        "start_year": 2019
+      }
+    },
+    {
       "id": "de_manufacturing_production",
       "label": "Manufacturing production, Germany (sca)",
       "role": "target",
@@ -416,6 +557,74 @@
         }
       ],
       "_note": "CPB publishes the monitor as a free xlsx; the connector follows the newest link. Fallback: Eurostat extra-EU export volume (sa)."
+    },
+    {
+      "id": "us_manufacturing_production",
+      "label": "Manufacturing production, United States",
+      "role": "target",
+      "geography": "US",
+      "frequency": "M",
+      "publication_lag_days": 16,
+      "source": "fred",
+      "params": {
+        "fred_id": "IPMAN"
+      }
+    },
+    {
+      "id": "us_goods_imports",
+      "label": "Goods imports, United States (BOP basis)",
+      "role": "target",
+      "geography": "US",
+      "frequency": "M",
+      "optional": true,
+      "publication_lag_days": 35,
+      "source": "fred",
+      "params": {
+        "fred_id": "BOPGIMP"
+      }
+    },
+    {
+      "id": "ea_exports",
+      "label": "Extra-euro-area export volume (sa)",
+      "role": "target",
+      "geography": "EA",
+      "frequency": "M",
+      "optional": true,
+      "publication_lag_days": 45,
+      "source": "eurostat_jsonstat",
+      "params": {
+        "flow": "ei_eteu27_2020_m",
+        "dims": {
+          "geo": "EA20",
+          "stk_flow": "EXP",
+          "partner": "EXT_EA20",
+          "indic": "ET-T",
+          "unit": "IVOL-SA"
+        }
+      }
+    },
+    {
+      "id": "gcc_exports",
+      "label": "Merchandise exports, Saudi Arabia",
+      "role": "target",
+      "geography": "GCC",
+      "frequency": "M",
+      "optional": true,
+      "publication_lag_days": 60,
+      "source": "fred",
+      "params": {
+        "fred_id": "XTEXVA01SAM667S"
+      },
+      "fallback": [
+        {
+          "source": "fred",
+          "frequency": "M",
+          "params": {
+            "fred_id": "XTEXVA01SAM664S"
+          }
+        }
+      ],
+      "_verify": "OECD MEI series on FRED; may be discontinued"
     }
   ],
   "validation": [
@@ -451,6 +660,54 @@
     },
     {
       "indicator": "world_dry_bulk_calls",
+      "target": "world_trade_volume",
+      "transform": "yoy",
+      "max_lag": 3
+    },
+    {
+      "indicator": "us_freight_tsi",
+      "target": "us_manufacturing_production",
+      "transform": "mom",
+      "max_lag": 3
+    },
+    {
+      "indicator": "us_cass_shipments",
+      "target": "us_manufacturing_production",
+      "transform": "yoy",
+      "max_lag": 3
+    },
+    {
+      "indicator": "us_rail_carloads",
+      "target": "us_manufacturing_production",
+      "transform": "mom",
+      "max_lag": 3
+    },
+    {
+      "indicator": "us_port_calls",
+      "target": "us_goods_imports",
+      "transform": "yoy",
+      "max_lag": 3
+    },
+    {
+      "indicator": "ea_port_calls",
+      "target": "ea_exports",
+      "transform": "yoy",
+      "max_lag": 3
+    },
+    {
+      "indicator": "gcc_port_calls",
+      "target": "gcc_exports",
+      "transform": "yoy",
+      "max_lag": 3
+    },
+    {
+      "indicator": "hormuz_transits",
+      "target": "gcc_exports",
+      "transform": "yoy",
+      "max_lag": 3
+    },
+    {
+      "indicator": "bab_el_mandeb_transits",
       "target": "world_trade_volume",
       "transform": "yoy",
       "max_lag": 3
