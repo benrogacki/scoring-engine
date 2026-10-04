@@ -12,12 +12,15 @@ dependencies = []
 
 [project.optional-dependencies]
 databricks = ["databricks-sql-connector>=3.0"]
+ais = ["websockets>=12"]
 
 [project.scripts]
 credit-score = "scoring_engine.cli:main"
+freight-nowcast = "freight_nowcast.cli:main"
 
 [tool.setuptools.packages.find]
-include = ["scoring_engine*"]
+include = ["scoring_engine*", "freight_nowcast*"]
 
 [tool.setuptools.package-data]
 scoring_engine = ["templates/*.html", "sources/queries/*.sql"]
+freight_nowcast = ["templates/*.html"]
