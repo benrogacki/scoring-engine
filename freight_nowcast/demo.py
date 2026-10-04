@@ -70,6 +70,17 @@ def generate(as_of: date, seed: int = 11, start: Tuple[int, int] = (2012, 1)) ->
         "world_port_calls": mk("world_port_calls", 0.15, 0.6, 0.9),
         "world_trade_volume": mk("world_trade_volume", 0.2, 0.7, 0.8),
         "world_dry_bulk_calls": mk("world_dry_bulk_calls", 0.1, 0.5, 1.4),
+        "ea_exports": mk("ea_exports", 0.1, 0.8, 1.0),
+        "us_freight_tsi": mk("us_freight_tsi", 0.1, 0.8, 0.5),
+        "us_cass_shipments": mk("us_cass_shipments", 0.0, 0.9, 1.3),
+        "us_rail_carloads": mk("us_rail_carloads", -0.05, 0.6, 0.9),
+        "us_port_calls": mk("us_port_calls", 0.1, 0.7, 1.1),
+        "us_manufacturing_production": mk("us_manufacturing_production", 0.1, 0.9, 0.6),
+        "us_goods_imports": mk("us_goods_imports", 0.3, 0.8, 1.2),
+        "gcc_port_calls": mk("gcc_port_calls", 0.3, 0.5, 1.5),
+        "hormuz_transits": mk("hormuz_transits", 0.1, 0.4, 1.8),
+        "bab_el_mandeb_transits": mk("bab_el_mandeb_transits", 0.0, 0.3, 2.5),
+        "gcc_exports": mk("gcc_exports", 0.2, 0.6, 2.0),
     }
     # the US-style partial last month is dropped from the monthly series: those
     # are "not yet published"; the daily toll series carries the ragged edge
@@ -94,7 +105,8 @@ def generate(as_of: date, seed: int = 11, start: Tuple[int, int] = (2012, 1)) ->
                                         [o for o in out["de_toll_mileage"].observations if o[0] < last], "M", "synthetic")
     out["de_toll_mileage_daily"] = Series("de_toll_mileage_daily", daily, "D", "synthetic")
     # industrial production is published ~5 weeks after the month: drop the last month
-    for sid in ("de_manufacturing_production", "ea_manufacturing_production", "de_exports", "world_trade_volume"):
+    for sid in ("de_manufacturing_production", "ea_manufacturing_production", "de_exports", "world_trade_volume",
+                "ea_exports", "us_manufacturing_production", "us_goods_imports", "gcc_exports"):
         s = out[sid]
         out[sid] = Series(sid, s.observations[:-1], "M", "synthetic")
     # dry-bulk freight (Baltic Dry stand-in): working-daily, volatile, loosely tied to the world cycle

@@ -298,7 +298,7 @@ class PipelineTests(unittest.TestCase):
             feed = json.loads((tmp / "out" / "capstone_feed.json").read_text())
             self.assertEqual(feed["schema"], SCHEMA)
             self.assertIn(feed["tier1"]["phase"], ("Recovery", "Expansion", "Slowdown", "Contraction"))
-            self.assertEqual(set(feed["tier1"]["by_geography"]), {"DE", "EA", "WORLD"})
+            self.assertEqual(set(feed["tier1"]["by_geography"]), {"DE", "EA", "US", "GCC", "WORLD"})
             self.assertTrue(feed["tier1"]["by_geography"]["DE"]["provisional"])  # month-to-date daily toll
             verdicts = {f"{v['indicator']}->{v['target']}": v["verdict"] for v in feed["validation"]}
             self.assertEqual(verdicts["de_toll_mileage->de_manufacturing_production"], "evidenced")
@@ -391,6 +391,10 @@ class LiveSourceTests(unittest.TestCase):
             ]}).encode()
 
         s = portwatch.fetch("pc", countries=["DEU"], start_year=2025, end_year=2026, getter=getter)
+        cp = portwatch.build_query(None, 2025, "n_total", layer_url=portwatch.LAYERS["chokepoints"],
+                                   names=["Strait of Hormuz"])
+        self.assertIn("Daily_Chokepoints_Data", cp)
+        self.assertIn("portname+IN+%28%27Strait+of+Hormuz%27%29", cp)
         self.assertEqual(len(s.observations), 4)
         self.assertEqual(s.observations[-1], (date(2026, 1, 2), 55.0))
         with self.assertRaisesRegex(SourceError, "Invalid query"):
