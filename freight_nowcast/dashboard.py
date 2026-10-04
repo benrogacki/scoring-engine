@@ -79,10 +79,26 @@ def payload(r: NowcastResult, cfg: Mapping[str, Any]) -> Dict[str, Any]:
         "feed": feed,
         "warnings": r.warnings,
         "sources": source_status(r, cfg),
+        "fingerprint": _fingerprint(r),
+        "downloads": [["capstone_feed.json", "Capstone feed (Tier 1 / Tier 2)"],
+                      ["composite.csv", "Composite and geography z-scores"],
+                      ["indicator_panel.csv", "Every indicator: level, momentum, z"],
+                      ["turning_points.csv", "Turning points"],
+                      ["validation.json", "Evidence results"],
+                      ["nowcast_summary.md", "One-page summary"]],
     }
 
 
+def _fingerprint(r: NowcastResult) -> str:
+    """The data fingerprint written next to the dashboard, so an open page can tell when
+    a newer run has replaced it (see the auto-refresh in the template)."""
+    return getattr(r, "_fingerprint", "") or ""
+
+
 def write_dashboard(r: NowcastResult, cfg: Mapping[str, Any], path: Path) -> Path:
+    fp = Path(path).with_name("data_fingerprint.txt")
+    if fp.exists():
+        r._fingerprint = fp.read_text(encoding="utf-8").strip()
     data = json.dumps(payload(r, cfg)).replace("</", "<\\/")
     html = TEMPLATE.read_text(encoding="utf-8").replace("/*__DATA__*/null", data)
     Path(path).parent.mkdir(parents=True, exist_ok=True)

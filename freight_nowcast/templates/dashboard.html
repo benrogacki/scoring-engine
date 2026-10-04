@@ -48,6 +48,11 @@ h2 { font-size: 15px; margin: 0 0 10px; }
 .toc a:hover { color: var(--text-primary); }
 #sources td:first-child { white-space: normal; min-width: 220px; }
 #sources .src-note { color: var(--text-muted); font-size: 12px; margin-top: 2px; max-width: 46ch; }
+.downloads { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 8px; }
+.downloads a { color: var(--series-1); text-decoration: none; font-weight: 600; }
+.downloads a:hover { text-decoration: underline; }
+.downloads span { display: block; color: var(--text-muted); font-size: 12px; }
+#footer { margin-top: 8px; }
 .card { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin-bottom: 16px; }
 .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin-bottom: 16px; }
 .tile { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
@@ -140,10 +145,17 @@ li, .tile .n { overflow-wrap: anywhere; }
     <div class="table-wrap"><table id="sources"></table></div>
   </section>
 
+  <section class="card" id="s-downloads" hidden>
+    <h2>Data</h2>
+    <p class="sub">The numbers behind this page, from the same run.</p>
+    <ul class="downloads" id="downloads"></ul>
+  </section>
+
   <section class="card" id="warn-card" hidden>
     <h2>Data warnings</h2>
     <ul id="warnings"></ul>
   </section>
+  <footer class="note" id="footer"></footer>
 </main>
 <script>
 const D = /*__DATA__*/null;
@@ -273,6 +285,28 @@ $("sources").innerHTML = "<tr><th>Series</th><th>Role</th><th>Status</th><th>Las
   D.sources.map((s) => { const [cls, txt] = SRC[s.status] || ["b-na", s.status];
     const note = s.note ? `<div class="src-note">${esc(s.note)}</div>` : "";
     return `<tr><td>${esc(s.label)}${s.required ? "" : ' <span class="note">optional</span>'}${note}</td><td>${esc(s.role)}</td><td><span class="badge ${cls}">${txt}</span></td><td>${esc(s.last || "–")}</td><td>${esc((s.fetched || "–").replace("T", " ").replace("+00:00", " UTC"))}</td><td>${esc(s.origin || "–")}</td></tr>`; }).join("");
+// On a hosted site the data files sit next to the page: show download links and
+// reload when a newer run has published (the fingerprint changes). Inside a sandboxed
+// viewer the fetch fails and the page stays a static snapshot.
+(async () => {
+  const foot = $("footer");
+  foot.textContent = `Data fetched ${D.data_updated_at || D.as_of}.`;
+  if (!/^https?:$/.test(location.protocol)) return;
+  try {
+    const res = await fetch("data_fingerprint.txt", {cache: "no-store"});
+    if (!res.ok) return;
+    $("s-downloads").hidden = false;
+    $("downloads").innerHTML = D.downloads.map(([f, label]) => `<li><a href="${esc(f)}">${esc(f)}</a><span>${esc(label)}</span></li>`).join("");
+    foot.textContent += " This page checks for new data every 10 minutes and reloads when a new run has published.";
+    setInterval(async () => {
+      try {
+        const r = await fetch("data_fingerprint.txt", {cache: "no-store"});
+        if (r.ok && D.fingerprint && (await r.text()).trim() !== D.fingerprint) location.reload();
+      } catch (e) { /* offline: try again next time */ }
+    }, 600000);
+  } catch (e) { /* not hosted with its data files */ }
+})();
+
 if (D.warnings.length) { $("warn-card").hidden = false; $("warnings").innerHTML = D.warnings.map((w) => `<li>${esc(w)}</li>`).join(""); }
 </script>
 </body>

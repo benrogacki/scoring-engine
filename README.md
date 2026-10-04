@@ -203,7 +203,8 @@ python -m freight_nowcast demo --as-of 2026-09-30 --out out/freight-demo   # syn
 
 Geographies: Germany, Eurozone, United States, Arabia (GCC) and world sea trade. A GitHub Actions job
 checks every source every 3 hours. When a source has released new data, it republishes the nowcast to
-the `freight-live` branch and the Pages dashboard.
+the `freight-live` branch and to the dashboard website (Cloudflare Pages or GitHub Pages; see
+[hosting](docs/freight_nowcast.md#running-live)).
 
 See [`docs/freight_nowcast.md`](docs/freight_nowcast.md) for sources, method, validation and the
 feed schema, and [`examples/freight/output/`](examples/freight/output/) for a demo run.

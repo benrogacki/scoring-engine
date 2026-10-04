@@ -11,8 +11,12 @@
 # that change the nowcaster (a live smoke test of every source); those always
 # publish. Scheduled runs only fire from the default branch.
 #
-# Secrets (optional): DESTATIS_TOKEN — a free GENESIS-Online token. Without it
-# the GENESIS guest login is used, which is rate-limited.
+# Secrets (all optional):
+#   DESTATIS_TOKEN          free GENESIS-Online token (official monthly toll index)
+#   CLOUDFLARE_API_TOKEN    + CLOUDFLARE_ACCOUNT_ID: deploy the dashboard website to
+#                           Cloudflare Pages (free, works with a private repo)
+# Repository variable (optional): CF_PAGES_PROJECT, the Pages project name
+# (default freight-nowcast, i.e. https://freight-nowcast.pages.dev).
 name: Freight nowcast
 
 on:
@@ -45,6 +49,9 @@ jobs:
       changed: ${{ steps.publish.outputs.changed }}
     env:
       DESTATIS_TOKEN: ${{ secrets.DESTATIS_TOKEN }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CF_PAGES_PROJECT: ${{ vars.CF_PAGES_PROJECT || 'freight-nowcast' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -90,8 +97,10 @@ jobs:
         run: |
           mkdir -p site
           if [ -f out/freight/live/dashboard.html ]; then
+            cp out/freight/live/. site/ -r
             cp out/freight/live/dashboard.html site/index.html
-            cp out/freight/live/*.json out/freight/live/*.csv out/freight/live/*.md site/ 2>/dev/null || true
+            # the page polls this file to notice new runs; never serve it from cache
+            printf '/data_fingerprint.txt\n  Cache-Control: no-cache\n' > site/_headers
           fi
 
       - uses: actions/upload-pages-artifact@v3
@@ -130,6 +139,15 @@ jobs:
           git commit -qm "Live freight nowcast $(date -u +%Y-%m-%dT%H:%MZ)" -m "New data:" -m "$(cat ../releases.txt)" \
             || { echo "no changes"; exit 0; }
           git push origin HEAD:freight-live
+
+      - name: Deploy the dashboard website to Cloudflare Pages
+        if: >-
+          env.CLOUDFLARE_API_TOKEN != '' &&
+          (steps.publish.outputs.changed == 'true' || github.event_name != 'schedule')
+        run: |
+          npx --yes wrangler@3 pages project create "$CF_PAGES_PROJECT" --production-branch main 2>/dev/null || true
+          npx --yes wrangler@3 pages deploy site --project-name "$CF_PAGES_PROJECT" --branch main --commit-dirty=true
+          echo "Dashboard: https://$CF_PAGES_PROJECT.pages.dev" >> "$GITHUB_STEP_SUMMARY"
 
   # Serves the live dashboard on GitHub Pages. Needs Pages enabled once
   # (Settings -> Pages -> Source: GitHub Actions); the default github-pages

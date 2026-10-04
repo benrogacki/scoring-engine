@@ -66,11 +66,27 @@ starts once this is merged.
 
 The Actions cache carries the data between runs.
 
-**Dashboard on the web.** The workflow also builds the dashboard as a GitHub Pages site. To switch
-it on, set Settings → Pages → Source to *GitHub Actions*; it then deploys on every run of the
-default branch. Otherwise, open `dashboard.html` from the `freight-live` branch or from the run's
-artifact. To use your own GENESIS account instead of the
-rate-limited guest login, add a repository secret `DESTATIS_TOKEN`.
+**Dashboard website.** Every run that publishes also builds the dashboard as a small website:
+
+- `index.html`: the dashboard
+- the CSV and JSON outputs next to it, including `capstone_feed.json` at a stable address the
+  capstone can read
+- `data_fingerprint.txt`
+
+An open page polls the fingerprint every 10 minutes and reloads itself when a new run has
+published, so a browser tab left open stays current.
+
+Pick one host. Both are free, and both redeploy only when the numbers change.
+
+| | Cloudflare Pages (recommended for a private repo) | GitHub Pages |
+|---|---|---|
+| Works with a private repo | yes | only on a paid GitHub plan, or if the repo is public |
+| Address | `https://freight-nowcast.pages.dev` (or a custom domain) | `https://benrogacki.github.io/scoring-engine/` |
+| Restrict to your team | yes, free with Cloudflare Access (allow-list emails) | no (public site) |
+| Setup | 1. Create a free Cloudflare account. 2. Under *My Profile → API Tokens*, create a token with **Account → Cloudflare Pages → Edit**. 3. In this repo, under *Settings → Secrets and variables → Actions*, add `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` (shown on the Cloudflare dashboard home). 4. Optionally, add a repository variable `CF_PAGES_PROJECT` to choose the site name. | *Settings → Pages → Source: GitHub Actions* |
+
+The workflow creates the Cloudflare project on its first deploy, and the job summary prints the
+address.
 
 The sandbox:
 
