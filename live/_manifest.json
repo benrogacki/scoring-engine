@@ -2,10 +2,10 @@
   "series": {
     "de_toll_mileage": {
       "source": "genesis",
-      "attempted_at": "2026-10-04T14:05:33+00:00",
+      "attempted_at": "2026-10-06T22:51:55+00:00",
       "optional": false,
       "status": "ok",
-      "fetched_at": "2026-10-04T14:05:33+00:00",
+      "fetched_at": "2026-10-06T22:51:55+00:00",
       "observations": 224,
       "first": "2008-01-01",
       "last": "2026-08-01",
@@ -20,10 +20,10 @@
     },
     "de_toll_mileage_daily": {
       "source": "destatis_daily",
-      "attempted_at": "2026-10-04T14:05:38+00:00",
+      "attempted_at": "2026-10-06T22:52:00+00:00",
       "optional": true,
       "status": "ok",
-      "fetched_at": "2026-10-04T14:05:38+00:00",
+      "fetched_at": "2026-10-06T22:52:00+00:00",
       "observations": 6844,
       "first": "2008-01-01",
       "last": "2026-09-26",
@@ -36,13 +36,13 @@
     },
     "de_port_calls": {
       "source": "portwatch",
-      "attempted_at": "2026-10-04T14:05:41+00:00",
+      "attempted_at": "2026-10-06T22:52:03+00:00",
       "optional": true,
       "status": "ok",
-      "fetched_at": "2026-10-04T14:05:41+00:00",
-      "observations": 2825,
+      "fetched_at": "2026-10-06T22:52:03+00:00",
+      "observations": 2832,
       "first": "2019-01-01",
-      "last": "2026-09-25",
+      "last": "2026-10-02",
       "origin": "imf:portwatch",
       "details": {
         "countries": "DEU",
@@ -53,13 +53,13 @@
     },
     "ea_port_calls": {
       "source": "portwatch",
-      "attempted_at": "2026-10-04T14:05:42+00:00",
+      "attempted_at": "2026-10-06T22:52:04+00:00",
       "optional": true,
       "status": "ok",
-      "fetched_at": "2026-10-04T14:05:42+00:00",
-      "observations": 2825,
+      "fetched_at": "2026-10-06T22:52:04+00:00",
+      "observations": 2832,
       "first": "2019-01-01",
-      "last": "2026-09-25",
+      "last": "2026-10-02",
       "origin": "imf:portwatch",
       "details": {
         "countries": "AUT,BEL,HRV,CYP,EST,FIN,FRA,DEU,GRC,IRL,ITA,LVA,LTU,LUX,MLT,NLD,PRT,SVK,SVN,ESP",
@@ -70,13 +70,13 @@
     },
     "world_port_calls": {
       "source": "portwatch",
-      "attempted_at": "2026-10-04T14:05:43+00:00",
+      "attempted_at": "2026-10-06T22:52:05+00:00",
       "optional": true,
       "status": "ok",
-      "fetched_at": "2026-10-04T14:05:43+00:00",
-      "observations": 2825,
+      "fetched_at": "2026-10-06T22:52:05+00:00",
+      "observations": 2832,
       "first": "2019-01-01",
-      "last": "2026-09-25",
+      "last": "2026-10-02",
       "origin": "imf:portwatch",
       "details": {
         "countries": "WORLD",
@@ -85,9 +85,23 @@
         "layer": "ports"
       }
     },
+    "dry_bulk_freight": {
+      "source": "yahoo_chart",
+      "attempted_at": "2026-10-06T22:52:07+00:00",
+      "optional": true,
+      "status": "ok",
+      "fetched_at": "2026-10-06T22:52:07+00:00",
+      "observations": 2147,
+      "first": "2018-03-22",
+      "last": "2026-10-06",
+      "origin": "yahoo:BDRY",
+      "details": {
+        "url": "https://query1.finance.yahoo.com/v8/finance/chart/BDRY?period1=946684800&period2=1791327127&interval=1d&includeAdjustedClose=true"
+      }
+    },
     "de_ais_stationary": {
       "source": "csv",
-      "attempted_at": "2026-10-04T14:05:44+00:00",
+      "attempted_at": "2026-10-06T22:52:07+00:00",
       "optional": true,
       "status": "failed",
       "error": "de_ais_stationary: file /home/runner/work/scoring-engine/scoring-engine/data/freight/ais_port_counts.csv not found (Written by `freight-nowcast ais-listen` (needs AISSTREAM_API_KEY; cron it daily). Enters the composite once it has 3 years of history.)",
@@ -95,12 +109,122 @@
       "last": null,
       "observations": null
     },
-    "de_manufacturing_production": {
-      "source": "sdmx",
-      "attempted_at": "2026-10-04T14:05:46+00:00",
+    "us_freight_tsi": {
+      "source": "fred",
+      "attempted_at": "2026-10-06T22:52:07+00:00",
       "optional": false,
       "status": "ok",
-      "fetched_at": "2026-10-04T14:05:46+00:00",
+      "fetched_at": "2026-10-06T22:52:07+00:00",
+      "observations": 319,
+      "first": "2000-01-01",
+      "last": "2026-07-01",
+      "origin": "fred:TSIFRGHT",
+      "details": {
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=TSIFRGHT"
+      }
+    },
+    "us_cass_shipments": {
+      "source": "fred",
+      "attempted_at": "2026-10-06T22:52:07+00:00",
+      "optional": true,
+      "status": "ok",
+      "fetched_at": "2026-10-06T22:52:07+00:00",
+      "observations": 128,
+      "first": "2016-01-01",
+      "last": "2026-08-01",
+      "origin": "fred:FRGSHPUSM649NCIS",
+      "details": {
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=FRGSHPUSM649NCIS"
+      }
+    },
+    "us_rail_carloads": {
+      "source": "fred",
+      "attempted_at": "2026-10-06T22:52:07+00:00",
+      "optional": true,
+      "status": "ok",
+      "fetched_at": "2026-10-06T22:52:07+00:00",
+      "observations": 319,
+      "first": "2000-01-01",
+      "last": "2026-07-01",
+      "origin": "fred:RAILFRTCARLOADSD11",
+      "details": {
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=RAILFRTCARLOADSD11"
+      }
+    },
+    "us_port_calls": {
+      "source": "portwatch",
+      "attempted_at": "2026-10-06T22:52:07+00:00",
+      "optional": true,
+      "status": "ok",
+      "fetched_at": "2026-10-06T22:52:07+00:00",
+      "observations": 2832,
+      "first": "2019-01-01",
+      "last": "2026-10-02",
+      "origin": "imf:portwatch",
+      "details": {
+        "countries": "USA",
+        "field": "portcalls",
+        "query": "full",
+        "layer": "ports"
+      }
+    },
+    "gcc_port_calls": {
+      "source": "portwatch",
+      "attempted_at": "2026-10-06T22:52:09+00:00",
+      "optional": true,
+      "status": "ok",
+      "fetched_at": "2026-10-06T22:52:09+00:00",
+      "observations": 2832,
+      "first": "2019-01-01",
+      "last": "2026-10-02",
+      "origin": "imf:portwatch",
+      "details": {
+        "countries": "SAU,ARE,QAT,KWT,OMN,BHR",
+        "field": "portcalls",
+        "query": "full",
+        "layer": "ports"
+      }
+    },
+    "hormuz_transits": {
+      "source": "portwatch",
+      "attempted_at": "2026-10-06T22:52:10+00:00",
+      "optional": true,
+      "status": "ok",
+      "fetched_at": "2026-10-06T22:52:10+00:00",
+      "observations": 2834,
+      "first": "2019-01-01",
+      "last": "2026-10-04",
+      "origin": "imf:portwatch",
+      "details": {
+        "countries": "Strait of Hormuz",
+        "field": "n_total",
+        "query": "full",
+        "layer": "chokepoints"
+      }
+    },
+    "bab_el_mandeb_transits": {
+      "source": "portwatch",
+      "attempted_at": "2026-10-06T22:52:11+00:00",
+      "optional": true,
+      "status": "ok",
+      "fetched_at": "2026-10-06T22:52:11+00:00",
+      "observations": 2834,
+      "first": "2019-01-01",
+      "last": "2026-10-04",
+      "origin": "imf:portwatch",
+      "details": {
+        "countries": "Bab el-Mandeb Strait",
+        "field": "n_total",
+        "query": "full",
+        "layer": "chokepoints"
+      }
+    },
+    "de_manufacturing_production": {
+      "source": "sdmx",
+      "attempted_at": "2026-10-06T22:52:13+00:00",
+      "optional": false,
+      "status": "ok",
+      "fetched_at": "2026-10-06T22:52:13+00:00",
       "observations": 223,
       "first": "2008-01-01",
       "last": "2026-07-01",
@@ -111,10 +235,10 @@
     },
     "ea_manufacturing_production": {
       "source": "sdmx",
-      "attempted_at": "2026-10-04T14:05:47+00:00",
+      "attempted_at": "2026-10-06T22:52:14+00:00",
       "optional": false,
       "status": "ok",
-      "fetched_at": "2026-10-04T14:05:47+00:00",
+      "fetched_at": "2026-10-06T22:52:14+00:00",
       "observations": 223,
       "first": "2008-01-01",
       "last": "2026-07-01",
@@ -125,10 +249,10 @@
     },
     "de_exports": {
       "source": "genesis",
-      "attempted_at": "2026-10-04T14:05:47+00:00",
+      "attempted_at": "2026-10-06T22:52:14+00:00",
       "optional": true,
       "status": "ok",
-      "fetched_at": "2026-10-04T14:05:47+00:00",
+      "fetched_at": "2026-10-06T22:52:14+00:00",
       "observations": 294,
       "first": "2002-01-01",
       "last": "2026-06-01",
@@ -140,10 +264,10 @@
     },
     "world_trade_volume": {
       "source": "cpb",
-      "attempted_at": "2026-10-04T14:05:50+00:00",
+      "attempted_at": "2026-10-06T22:52:17+00:00",
       "optional": true,
       "status": "ok",
-      "fetched_at": "2026-10-04T14:05:50+00:00",
+      "fetched_at": "2026-10-06T22:52:17+00:00",
       "observations": 319,
       "first": "2000-01-01",
       "last": "2026-07-01",
@@ -154,136 +278,12 @@
         "row": "World trade tgz_w1_qnmi_sn"
       }
     },
-    "dry_bulk_freight": {
-      "source": "yahoo_chart",
-      "attempted_at": "2026-10-04T14:05:44+00:00",
-      "optional": true,
-      "status": "ok",
-      "fetched_at": "2026-10-04T14:05:44+00:00",
-      "observations": 2145,
-      "first": "2018-03-22",
-      "last": "2026-10-02",
-      "origin": "yahoo:BDRY",
-      "details": {
-        "url": "https://query1.finance.yahoo.com/v8/finance/chart/BDRY?period1=946684800&period2=1791122744&interval=1d&includeAdjustedClose=true"
-      }
-    },
-    "us_freight_tsi": {
-      "source": "fred",
-      "attempted_at": "2026-10-04T14:05:44+00:00",
-      "optional": false,
-      "status": "ok",
-      "fetched_at": "2026-10-04T14:05:44+00:00",
-      "observations": 319,
-      "first": "2000-01-01",
-      "last": "2026-07-01",
-      "origin": "fred:TSIFRGHT",
-      "details": {
-        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=TSIFRGHT"
-      }
-    },
-    "us_cass_shipments": {
-      "source": "fred",
-      "attempted_at": "2026-10-04T14:05:44+00:00",
-      "optional": true,
-      "status": "ok",
-      "fetched_at": "2026-10-04T14:05:44+00:00",
-      "observations": 128,
-      "first": "2016-01-01",
-      "last": "2026-08-01",
-      "origin": "fred:FRGSHPUSM649NCIS",
-      "details": {
-        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=FRGSHPUSM649NCIS"
-      }
-    },
-    "us_rail_carloads": {
-      "source": "fred",
-      "attempted_at": "2026-10-04T14:05:44+00:00",
-      "optional": true,
-      "status": "ok",
-      "fetched_at": "2026-10-04T14:05:44+00:00",
-      "observations": 319,
-      "first": "2000-01-01",
-      "last": "2026-07-01",
-      "origin": "fred:RAILFRTCARLOADSD11",
-      "details": {
-        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=RAILFRTCARLOADSD11"
-      }
-    },
-    "us_port_calls": {
-      "source": "portwatch",
-      "attempted_at": "2026-10-04T14:05:44+00:00",
-      "optional": true,
-      "status": "ok",
-      "fetched_at": "2026-10-04T14:05:44+00:00",
-      "observations": 2825,
-      "first": "2019-01-01",
-      "last": "2026-09-25",
-      "origin": "imf:portwatch",
-      "details": {
-        "countries": "USA",
-        "field": "portcalls",
-        "query": "full",
-        "layer": "ports"
-      }
-    },
-    "gcc_port_calls": {
-      "source": "portwatch",
-      "attempted_at": "2026-10-04T14:05:45+00:00",
-      "optional": true,
-      "status": "ok",
-      "fetched_at": "2026-10-04T14:05:45+00:00",
-      "observations": 2825,
-      "first": "2019-01-01",
-      "last": "2026-09-25",
-      "origin": "imf:portwatch",
-      "details": {
-        "countries": "SAU,ARE,QAT,KWT,OMN,BHR",
-        "field": "portcalls",
-        "query": "full",
-        "layer": "ports"
-      }
-    },
-    "hormuz_transits": {
-      "source": "portwatch",
-      "attempted_at": "2026-10-04T14:05:45+00:00",
-      "optional": true,
-      "status": "ok",
-      "fetched_at": "2026-10-04T14:05:45+00:00",
-      "observations": 2827,
-      "first": "2019-01-01",
-      "last": "2026-09-27",
-      "origin": "imf:portwatch",
-      "details": {
-        "countries": "Strait of Hormuz",
-        "field": "n_total",
-        "query": "full",
-        "layer": "chokepoints"
-      }
-    },
-    "bab_el_mandeb_transits": {
-      "source": "portwatch",
-      "attempted_at": "2026-10-04T14:05:46+00:00",
-      "optional": true,
-      "status": "ok",
-      "fetched_at": "2026-10-04T14:05:46+00:00",
-      "observations": 2827,
-      "first": "2019-01-01",
-      "last": "2026-09-27",
-      "origin": "imf:portwatch",
-      "details": {
-        "countries": "Bab el-Mandeb Strait",
-        "field": "n_total",
-        "query": "full",
-        "layer": "chokepoints"
-      }
-    },
     "us_manufacturing_production": {
       "source": "fred",
-      "attempted_at": "2026-10-04T14:05:54+00:00",
+      "attempted_at": "2026-10-06T22:52:21+00:00",
       "optional": false,
       "status": "ok",
-      "fetched_at": "2026-10-04T14:05:54+00:00",
+      "fetched_at": "2026-10-06T22:52:21+00:00",
       "observations": 656,
       "first": "1972-01-01",
       "last": "2026-08-01",
@@ -294,13 +294,13 @@
     },
     "us_goods_imports": {
       "source": "fred",
-      "attempted_at": "2026-10-04T14:05:54+00:00",
+      "attempted_at": "2026-10-06T22:52:21+00:00",
       "optional": true,
       "status": "ok",
-      "fetched_at": "2026-10-04T14:05:54+00:00",
-      "observations": 415,
+      "fetched_at": "2026-10-06T22:52:21+00:00",
+      "observations": 416,
       "first": "1992-01-01",
-      "last": "2026-07-01",
+      "last": "2026-08-01",
       "origin": "fred:BOPGIMP",
       "details": {
         "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=BOPGIMP"
@@ -308,10 +308,10 @@
     },
     "ea_exports": {
       "source": "eurostat_jsonstat",
-      "attempted_at": "2026-10-04T14:05:55+00:00",
+      "attempted_at": "2026-10-06T22:52:21+00:00",
       "optional": true,
       "status": "ok",
-      "fetched_at": "2026-10-04T14:05:55+00:00",
+      "fetched_at": "2026-10-06T22:52:21+00:00",
       "observations": 294,
       "first": "2002-01-01",
       "last": "2026-06-01",
@@ -322,10 +322,10 @@
     },
     "gcc_exports": {
       "source": "sdmx",
-      "attempted_at": "2026-10-04T14:05:55+00:00",
+      "attempted_at": "2026-10-06T22:52:22+00:00",
       "optional": true,
       "status": "ok",
-      "fetched_at": "2026-10-04T14:05:55+00:00",
+      "fetched_at": "2026-10-06T22:52:22+00:00",
       "observations": 138,
       "first": "2015-01-01",
       "last": "2026-06-01",
@@ -335,6 +335,6 @@
       }
     }
   },
-  "updated_at": "2026-10-04T14:05:56+00:00",
+  "updated_at": "2026-10-06T22:52:23+00:00",
   "mode": "live"
 }
