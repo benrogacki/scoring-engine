@@ -205,6 +205,33 @@ Weights must sum to 1.0. The engine checks this, and the grade ordering, before 
 5. **FD/CFO** receives `portfolio_summary.md`. Keep each month's `portfolio_summary.json` to track
    overdue %, the AR-weighted score and HHI over time.
 
+## Freight nowcaster (separate module)
+
+`freight_nowcast/` is a separate tool in the same repository. It tracks real-economy momentum from
+published freight series:
+
+- **road:** the German truck toll mileage index from Destatis GENESIS, monthly plus working-daily
+- **sea:** OECD AIS port calls and the Baltic Dry Index, plus optional aisstream.io port counts
+
+It produces a composite index, z-scores per geography, cycle phases and turning-point flags.
+Validation is built in: toll mileage is tested against manufacturing production, and port calls
+against trade statistics. It does not touch the ledger or scoring code. It feeds the capstone
+through `capstone_feed.json`: the real-economy read next to the yield curve in Tier 1, and the
+cycle/sector tilt in Tier 2.
+
+```bash
+python -m freight_nowcast live --out out/freight/live                      # real data: fetch + run
+python -m freight_nowcast demo --as-of 2026-09-30 --out out/freight-demo   # synthetic sandbox, offline
+```
+
+Geographies: Germany, Eurozone, United States, Arabia (GCC) and world sea trade. A GitHub Actions job
+checks every source every 3 hours. When a source has released new data, it republishes the nowcast to
+the `freight-live` branch and to the dashboard website (Cloudflare Pages or GitHub Pages; see
+[hosting](docs/freight_nowcast.md#running-live)).
+
+See [`docs/freight_nowcast.md`](docs/freight_nowcast.md) for sources, method, validation and the
+feed schema, and [`examples/freight/output/`](examples/freight/output/) for a demo run.
+
 ## Development
 
 ```bash
@@ -223,3 +250,5 @@ The code lives in the `scoring_engine/` package:
 - `engine.py`: the pipeline and portfolio summary
 - `report.py`: output files
 - `cli.py`: the command-line interface
+
+The freight nowcaster lives in `freight_nowcast/`; see its [docs](docs/freight_nowcast.md).
