@@ -8,7 +8,7 @@ from typing import Dict, Optional
 
 from . import SourceError
 
-USER_AGENT = "freight-nowcast/0.2 (+https://github.com/benrogacki/scoring-engine)"
+USER_AGENT = "freight-nowcast/0.2 (+https://github.com/benrogacki/global-freight-tracker)"
 
 
 def get(url: str, headers: Optional[Dict[str, str]] = None, timeout: int = 120, retries: int = 2) -> bytes:

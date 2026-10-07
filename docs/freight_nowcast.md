@@ -101,7 +101,7 @@ Pick one host. Both are free, and both redeploy only when the numbers change.
 | | Cloudflare Pages (recommended for a private repo) | GitHub Pages |
 |---|---|---|
 | Works with a private repo | yes | only on a paid GitHub plan, or if the repo is public |
-| Address | `https://freight-nowcast.pages.dev` (or a custom domain) | `https://benrogacki.github.io/scoring-engine/` |
+| Address | `https://freight-nowcast.pages.dev` (or a custom domain) | `https://benrogacki.github.io/global-freight-tracker/` (repo renamed from scoring-engine) |
 | Restrict to your team | yes, free with Cloudflare Access (allow-list emails) | no (public site) |
 | Setup | 1. Create a free Cloudflare account. 2. Under *My Profile → API Tokens*, create a token with **Account → Cloudflare Pages → Edit**. 3. In this repo, under *Settings → Secrets and variables → Actions*, add `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` (shown on the Cloudflare dashboard home). 4. Optionally, add a repository variable `CF_PAGES_PROJECT` to choose the site name. | *Settings → Pages → Source: GitHub Actions* |
 
