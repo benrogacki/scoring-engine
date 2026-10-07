@@ -205,7 +205,7 @@ Weights must sum to 1.0. The engine checks this, and the grade ordering, before 
 5. **FD/CFO** receives `portfolio_summary.md`. Keep each month's `portfolio_summary.json` to track
    overdue %, the AR-weighted score and HHI over time.
 
-## Freight nowcaster (separate module)
+## Global Freight Activity Tracker (separate module)
 
 `freight_nowcast/` is a separate tool in the same repository. It tracks real-economy momentum from
 published freight series:

@@ -115,7 +115,7 @@ def build_feed(result: NowcastResult, cfg: Mapping[str, Any]) -> Dict[str, Any]:
     table = cfg.get("tier2_tilts") or DEFAULT_TILTS
     top = _read(result, result.composite, result.phases)
     by_geo = {c: _read(result, g, result.geo_phases[c]) for c, g in result.geographies.items()}
-    return {
+    feed = {
         "schema": SCHEMA,
         "generated_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
         "as_of": result.as_of.isoformat(),
@@ -141,3 +141,7 @@ def build_feed(result: NowcastResult, cfg: Mapping[str, Any]) -> Dict[str, Any]:
         "series": result.series_meta,
         "warnings": result.warnings,
     }
+    from .thesis import build_thesis  # local import: thesis reads the feed it is part of
+
+    feed["thesis"] = build_thesis(result, feed)
+    return feed

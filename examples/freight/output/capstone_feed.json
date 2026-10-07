@@ -1,6 +1,6 @@
 {
   "schema": "freight_nowcast/capstone_feed@1",
-  "generated_at": "2026-10-04T13:26:33+00:00",
+  "generated_at": "2026-10-04T14:02:56+00:00",
   "as_of": "2026-09-30",
   "data_mode": "synthetic",
   "data_updated_at": null,
@@ -913,7 +913,7 @@
       "fetched_at": null
     },
     "ea_exports": {
-      "label": "Extra-euro-area export volume (sa)",
+      "label": "Extra-EU export volume, sa (Eurozone proxy)",
       "role": "target",
       "mode": "",
       "geography": "EA",
@@ -924,11 +924,11 @@
       "fetched_at": null
     },
     "gcc_exports": {
-      "label": "Merchandise exports, Saudi Arabia",
+      "label": "Merchandise exports, Saudi Arabia (IMF IMTS)",
       "role": "target",
       "mode": "",
       "geography": "GCC",
-      "source": "fred",
+      "source": "sdmx",
       "last_observation": "2026-07-01",
       "extended_by": null,
       "latest_month_coverage": 1.0,
@@ -938,5 +938,30 @@
   "warnings": [
     "SYNTHETIC DEMO DATA: these outputs are not real statistics",
     "de_ais_stationary: optional, no data cached yet (skipped)"
-  ]
+  ],
+  "thesis": {
+    "headline": "Freight data says the global goods economy is running below trend and weakening (composite -0.99 z, falling over three months).",
+    "sections": [
+      {
+        "title": "Where",
+        "text": "The world is moving at different speeds. Eurozone is the strongest (+0.5 z) and Germany the weakest (-1.2 z), a gap of 1.7 standard deviations. By region: Eurozone +0.5 z (expansion); United States -1.0 z (contraction); Arabia (GCC) -1.1 z (contraction); World sea trade -1.1 z (contraction); Germany -1.2 z (contraction)."
+      },
+      {
+        "title": "Costs vs volumes",
+        "text": "Freight rates (-17% y/y) and volumes (-2.1% y/y) are falling together: demand is weakening."
+      }
+    ],
+    "implications": [
+      "Growth: a goods-sector downturn; official production and trade data are likely to print weak in coming releases.",
+      "Growth is uneven: expect Eurozone-facing activity to outperform Germany-facing activity while the gap persists.",
+      "Disinflationary for goods: weak demand is pulling freight costs and volumes down.",
+      "Positioning: the cycle phase favours defensives over cyclicals (tilt -0.66, scaled by low conviction)."
+    ],
+    "watch": [
+      "No turning point in the last six months; a 0.5 z move off the recent extreme sustained for two months would flag one.",
+      "Official data lags the freight data: Manufacturing production, Germany (sca) is only available to July 2026. The next official releases will confirm or contradict this read."
+    ],
+    "confidence": "Conviction is low. 3 of 13 indicator-to-official-data links pass the out-of-sample evidence test and the latest month is provisional (month-to-date data). Treat this as a hypothesis the next official releases will test.",
+    "method": "Written automatically from the latest data by fixed rules on every run. It describes what the freight data is consistent with; it is not a forecast or investment advice."
+  }
 }

@@ -191,7 +191,8 @@
       "source": "portwatch",
       "params": {
         "start_year": 2019
-      }
+      },
+      "kind": "global_volume"
     },
     {
       "id": "oecd_world_port_calls",
@@ -244,7 +245,8 @@
           }
         }
       ],
-      "_note": "Free stand-in for the licensed Baltic Dry: the BDRY ETF holds the dry-bulk freight futures (Capesize/Panamax/Supramax) that settle on Baltic indices. Fallbacks: Stooq CSV, then the US deep-sea freight PPI (FRED)."
+      "_note": "Free stand-in for the licensed Baltic Dry: the BDRY ETF holds the dry-bulk freight futures (Capesize/Panamax/Supramax) that settle on Baltic indices. Fallbacks: Stooq CSV, then the US deep-sea freight PPI (FRED).",
+      "kind": "freight_rate"
     },
     {
       "id": "world_dry_bulk_calls",
@@ -430,7 +432,10 @@
         ],
         "field": "n_total",
         "start_year": 2019
-      }
+      },
+      "kind": "chokepoint",
+      "chokepoint_energy": true,
+      "chokepoint_note": "normally carries about a fifth of the world's oil and much of its LNG"
     },
     {
       "id": "bab_el_mandeb_transits",
@@ -451,7 +456,9 @@
         ],
         "field": "n_total",
         "start_year": 2019
-      }
+      },
+      "kind": "chokepoint",
+      "chokepoint_note": "is the southern gate to the Red Sea and the Suez Canal, the shortest Asia–Europe sea route"
     },
     {
       "id": "de_manufacturing_production",
