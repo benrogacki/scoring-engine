@@ -83,6 +83,24 @@
     "rounding": 1000,
     "tolerance_pct": 0.1
   },
+  "health": {
+    "stale_days": 10,
+    "max_missing_paid_date_share": 0.05,
+    "control_total_tolerance_pct": 0.005
+  },
+  "backtest": {
+    "horizon_days": 90,
+    "bad_days_past_due": 60,
+    "points": 4,
+    "step_days": 30,
+    "min_history_days": 180,
+    "min_observations": 30,
+    "min_bads": 5,
+    "min_grade_observations": 5,
+    "monotonic_tolerance": 0.05,
+    "auc_evidenced": 0.7,
+    "auc_weak": 0.6
+  },
   "collections": {
     "bucket_urgency": {
       "1_30": 1.0,

@@ -66,6 +66,27 @@ DEFAULT_CONFIG: Dict[str, Any] = {
         "rounding": 1000,
         "tolerance_pct": 0.10,
     },
+    # Data health checks on every extract.
+    "health": {
+        "stale_days": 10,
+        "max_missing_paid_date_share": 0.05,
+        "control_total_tolerance_pct": 0.005,
+    },
+    # Backtest: re-score at past dates and check who went on to pay badly.
+    "backtest": {
+        "horizon_days": 90,
+        "bad_days_past_due": 60,
+        "points": 4,
+        "step_days": 30,
+        "min_history_days": 180,
+        "min_observations": 30,
+        "min_bads": 5,
+        "min_grade_observations": 5,
+        # Neighbouring grades may reverse by this much (sampling noise) and still count as monotonic.
+        "monotonic_tolerance": 0.05,
+        "auc_evidenced": 0.70,
+        "auc_weak": 0.60,
+    },
     "collections": {
         # Urgency multiplier applied to overdue value in each bucket.
         "bucket_urgency": {"1_30": 1.0, "31_60": 1.5, "61_90": 2.5, "90_plus": 4.0},

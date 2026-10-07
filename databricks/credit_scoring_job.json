@@ -20,7 +20,8 @@
           "as_of": "",
           "policy_json": "",
           "lookback_months": "15",
-          "currency": "£"
+          "currency": "£",
+          "control_total": ""
         }
       },
       "timeout_seconds": 3600,

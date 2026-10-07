@@ -32,6 +32,8 @@ ENV_VARS = ("DATABRICKS_SERVER_HOSTNAME", "DATABRICKS_HTTP_PATH", "DATABRICKS_TO
 TEXT_COLUMNS = {
     "customer_name", "industry", "grade", "grade_label", "limit_action", "collection_tier",
     "risk_drivers", "tier", "action",
+    # run log
+    "run_at", "source", "fingerprint", "data_health", "backtest_verdict", "previous_as_of",
 }
 _IDENT = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z_][A-Za-z0-9_]*){0,2}$")
 
@@ -178,3 +180,28 @@ def spark_write_table(spark, table: str, rows: Sequence[Dict[str, Any]], as_of: 
     else:
         df.write.saveAsTable(table)
     return len(rows)
+
+
+def spark_previous_scorecard(spark, table: str, as_of: date):
+    """(as_of, scorecard rows by customer) of the latest earlier run in ``table``, or (None, None)."""
+    table = check_table_name(table)
+    if not spark.catalog.tableExists(table):
+        return None, None
+    row = spark.sql(f"SELECT max(as_of) AS d FROM {table} WHERE as_of < DATE'{as_of.isoformat()}'").collect()[0]
+    prev = row["d"]
+    if prev is None:
+        return None, None
+    prev = prev if isinstance(prev, date) else date.fromisoformat(str(prev))
+    rows = spark.sql(f"SELECT * FROM {table} WHERE as_of = DATE'{prev.isoformat()}'").collect()
+    card = {}
+    for r in rows:
+        d = {k: ("" if v is None else _text(v)) for k, v in r.asDict().items() if k != "as_of"}
+        card[d["customer_id"]] = d
+    return prev.isoformat(), card
+
+
+def _text(v: Any) -> str:
+    # Whole numbers stored as DOUBLE come back as 12.0; keep them readable.
+    if isinstance(v, float) and v.is_integer():
+        return str(int(v))
+    return str(v)

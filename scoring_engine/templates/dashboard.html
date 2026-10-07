@@ -252,6 +252,24 @@ ul.drivers { margin: 0; padding-left: 18px; display: grid; gap: 5px; color: var(
 .btn:hover { border-color: var(--ink-2); }
 .btn.primary { background: var(--ink); color: var(--bg); border-color: var(--ink); }
 pre.json { background: var(--surface-2); border-radius: 8px; padding: 10px 12px; font-family: var(--mono); font-size: 11.5px; overflow-x: auto; max-height: 220px; margin: 10px 0 0; white-space: pre; }
+/* Data & evidence */
+.ev-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+@media (max-width: 900px) { .ev-grid { grid-template-columns: minmax(0, 1fr); } }
+.ev-big { font-size: 20px; font-weight: 600; margin-top: 8px; }
+.ev-note { font-size: 13px; color: var(--ink-2); margin-top: 6px; }
+.kv { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 14px; font-size: 12.5px; margin-top: 12px; }
+.kv dt { color: var(--muted); } .kv dd { margin: 0; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.change-list { display: grid; gap: 2px; }
+.change-list .c { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 10px; align-items: baseline; padding: 7px 8px; border-radius: 6px; cursor: pointer; font-size: 13px; }
+.change-list .c:hover { background: var(--accent-wash); }
+.change-list .c b { font-weight: 500; }
+@media (max-width: 520px) { .change-list .c { grid-template-columns: minmax(0, 1fr); gap: 2px; } }
+.checks-list { display: grid; }
+.checks-list .ck { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 3px 12px; padding: 10px 0; border-top: 1px solid var(--line); font-size: 13px; }
+.checks-list .ck:first-child { border-top: 0; padding-top: 0; }
+.checks-list .ck .d { grid-column: 1 / -1; color: var(--ink-2); font-size: 12.5px; }
+ul.downloads { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; font-size: 13px; }
+ul.downloads a { color: var(--accent); font-family: var(--mono); font-size: 12.5px; margin-right: 10px; }
 .foot { margin-top: 32px; font-size: 12.5px; color: var(--muted); max-width: 80ch; }
 </style>
 
@@ -272,6 +290,7 @@ pre.json { background: var(--surface-2); border-radius: 8px; padding: 10px 12px;
     <button class="tab" role="tab" id="tab-collections" data-tab="collections">Collections<span class="count" id="n-collections"></span></button>
     <button class="tab" role="tab" id="tab-limits" data-tab="limits">Credit limits<span class="count" id="n-limits"></span></button>
     <button class="tab" role="tab" id="tab-policy" data-tab="policy">Policy</button>
+    <button class="tab" role="tab" id="tab-data" data-tab="data" hidden>Data &amp; evidence</button>
   </nav>
 
   <main>
@@ -336,6 +355,33 @@ pre.json { background: var(--surface-2); border-radius: 8px; padding: 10px 12px;
         <aside class="block impact" id="impact"></aside>
       </div>
     </section>
+    <section class="panel" id="panel-data" role="tabpanel" hidden>
+      <div class="stack">
+        <div class="ev-grid">
+          <div class="block" id="ev-health"></div>
+          <div class="block" id="ev-backtest"></div>
+          <div class="block" id="ev-changes"></div>
+        </div>
+        <div class="grid-2">
+          <div class="block">
+            <div class="block-head"><h2>Backtest by grade</h2><span class="hint" id="bt-hint"></span></div>
+            <div class="rows" id="bt-rows"></div>
+          </div>
+          <div class="block">
+            <div class="block-head"><h2>Data checks</h2><span class="hint">Run before scoring</span></div>
+            <div class="checks-list" id="health-list"></div>
+          </div>
+        </div>
+        <div class="block">
+          <div class="block-head"><h2 id="changes-title">Changes since the last run</h2><span class="hint">Most severe first · click to open the customer</span></div>
+          <div class="change-list" id="change-list"></div>
+        </div>
+        <div class="block" id="downloads-block" hidden>
+          <div class="block-head"><h2>Files from this run</h2></div>
+          <ul class="downloads" id="downloads"></ul>
+        </div>
+      </div>
+    </section>
   </main>
 
   <p class="foot" id="foot"></p>
@@ -367,6 +413,14 @@ const TIER_META = {
 };
 const LIMIT_META = {
   Increase: "good", Reduce: "serious", Suspend: "critical", Maintain: "neutral", "Set limit": "accent", Review: "warning",
+};
+const RUN = DATA.run || null;
+const HEALTH_META = { ok: { cls: "good", short: "passed" }, warn: { cls: "warning", short: "warnings" }, fail: { cls: "critical", short: "failed" }, info: { cls: "neutral", short: "info" } };
+const VERDICT_META = { evidenced: { cls: "good" }, weak: { cls: "warning" }, "not evidenced": { cls: "critical" }, "insufficient data": { cls: "neutral" } };
+const CHANGE_META = {
+  escalated: ["critical", "New P1"], downgrade: ["serious", "Downgrade"], over_limit: ["serious", "Over limit"],
+  limit_action: ["accent", "Limit action"], new: ["neutral", "New customer"], upgrade: ["good", "Upgrade"],
+  de_escalated: ["good", "Left P1"], back_within_limit: ["good", "Within limit"], gone: ["neutral", "Left ledger"],
 };
 const clone = (o) => JSON.parse(JSON.stringify(o));
 const DEFAULT = clone(DATA.config);
@@ -580,9 +634,12 @@ function renderHeader() {
   meta.innerHTML =
     `<span class="tag">As at <b class="mono">${esc(DATA.as_of)}</b></span>` +
     `<span class="tag">${esc(DATA.source || "Debtor ledger")}</span>` +
-    (policyChanged() ? `<button class="tag policy" type="button" id="policy-tag">Custom policy · view changes</button>` : `<span class="tag">Default policy</span>`);
+    (policyChanged() ? `<button class="tag policy" type="button" id="policy-tag">Custom policy · view changes</button>` : `<span class="tag">Default policy</span>`) +
+    (RUN ? `<button class="tag" type="button" data-goto="data"><span class="pill ${HEALTH_META[RUN.health_status].cls}" style="padding:0 6px 0 4px">${HEALTH_META[RUN.health_status].short}</span>Data checks</button>` : "") +
+    (RUN && RUN.backtest ? `<button class="tag" type="button" data-goto="data"><span class="pill ${VERDICT_META[RUN.backtest.verdict].cls}" style="padding:0 6px 0 4px">${esc(RUN.backtest.verdict)}</span>Backtest</button>` : "");
   const pt = document.getElementById("policy-tag");
   if (pt) pt.addEventListener("click", () => setTab("policy"));
+  meta.querySelectorAll("[data-goto]").forEach((b) => b.addEventListener("click", () => setTab(b.dataset.goto)));
 }
 function deltaHtml(now, base, fmt, goodWhenUp) {
   if (!policyChanged() || base == null || now == null) return "";
@@ -977,6 +1034,56 @@ function renderImpact() {
   });
 }
 
+/* ---------- data & evidence ---------- */
+const fmtTime = (t) => (t ? String(t).replace("T", " ").replace("+00:00", " UTC") : "—");
+function renderData() {
+  if (!RUN) return;
+  const src = RUN.source || {}, hm = HEALTH_META[RUN.health_status];
+  const problems = RUN.health.filter((c) => c.status === "warn" || c.status === "fail").length;
+  document.getElementById("ev-health").innerHTML = `<div class="block-head"><h2>Data health</h2></div>
+    <span class="pill ${hm.cls}">${RUN.health_status === "ok" ? "All checks passed" : RUN.health_status === "warn" ? `${problems} warning${problems === 1 ? "" : "s"}` : "Checks failed: do not act on this run"}</span>
+    <dl class="kv"><dt>Source</dt><dd>${esc(src.label || "—")}</dd><dt>Extracted</dt><dd>${esc(fmtTime(src.extracted_at))}</dd>
+    <dt>Rows</dt><dd>${(src.invoice_rows ?? 0).toLocaleString("en-GB")} invoices · ${(src.customer_rows ?? 0).toLocaleString("en-GB")} customers</dd>
+    <dt>Newest invoice</dt><dd>${esc(src.latest_invoice_date || "—")}</dd><dt>Newest payment</dt><dd>${esc(src.latest_payment_date || "—")}</dd></dl>`;
+
+  const bt = RUN.backtest;
+  const evb = document.getElementById("ev-backtest");
+  if (!bt) evb.innerHTML = `<div class="block-head"><h2>Backtest</h2></div><p class="dim" style="margin:0">Skipped for this run.</p>`;
+  else evb.innerHTML = `<div class="block-head"><h2>Backtest</h2><span class="hint">Do the grades predict late payment?</span></div>
+    <span class="pill ${VERDICT_META[bt.verdict].cls}">${esc(bt.verdict)}</span>
+    <div class="ev-big num">${bt.auc == null ? "AUC —" : `AUC ${bt.auc.toFixed(2)} · Gini ${bt.gini.toFixed(2)}`}</div>
+    <div class="ev-note">${esc(bt.note)}</div>
+    <dl class="kv"><dt>Scored at</dt><dd>${esc(bt.points.join(", ") || "—")}</dd><dt>Outcome</dt><dd>${bt.bad_days_past_due}+ days overdue within ${bt.horizon_days} days</dd>
+    <dt>Sample</dt><dd>${bt.observations} customer-dates · ${bt.bads} went bad</dd></dl>`;
+
+  const ch = RUN.changes || [];
+  const counts = {};
+  ch.forEach((c) => (counts[c.kind] = (counts[c.kind] || 0) + 1));
+  document.getElementById("ev-changes").innerHTML = `<div class="block-head"><h2>Since the last run</h2><span class="hint">${RUN.previous_as_of ? "vs " + esc(RUN.previous_as_of) : ""}</span></div>` +
+    (!RUN.previous_as_of ? '<p class="dim" style="margin:0">No previous run to compare against. The next run will list regrades, new escalations and limit breaches here.</p>'
+      : !ch.length ? '<p style="margin:0">No changes.</p>'
+      : `<div class="chips" style="gap:8px">${Object.keys(CHANGE_META).filter((k) => counts[k]).map((k) => `<span class="pill ${CHANGE_META[k][0]}">${counts[k]} ${CHANGE_META[k][1].toLowerCase()}</span>`).join("")}</div>`);
+
+  if (bt) {
+    document.getElementById("bt-hint").textContent = `Share that went ${bt.bad_days_past_due}+ days overdue within ${bt.horizon_days} days`;
+    document.getElementById("bt-rows").innerHTML = GRADES.map((g) => {
+      const d = bt.by_grade[g] || { observations: 0, bads: 0, bad_rate: null };
+      const rate = d.bad_rate;
+      return `<div class="row" ${tipAttr(`<b>${rate == null ? "—" : pct(rate, 1)}</b> went bad<div class="t-sub">Grade ${g}: ${d.bads} of ${d.observations} customer-dates</div>`)}>
+        <span class="grade g-${g}">${g}</span><span class="name">${d.observations} observed<small>${d.bads} went bad</small></span>
+        <span class="track"><span class="fill" style="display:block;width:${(rate || 0) * 100}%;background:var(--g-${g})"></span></span>
+        <span class="val">${rate == null ? "—" : pct(rate)}</span></div>`;
+    }).join("");
+  }
+  document.getElementById("health-list").innerHTML = RUN.health.map((c) =>
+    `<div class="ck"><span>${esc(c.label)}</span><span class="pill ${HEALTH_META[c.status].cls}">${esc(c.status)}</span><span class="d">${esc(c.detail)}</span></div>`).join("");
+
+  document.getElementById("changes-title").textContent = RUN.previous_as_of ? `Changes since ${RUN.previous_as_of}` : "Changes since the last run";
+  document.getElementById("change-list").innerHTML = !RUN.previous_as_of ? '<p class="dim" style="margin:0">No previous run yet.</p>'
+    : !ch.length ? '<p class="dim" style="margin:0">Nothing moved.</p>'
+    : ch.slice(0, 200).map((c) => `<div class="c" data-open="${esc(c.customer_id)}" tabindex="0"><span><span class="pill ${CHANGE_META[c.kind][0]}">${CHANGE_META[c.kind][1]}</span></span><span><b>${esc(c.customer_name)}</b> <span class="dim">· ${esc(c.detail)}</span></span></div>`).join("");
+}
+
 /* ---------- wiring ---------- */
 function recompute() {
   S = scoreAll(policy);
@@ -990,6 +1097,7 @@ function renderAll() {
   if (ui.tab === "collections") renderCollections();
   if (ui.tab === "limits") renderLimits();
   if (ui.tab === "policy") { syncPolicyInputs(); renderImpact(); }
+  if (ui.tab === "data") renderData();
 }
 function setTab(tab, fromHash) {
   ui.tab = tab;
@@ -1027,9 +1135,31 @@ let rt; window.addEventListener("resize", () => { clearTimeout(rt); rt = setTime
 
 document.getElementById("foot").textContent =
   `Scores run 0–100 (higher = lower risk): ${pct(DEFAULT.weights.payment)} payment history, ${pct(DEFAULT.weights.ageing)} ageing, ${pct(DEFAULT.weights.concentration)} concentration and exposure, then policy caps. ` +
-  `Payment history covers ${DEFAULT.lookback_months} months to ${DATA.as_of}. Generated by the scoring-engine CLI; the Policy tab recalculates in your browser and does not change the source data.`;
+  `Payment history covers ${DEFAULT.lookback_months} months to ${DATA.as_of}. Generated by the scoring-engine CLI; the Policy tab recalculates in your browser and does not change the source data.` +
+  (RUN ? ` Data extracted ${fmtTime(RUN.source.extracted_at)}; run fingerprint ${RUN.fingerprint}. Backtest and data checks use the policy this run was scored with.` : "");
 buildPolicy();
 const initial = (location.hash || "").slice(1);
-setTab(["overview", "customers", "collections", "limits", "policy"].includes(initial) ? initial : "overview", true);
+if (RUN) document.getElementById("tab-data").hidden = false;
+setTab(["overview", "customers", "collections", "limits", "policy"].concat(RUN ? ["data"] : []).includes(initial) ? initial : "overview", true);
+
+// Hosted next to its data files (e.g. a Databricks Volume or an internal web server), the page
+// lists the run's files and reloads itself when a newer run is published (the fingerprint file
+// changes). Opened as a file or in a sandboxed viewer, the fetch fails and it stays a snapshot.
+(async () => {
+  if (!RUN || !/^https?:$/.test(location.protocol)) return;
+  try {
+    const res = await fetch("data_fingerprint.txt", { cache: "no-store" });
+    if (!res.ok) return;
+    document.getElementById("downloads-block").hidden = false;
+    document.getElementById("downloads").innerHTML = RUN.downloads.map(([f, label]) => `<li><a href="${esc(f)}">${esc(f)}</a><span class="dim">${esc(label)}</span></li>`).join("");
+    document.getElementById("foot").textContent += " This page checks for a newer run every 10 minutes and reloads when one is published.";
+    setInterval(async () => {
+      try {
+        const r = await fetch("data_fingerprint.txt", { cache: "no-store" });
+        if (r.ok && (await r.text()).trim() !== RUN.fingerprint) location.reload();
+      } catch (e) { /* offline: try again next time */ }
+    }, 600000);
+  } catch (e) { /* not hosted with its data files */ }
+})();
 })();
 </script>

@@ -1,0 +1,177 @@
+# Credit scoring: tests on every push, and a scheduled live run that publishes only when results change.
+#
+# ci    (push / pull request): unit tests, then an end-to-end run on the synthetic sample ledger
+#       (August, then September compared with August), checking the outputs. The sample dashboard is
+#       uploaded as an artifact so reviewers can open it.
+#
+# live  (weekday schedule / manual): pulls the real ledger from NetSuite or Databricks, checks the
+#       data, scores it, compares with the last published run and publishes only if something moved.
+#       Runs only when the repository variable CREDIT_SOURCE is set to "netsuite" or "databricks".
+#
+# Customer credit data is confidential, so live results are never committed to git or deployed to a
+# public website. They go to a private workflow artifact (kept 30 days, visible to people with read
+# access to this repository) and, if DATABRICKS_OUTPUT_PREFIX is set, to Delta tables. The job summary
+# shown on the run page is aggregate-only: no customer names.
+#
+# Repository variables:   CREDIT_SOURCE (netsuite | databricks), CREDIT_CURRENCY (e.g. £),
+#                         DATABRICKS_INVOICES_TABLE, DATABRICKS_CUSTOMERS_TABLE, DATABRICKS_OUTPUT_PREFIX
+# Repository secrets:     NETSUITE_ACCOUNT_ID, NETSUITE_CONSUMER_KEY, NETSUITE_CONSUMER_SECRET,
+#                         NETSUITE_TOKEN_ID, NETSUITE_TOKEN_SECRET
+#                         DATABRICKS_SERVER_HOSTNAME, DATABRICKS_HTTP_PATH, DATABRICKS_TOKEN
+name: Credit scoring
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: "17 6 * * 1-5"   # 06:17 UTC on weekdays; scheduled runs only fire from the default branch
+  workflow_dispatch:
+    inputs:
+      as_of:
+        description: "Scoring date (YYYY-MM-DD); blank = today"
+        type: string
+        default: ""
+      publish:
+        description: "Publish even if nothing changed"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: credit-scoring-${{ github.workflow }}-${{ github.event_name == 'schedule' && 'live' || github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  ci:
+    if: github.event_name == 'push' || github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Unit tests
+        run: python -m unittest discover -s tests -v
+
+      - name: Sample run (August, then September compared with August)
+        run: |
+          python -m scoring_engine run --ledger examples/ledger.csv --customers examples/customers.csv \
+            --as-of 2026-08-31 --out out/sample-aug --label "Synthetic sample ledger" --strict
+          python -m scoring_engine run --ledger examples/ledger.csv --customers examples/customers.csv \
+            --as-of 2026-09-30 --previous out/sample-aug --out out/sample --label "Synthetic sample ledger" \
+            --strict --job-summary "$GITHUB_STEP_SUMMARY"
+
+      - name: Check the outputs
+        run: |
+          python - <<'PY'
+          import json, pathlib
+          out = pathlib.Path("out/sample")
+          feed = json.loads((out / "credit_feed.json").read_text())
+          assert feed["schema"] == "scoring_engine/credit_feed@1", feed["schema"]
+          assert feed["data_health"] == "ok", feed["data_health"]
+          assert feed["backtest"]["verdict"] == "evidenced", feed["backtest"]
+          assert len(feed["customers"]) == 36
+          assert feed["fingerprint"] == (out / "data_fingerprint.txt").read_text().strip()
+          assert json.loads((out / "changes.json").read_text())["previous_as_of"] == "2026-08-31"
+          print("outputs OK:", feed["portfolio"])
+          PY
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sample-dashboard
+          path: out/sample
+          retention-days: 14
+
+  live:
+    if: >-
+      (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') &&
+      (vars.CREDIT_SOURCE == 'netsuite' || vars.CREDIT_SOURCE == 'databricks')
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      CREDIT_SOURCE: ${{ vars.CREDIT_SOURCE }}
+      NETSUITE_ACCOUNT_ID: ${{ secrets.NETSUITE_ACCOUNT_ID }}
+      NETSUITE_CONSUMER_KEY: ${{ secrets.NETSUITE_CONSUMER_KEY }}
+      NETSUITE_CONSUMER_SECRET: ${{ secrets.NETSUITE_CONSUMER_SECRET }}
+      NETSUITE_TOKEN_ID: ${{ secrets.NETSUITE_TOKEN_ID }}
+      NETSUITE_TOKEN_SECRET: ${{ secrets.NETSUITE_TOKEN_SECRET }}
+      DATABRICKS_SERVER_HOSTNAME: ${{ secrets.DATABRICKS_SERVER_HOSTNAME }}
+      DATABRICKS_HTTP_PATH: ${{ secrets.DATABRICKS_HTTP_PATH }}
+      DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install
+        run: pip install -e ".[databricks]"
+
+      - name: Unit tests
+        run: python -m unittest discover -s tests
+
+      - name: Restore the last published run (for "what changed")
+        uses: actions/cache@v4
+        with:
+          path: state/last_published
+          key: credit-live-${{ github.run_id }}
+          restore-keys: credit-live-
+
+      - name: Source arguments
+        id: args
+        run: |
+          if [ "$CREDIT_SOURCE" = "databricks" ]; then
+            a="--source databricks --invoices-table ${{ vars.DATABRICKS_INVOICES_TABLE }}"
+            if [ -n "${{ vars.DATABRICKS_CUSTOMERS_TABLE }}" ]; then a="$a --customers-table ${{ vars.DATABRICKS_CUSTOMERS_TABLE }}"; fi
+          else
+            a="--source netsuite"
+          fi
+          echo "source=$a" >> "$GITHUB_OUTPUT"
+          echo "as_of=${{ inputs.as_of || '' }}" >> "$GITHUB_OUTPUT"
+
+      - name: Probe the source and check the data
+        run: |
+          as_of="${{ steps.args.outputs.as_of }}"
+          python -m scoring_engine probe ${{ steps.args.outputs.source }} ${as_of:+--as-of $as_of} | tee probe.log
+
+      - name: Score
+        run: |
+          as_of="${{ steps.args.outputs.as_of }}"
+          prev=""; [ -f state/last_published/scorecard.csv ] && prev="--previous state/last_published"
+          tables="${{ vars.DATABRICKS_OUTPUT_PREFIX }}"
+          # Tables are keyed by as_of, so writing an unchanged run again just replaces identical rows.
+          python -m scoring_engine run ${{ steps.args.outputs.source }} ${as_of:+--as-of $as_of} $prev \
+            ${tables:+--write-table-prefix $tables} \
+            --out out/live --currency "${{ vars.CREDIT_CURRENCY }}" --strict --job-summary "$GITHUB_STEP_SUMMARY"
+
+      - name: Did anything change?
+        id: changed
+        run: |
+          new=$(cat out/live/data_fingerprint.txt)
+          old=$(cat state/last_published/data_fingerprint.txt 2>/dev/null || echo none)
+          if [ "$new" = "$old" ] && [ "${{ github.event_name }}" = "schedule" ]; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            printf '\n**No change since the last published run; nothing published.**\n' >> "$GITHUB_STEP_SUMMARY"
+          elif [ "$new" = "$old" ] && [ "${{ inputs.publish }}" != "true" ]; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Publish results (private artifact)
+        if: steps.changed.outputs.changed == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: credit-scoring-${{ github.run_number }}
+          path: out/live
+          retention-days: 30
+
+      - name: Remember this run as the last published one
+        if: steps.changed.outputs.changed == 'true'
+        run: |
+          rm -rf state/last_published && mkdir -p state
+          cp -r out/live state/last_published

@@ -2,6 +2,7 @@
 import csv
 import json
 import os
+import re
 import tempfile
 import unittest
 from datetime import date, timedelta
@@ -54,8 +55,13 @@ class FakeFrame:
         return self
 
     def saveAsTable(self, name):
+        cols = [part.strip().split(" ")[0].strip("`") for part in self.schema.split(",")]
+        rows = [Row(zip(cols, values)) for values in self.rows]
         self.spark.saved.append((name, self._mode, self.schema, self.rows))
-        self.spark.existing.add(name)
+        if self._mode == "append" and name in self.spark.tables:
+            self.spark.tables[name].extend(rows)
+        else:
+            self.spark.tables[name] = rows
 
     def where(self, *a):
         return self
@@ -65,13 +71,15 @@ class FakeFrame:
 
 
 class FakeSpark:
+    """Enough of a SparkSession for the notebook: reads the source views, stores written tables."""
+
     def __init__(self, ledger, customers):
         self.ledger, self.customers = ledger, customers
-        self.queries, self.saved, self.existing = [], [], set()
+        self.queries, self.saved, self.tables = [], [], {}
         self.catalog = self
 
     def tableExists(self, name):
-        return name in self.existing
+        return name in self.tables
 
     def sql(self, q):
         self.queries.append(q)
@@ -79,6 +87,18 @@ class FakeSpark:
             return FakeFrame(self, [Row(r) for r in self.ledger])
         if "credit_customers" in q:
             return FakeFrame(self, [Row(r) for r in self.customers])
+        m = re.match(r"(SELECT max\(as_of\) AS d|SELECT \*|DELETE) FROM (\S+) WHERE as_of (<|=) DATE'([\d-]+)'", q)
+        if m:
+            kind, table, op, d = m.groups()
+            d = date.fromisoformat(d)
+            rows = self.tables.get(table, [])
+            if kind.startswith("DELETE"):
+                self.tables[table] = [r for r in rows if r["as_of"] != d]
+                return FakeFrame(self)
+            if kind.startswith("SELECT max"):
+                earlier = [r["as_of"] for r in rows if r["as_of"] < d]
+                return FakeFrame(self, [Row(d=max(earlier) if earlier else None)])
+            return FakeFrame(self, [r for r in rows if r["as_of"] == d])
         return FakeFrame(self)
 
     def createDataFrame(self, rows, schema=None):
@@ -94,9 +114,9 @@ def read_csv(path):
 
 
 class DatabricksJobTests(unittest.TestCase):
-    def run_notebook(self, params, ledger=None):
+    def run_notebook(self, params, ledger=None, spark=None):
         ledger = read_csv(REPO / "examples" / "ledger.csv") if ledger is None else ledger
-        spark = FakeSpark(ledger, read_csv(REPO / "examples" / "customers.csv"))
+        spark = spark or FakeSpark(ledger, read_csv(REPO / "examples" / "customers.csv"))
         dbutils = FakeDbutils(dict(params))
         cwd = os.getcwd()
         os.chdir(REPO / "databricks")  # Databricks runs a notebook from its own folder
@@ -116,35 +136,56 @@ class DatabricksJobTests(unittest.TestCase):
             self.assertEqual(out["customers"], 36)
             self.assertEqual(sum(out["grades"].values()), 36)
             names = [s[0] for s in spark.saved]
-            self.assertEqual(names, ["main.finance.credit_risk_scorecard", "main.finance.credit_risk_worklist"])
+            self.assertEqual(names, ["main.finance.credit_risk_scorecard", "main.finance.credit_risk_worklist",
+                                     "main.finance.credit_risk_runs"])
+            self.assertEqual(out["data_health"], "ok")
+            self.assertEqual(out["backtest"], "evidenced")
+            self.assertIsNone(out["previous_as_of"])
             scorecard = spark.saved[0]
             self.assertTrue(scorecard[2].startswith("as_of DATE, `customer_id` STRING"))
             self.assertEqual(len(scorecard[3]), 36)
             files = sorted(p.name for p in (Path(vol) / "2026-09-30").iterdir())
-            self.assertEqual(files, ["collections_worklist.csv", "dashboard.html", "portfolio_summary.json",
-                                     "portfolio_summary.md", "scorecard.csv"])
+            self.assertEqual(files, ["backtest.json", "changes.json", "collections_worklist.csv", "credit_feed.json",
+                                     "dashboard.html", "data_fingerprint.txt", "data_health.json",
+                                     "portfolio_summary.json", "portfolio_summary.md", "scorecard.csv"])
+            self.assertEqual(sorted(p.name for p in (Path(vol) / "latest").iterdir()), files)
             self.assertIn("-15)", spark.queries[0])
 
     def test_rerun_same_date_replaces_rows(self):
         with tempfile.TemporaryDirectory() as vol:
             params = {"output_volume": vol, "as_of": "2026-09-30"}
-            spark = FakeSpark(read_csv(REPO / "examples" / "ledger.csv"), read_csv(REPO / "examples" / "customers.csv"))
-            spark.existing.add("main.finance.credit_risk_scorecard")
-            spark.existing.add("main.finance.credit_risk_worklist")
-            # Reuse the fake with tables already present.
-            dbutils = FakeDbutils(dict(params))
-            cwd = os.getcwd()
-            os.chdir(REPO / "databricks")
-            try:
-                with self.assertRaises(NotebookExit):
-                    exec(compile(NOTEBOOK.read_text(), str(NOTEBOOK), "exec"),
-                         {"spark": spark, "dbutils": dbutils, "display": lambda df: None})
-            finally:
-                os.chdir(cwd)
+            spark, _ = self.run_notebook(params)
+            spark, _ = self.run_notebook(params, spark=spark)
             deletes = [q for q in spark.queries if q.startswith("DELETE")]
-            self.assertEqual(len(deletes), 2)
+            self.assertEqual(len(deletes), 3)
             self.assertIn("as_of = DATE'2026-09-30'", deletes[0])
-            self.assertTrue(all(mode == "append" for _, mode, _, _ in spark.saved))
+            self.assertEqual(len(spark.tables["main.finance.credit_risk_scorecard"]), 36)
+            self.assertEqual(len(spark.tables["main.finance.credit_risk_runs"]), 1)
+
+    def test_compares_with_previous_run_in_the_table(self):
+        with tempfile.TemporaryDirectory() as vol:
+            spark, _ = self.run_notebook({"output_volume": vol, "as_of": "2026-08-31"})
+            spark, out = self.run_notebook({"output_volume": vol, "as_of": "2026-09-30"}, spark=spark)
+            self.assertEqual(out["previous_as_of"], "2026-08-31")
+            self.assertGreater(out["changes"], 0)
+            log = spark.tables["main.finance.credit_risk_runs"]
+            self.assertEqual(len(log), 2)
+            sep = [r for r in log if r["as_of"] == date(2026, 9, 30)][0]
+            self.assertEqual(sep["previous_as_of"], "2026-08-31")
+            self.assertEqual(sep["changes"], out["changes"])
+            changes = json.loads((Path(vol) / "2026-09-30" / "changes.json").read_text())
+            self.assertIn("Pinnacle Group", [c["customer_name"] for c in changes["changes"]])
+
+    def test_failed_data_checks_leave_tables_untouched(self):
+        with tempfile.TemporaryDirectory() as vol:
+            spark, _ = self.run_notebook({"output_volume": vol, "as_of": "2026-09-30"})
+            before = len(spark.saved)
+            with self.assertRaisesRegex(RuntimeError, "Data checks failed, tables not updated"):
+                self.run_notebook({"output_volume": vol, "as_of": "2026-09-30", "control_total": "1,000,000"},
+                                  spark=spark)
+            self.assertEqual(len(spark.saved), before)
+            health = json.loads((Path(vol) / "latest" / "data_health.json").read_text())
+            self.assertEqual(health["status"], "fail")
 
     def test_blank_as_of_means_last_month_end(self):
         with tempfile.TemporaryDirectory() as vol:

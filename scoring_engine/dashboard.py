@@ -25,7 +25,35 @@ def _opt(value: Optional[float], digits: int = 4) -> Optional[float]:
     return None if value is None else round(value, digits)
 
 
-def build_payload(result: PortfolioResult, config: Dict[str, Any], source: str = "", currency: str = "") -> Dict[str, Any]:
+DOWNLOADS = [
+    ["credit_feed.json", "Credit feed for ERP / collections tools (schema credit_feed@1)"],
+    ["scorecard.csv", "Every customer: grade, sub-scores, limit, drivers"],
+    ["collections_worklist.csv", "Collections worklist in work order"],
+    ["portfolio_summary.md", "One-page summary with health, backtest and changes"],
+    ["data_health.json", "Data health checks"],
+    ["backtest.json", "Backtest results"],
+    ["changes.json", "Changes since the previous run"],
+]
+
+
+def run_payload(run, source_info: Optional[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
+    if run is None:
+        return None
+    src = {k: (v.isoformat() if hasattr(v, "isoformat") else v) for k, v in (source_info or {}).items()}
+    return {
+        "fingerprint": run.fingerprint,
+        "source": src,
+        "health_status": run.health_status,
+        "health": run.health,
+        "backtest": run.backtest,
+        "changes": run.changes,
+        "previous_as_of": run.previous_as_of,
+        "downloads": DOWNLOADS,
+    }
+
+
+def build_payload(result: PortfolioResult, config: Dict[str, Any], source: str = "", currency: str = "",
+                  run=None, source_info: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     customers = []
     for s in sorted(result.scores, key=lambda s: s.customer.customer_id):
         f = s.features
@@ -67,6 +95,7 @@ def build_payload(result: PortfolioResult, config: Dict[str, Any], source: str =
         "currency": currency,
         "config": config,
         "customers": customers,
+        "run": run_payload(run, source_info),
     }
 
 
@@ -83,7 +112,10 @@ def write_dashboard(
     source: str = "",
     currency: str = "",
     standalone: bool = True,
+    run=None,
+    source_info: Optional[Dict[str, Any]] = None,
 ) -> Path:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(render_dashboard(build_payload(result, config, source, currency), standalone), encoding="utf-8")
+    payload = build_payload(result, config, source, currency, run=run, source_info=source_info)
+    path.write_text(render_dashboard(payload, standalone), encoding="utf-8")
     return path

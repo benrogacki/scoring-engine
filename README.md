@@ -48,6 +48,26 @@ credit-score run --source databricks --invoices-table main.finance.credit_ar_inv
 Setup steps, required permissions, the default queries and a scheduled Databricks job are in
 [`docs/integrations.md`](docs/integrations.md).
 
+### Every run checks itself
+
+```bash
+credit-score probe --source netsuite                         # connect, pull, run the data checks; no scoring
+credit-score run --source netsuite --previous out/last-month --control-total 1804429.62 --strict --out out/
+```
+
+- **Data health**: freshness, duplicates, impossible dates, missing master records, and agreement
+  to the ERP's AR ageing total. A failed check stops publishing.
+- **Backtest**: re-scores the ledger at past dates and checks that lower grades really did go 60+ days
+  overdue more often (AUC, Gini, bad rate by grade, verdict).
+- **What changed** since the last run: new P1 escalations, regrades, customers newly over their
+  limit, and changed limit actions.
+- **`credit_feed.json`**: a versioned contract (`scoring_engine/credit_feed@1`) for the ERP and
+  collections tools, with credit-hold flags.
+
+Scheduled runs (Databricks job or GitHub Actions) publish only when the results change. Live
+results stay private: artifacts and Databricks tables, never a public site. See
+[`docs/operations.md`](docs/operations.md).
+
 Worked outputs from the sample ledger are in [`examples/output/`](examples/output/). Start with
 [`portfolio_summary.md`](examples/output/portfolio_summary.md).
 
@@ -154,7 +174,10 @@ Disputed balances add *"resolve dispute"* to the action.
 | `collections_worklist.csv` | Overdue customers in work order, with tier, overdue split, priority score and action |
 | `portfolio_summary.md` | Management summary: headline KPIs, ageing profile, grade distribution, largest exposures, top of worklist, limit changes |
 | `portfolio_summary.json` | The same KPIs in machine-readable form, for dashboards and month-on-month tracking |
-| `dashboard.html` | Interactive dashboard (open in any browser, no install): risk map, grade mix, ageing, searchable customer table with drill-down, collections worklist with tick-off, limit recommendations, and a **Policy** tab that re-scores the ledger live as you move the sliders and exports the resulting `--config` JSON |
+| `credit_feed.json` | Versioned feed for downstream systems: grades, limits, credit holds, worklist, changes |
+| `data_health.json` · `backtest.json` · `changes.json` | Data checks, backtest evidence, and what changed since `--previous` |
+| `data_fingerprint.txt` | Hash of the results; unchanged data gives the same fingerprint |
+| `dashboard.html` | Interactive dashboard (open in any browser, no install): risk map, grade mix, ageing, searchable customer table with drill-down, collections worklist with tick-off, limit recommendations, a **Policy** tab that re-scores the ledger live as you move the sliders and exports the resulting `--config` JSON, and a **Data & evidence** tab (health checks, backtest, what changed). Hosted next to its files, it reloads itself when a new run lands |
 
 ## Tuning the policy
 
@@ -189,6 +212,8 @@ python -m unittest discover -s tests -v
 ```
 
 The code lives in the `scoring_engine/` package:
+- `pipeline.py`: one run end to end (checks → score → backtest → changes → outputs), shared by the CLI, CI and the Databricks job
+- `health.py`, `backtest.py`, `changes.py`, `feed.py`: data checks, backtest, change detection, the credit feed
 - `loader.py`: row validation and column aliases, shared by every source
 - `sources/`: NetSuite (SuiteQL, OAuth 1.0a) and Databricks (SQL connector, Spark, write-back), plus the default queries
 - `features.py`: per-customer measurements
