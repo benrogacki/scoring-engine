@@ -2,10 +2,10 @@
   "series": {
     "de_toll_mileage": {
       "source": "genesis",
-      "attempted_at": "2026-10-06T22:51:55+00:00",
+      "attempted_at": "2026-10-07T12:19:19+00:00",
       "optional": false,
       "status": "ok",
-      "fetched_at": "2026-10-06T22:51:55+00:00",
+      "fetched_at": "2026-10-07T12:19:19+00:00",
       "observations": 224,
       "first": "2008-01-01",
       "last": "2026-08-01",
@@ -20,10 +20,10 @@
     },
     "de_toll_mileage_daily": {
       "source": "destatis_daily",
-      "attempted_at": "2026-10-06T22:52:00+00:00",
+      "attempted_at": "2026-10-07T12:19:23+00:00",
       "optional": true,
       "status": "ok",
-      "fetched_at": "2026-10-06T22:52:00+00:00",
+      "fetched_at": "2026-10-07T12:19:23+00:00",
       "observations": 6844,
       "first": "2008-01-01",
       "last": "2026-09-26",
@@ -36,10 +36,10 @@
     },
     "de_port_calls": {
       "source": "portwatch",
-      "attempted_at": "2026-10-06T22:52:03+00:00",
+      "attempted_at": "2026-10-07T12:19:25+00:00",
       "optional": true,
       "status": "ok",
-      "fetched_at": "2026-10-06T22:52:03+00:00",
+      "fetched_at": "2026-10-07T12:19:25+00:00",
       "observations": 2832,
       "first": "2019-01-01",
       "last": "2026-10-02",
@@ -53,10 +53,10 @@
     },
     "ea_port_calls": {
       "source": "portwatch",
-      "attempted_at": "2026-10-06T22:52:04+00:00",
+      "attempted_at": "2026-10-07T12:19:26+00:00",
       "optional": true,
       "status": "ok",
-      "fetched_at": "2026-10-06T22:52:04+00:00",
+      "fetched_at": "2026-10-07T12:19:26+00:00",
       "observations": 2832,
       "first": "2019-01-01",
       "last": "2026-10-02",
@@ -70,10 +70,10 @@
     },
     "world_port_calls": {
       "source": "portwatch",
-      "attempted_at": "2026-10-06T22:52:05+00:00",
+      "attempted_at": "2026-10-07T12:19:27+00:00",
       "optional": true,
       "status": "ok",
-      "fetched_at": "2026-10-06T22:52:05+00:00",
+      "fetched_at": "2026-10-07T12:19:27+00:00",
       "observations": 2832,
       "first": "2019-01-01",
       "last": "2026-10-02",
@@ -85,23 +85,9 @@
         "layer": "ports"
       }
     },
-    "dry_bulk_freight": {
-      "source": "yahoo_chart",
-      "attempted_at": "2026-10-06T22:52:07+00:00",
-      "optional": true,
-      "status": "ok",
-      "fetched_at": "2026-10-06T22:52:07+00:00",
-      "observations": 2147,
-      "first": "2018-03-22",
-      "last": "2026-10-06",
-      "origin": "yahoo:BDRY",
-      "details": {
-        "url": "https://query1.finance.yahoo.com/v8/finance/chart/BDRY?period1=946684800&period2=1791327127&interval=1d&includeAdjustedClose=true"
-      }
-    },
     "de_ais_stationary": {
       "source": "csv",
-      "attempted_at": "2026-10-06T22:52:07+00:00",
+      "attempted_at": "2026-10-07T12:19:28+00:00",
       "optional": true,
       "status": "failed",
       "error": "de_ais_stationary: file /home/runner/work/scoring-engine/scoring-engine/data/freight/ais_port_counts.csv not found (Written by `freight-nowcast ais-listen` (needs AISSTREAM_API_KEY; cron it daily). Enters the composite once it has 3 years of history.)",
@@ -109,12 +95,85 @@
       "last": null,
       "observations": null
     },
-    "us_freight_tsi": {
-      "source": "fred",
-      "attempted_at": "2026-10-06T22:52:07+00:00",
+    "de_manufacturing_production": {
+      "source": "sdmx",
+      "attempted_at": "2026-10-07T12:19:29+00:00",
       "optional": false,
       "status": "ok",
-      "fetched_at": "2026-10-06T22:52:07+00:00",
+      "fetched_at": "2026-10-07T12:19:29+00:00",
+      "observations": 223,
+      "first": "2008-01-01",
+      "last": "2026-07-01",
+      "origin": "sdmx:eurostat",
+      "details": {
+        "url": "https://ec.europa.eu/eurostat/api/dissemination/sdmx/2.1/data/sts_inpr_m/M.PRD.C.SCA.I21.DE?format=SDMX-CSV&startPeriod=2008-01"
+      }
+    },
+    "ea_manufacturing_production": {
+      "source": "sdmx",
+      "attempted_at": "2026-10-07T12:19:30+00:00",
+      "optional": false,
+      "status": "ok",
+      "fetched_at": "2026-10-07T12:19:30+00:00",
+      "observations": 223,
+      "first": "2008-01-01",
+      "last": "2026-07-01",
+      "origin": "sdmx:eurostat",
+      "details": {
+        "url": "https://ec.europa.eu/eurostat/api/dissemination/sdmx/2.1/data/sts_inpr_m/M.PRD.C.SCA.I21.EA20?format=SDMX-CSV&startPeriod=2008-01"
+      }
+    },
+    "de_exports": {
+      "source": "genesis",
+      "attempted_at": "2026-10-07T12:19:31+00:00",
+      "optional": true,
+      "status": "ok",
+      "fetched_at": "2026-10-07T12:19:31+00:00",
+      "observations": 294,
+      "first": "2002-01-01",
+      "last": "2026-06-01",
+      "origin": "eurostat:jsonstat",
+      "details": {
+        "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/ei_eteu27_2020_m?format=JSON&lang=EN&geo=DE&stk_flow=EXP&partner=WORLD&indic=ET-T&unit=IVOL-SA",
+        "fallback_used": "1: eurostat_jsonstat (primary failed: GENESIS HTTP 401: b'{\"Code\":15,\"Content\":\"You are not allowed to call this service or the header of your request does not contain all the necessary information )"
+      }
+    },
+    "world_trade_volume": {
+      "source": "cpb",
+      "attempted_at": "2026-10-07T12:19:33+00:00",
+      "optional": true,
+      "status": "ok",
+      "fetched_at": "2026-10-07T12:19:33+00:00",
+      "observations": 319,
+      "first": "2000-01-01",
+      "last": "2026-07-01",
+      "origin": "cpb:world-trade-monitor",
+      "details": {
+        "url": "https://www.cpb.nl/system/files/cpbmedia/CPB-world-trade-monitor-july-2026.xlsx",
+        "sheet": "trade_out",
+        "row": "World trade tgz_w1_qnmi_sn"
+      }
+    },
+    "dry_bulk_freight": {
+      "source": "yahoo_chart",
+      "attempted_at": "2026-10-07T12:19:27+00:00",
+      "optional": true,
+      "status": "ok",
+      "fetched_at": "2026-10-07T12:19:27+00:00",
+      "observations": 2147,
+      "first": "2018-03-22",
+      "last": "2026-10-06",
+      "origin": "yahoo:BDRY",
+      "details": {
+        "url": "https://query1.finance.yahoo.com/v8/finance/chart/BDRY?period1=946684800&period2=1791375567&interval=1d&includeAdjustedClose=true"
+      }
+    },
+    "us_freight_tsi": {
+      "source": "fred",
+      "attempted_at": "2026-10-07T12:19:28+00:00",
+      "optional": false,
+      "status": "ok",
+      "fetched_at": "2026-10-07T12:19:28+00:00",
       "observations": 319,
       "first": "2000-01-01",
       "last": "2026-07-01",
@@ -125,10 +184,10 @@
     },
     "us_cass_shipments": {
       "source": "fred",
-      "attempted_at": "2026-10-06T22:52:07+00:00",
+      "attempted_at": "2026-10-07T12:19:28+00:00",
       "optional": true,
       "status": "ok",
-      "fetched_at": "2026-10-06T22:52:07+00:00",
+      "fetched_at": "2026-10-07T12:19:28+00:00",
       "observations": 128,
       "first": "2016-01-01",
       "last": "2026-08-01",
@@ -139,10 +198,10 @@
     },
     "us_rail_carloads": {
       "source": "fred",
-      "attempted_at": "2026-10-06T22:52:07+00:00",
+      "attempted_at": "2026-10-07T12:19:28+00:00",
       "optional": true,
       "status": "ok",
-      "fetched_at": "2026-10-06T22:52:07+00:00",
+      "fetched_at": "2026-10-07T12:19:28+00:00",
       "observations": 319,
       "first": "2000-01-01",
       "last": "2026-07-01",
@@ -153,10 +212,10 @@
     },
     "us_port_calls": {
       "source": "portwatch",
-      "attempted_at": "2026-10-06T22:52:07+00:00",
+      "attempted_at": "2026-10-07T12:19:28+00:00",
       "optional": true,
       "status": "ok",
-      "fetched_at": "2026-10-06T22:52:07+00:00",
+      "fetched_at": "2026-10-07T12:19:28+00:00",
       "observations": 2832,
       "first": "2019-01-01",
       "last": "2026-10-02",
@@ -170,10 +229,10 @@
     },
     "gcc_port_calls": {
       "source": "portwatch",
-      "attempted_at": "2026-10-06T22:52:09+00:00",
+      "attempted_at": "2026-10-07T12:19:28+00:00",
       "optional": true,
       "status": "ok",
-      "fetched_at": "2026-10-06T22:52:09+00:00",
+      "fetched_at": "2026-10-07T12:19:28+00:00",
       "observations": 2832,
       "first": "2019-01-01",
       "last": "2026-10-02",
@@ -187,10 +246,10 @@
     },
     "hormuz_transits": {
       "source": "portwatch",
-      "attempted_at": "2026-10-06T22:52:10+00:00",
+      "attempted_at": "2026-10-07T12:19:29+00:00",
       "optional": true,
       "status": "ok",
-      "fetched_at": "2026-10-06T22:52:10+00:00",
+      "fetched_at": "2026-10-07T12:19:29+00:00",
       "observations": 2834,
       "first": "2019-01-01",
       "last": "2026-10-04",
@@ -204,10 +263,10 @@
     },
     "bab_el_mandeb_transits": {
       "source": "portwatch",
-      "attempted_at": "2026-10-06T22:52:11+00:00",
+      "attempted_at": "2026-10-07T12:19:29+00:00",
       "optional": true,
       "status": "ok",
-      "fetched_at": "2026-10-06T22:52:11+00:00",
+      "fetched_at": "2026-10-07T12:19:29+00:00",
       "observations": 2834,
       "first": "2019-01-01",
       "last": "2026-10-04",
@@ -219,71 +278,12 @@
         "layer": "chokepoints"
       }
     },
-    "de_manufacturing_production": {
-      "source": "sdmx",
-      "attempted_at": "2026-10-06T22:52:13+00:00",
-      "optional": false,
-      "status": "ok",
-      "fetched_at": "2026-10-06T22:52:13+00:00",
-      "observations": 223,
-      "first": "2008-01-01",
-      "last": "2026-07-01",
-      "origin": "sdmx:eurostat",
-      "details": {
-        "url": "https://ec.europa.eu/eurostat/api/dissemination/sdmx/2.1/data/sts_inpr_m/M.PRD.C.SCA.I21.DE?format=SDMX-CSV&startPeriod=2008-01"
-      }
-    },
-    "ea_manufacturing_production": {
-      "source": "sdmx",
-      "attempted_at": "2026-10-06T22:52:14+00:00",
-      "optional": false,
-      "status": "ok",
-      "fetched_at": "2026-10-06T22:52:14+00:00",
-      "observations": 223,
-      "first": "2008-01-01",
-      "last": "2026-07-01",
-      "origin": "sdmx:eurostat",
-      "details": {
-        "url": "https://ec.europa.eu/eurostat/api/dissemination/sdmx/2.1/data/sts_inpr_m/M.PRD.C.SCA.I21.EA20?format=SDMX-CSV&startPeriod=2008-01"
-      }
-    },
-    "de_exports": {
-      "source": "genesis",
-      "attempted_at": "2026-10-06T22:52:14+00:00",
-      "optional": true,
-      "status": "ok",
-      "fetched_at": "2026-10-06T22:52:14+00:00",
-      "observations": 294,
-      "first": "2002-01-01",
-      "last": "2026-06-01",
-      "origin": "eurostat:jsonstat",
-      "details": {
-        "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/ei_eteu27_2020_m?format=JSON&lang=EN&geo=DE&stk_flow=EXP&partner=WORLD&indic=ET-T&unit=IVOL-SA",
-        "fallback_used": "1: eurostat_jsonstat (primary failed: GENESIS HTTP 401: b'{\"Code\":15,\"Content\":\"You are not allowed to call this service or the header of your request does not contain all the necessary information )"
-      }
-    },
-    "world_trade_volume": {
-      "source": "cpb",
-      "attempted_at": "2026-10-06T22:52:17+00:00",
-      "optional": true,
-      "status": "ok",
-      "fetched_at": "2026-10-06T22:52:17+00:00",
-      "observations": 319,
-      "first": "2000-01-01",
-      "last": "2026-07-01",
-      "origin": "cpb:world-trade-monitor",
-      "details": {
-        "url": "https://www.cpb.nl/system/files/cpbmedia/CPB-world-trade-monitor-july-2026.xlsx",
-        "sheet": "trade_out",
-        "row": "World trade tgz_w1_qnmi_sn"
-      }
-    },
     "us_manufacturing_production": {
       "source": "fred",
-      "attempted_at": "2026-10-06T22:52:21+00:00",
+      "attempted_at": "2026-10-07T12:19:37+00:00",
       "optional": false,
       "status": "ok",
-      "fetched_at": "2026-10-06T22:52:21+00:00",
+      "fetched_at": "2026-10-07T12:19:37+00:00",
       "observations": 656,
       "first": "1972-01-01",
       "last": "2026-08-01",
@@ -294,10 +294,10 @@
     },
     "us_goods_imports": {
       "source": "fred",
-      "attempted_at": "2026-10-06T22:52:21+00:00",
+      "attempted_at": "2026-10-07T12:19:37+00:00",
       "optional": true,
       "status": "ok",
-      "fetched_at": "2026-10-06T22:52:21+00:00",
+      "fetched_at": "2026-10-07T12:19:37+00:00",
       "observations": 416,
       "first": "1992-01-01",
       "last": "2026-08-01",
@@ -308,10 +308,10 @@
     },
     "ea_exports": {
       "source": "eurostat_jsonstat",
-      "attempted_at": "2026-10-06T22:52:21+00:00",
+      "attempted_at": "2026-10-07T12:19:37+00:00",
       "optional": true,
       "status": "ok",
-      "fetched_at": "2026-10-06T22:52:21+00:00",
+      "fetched_at": "2026-10-07T12:19:37+00:00",
       "observations": 294,
       "first": "2002-01-01",
       "last": "2026-06-01",
@@ -322,10 +322,10 @@
     },
     "gcc_exports": {
       "source": "sdmx",
-      "attempted_at": "2026-10-06T22:52:22+00:00",
+      "attempted_at": "2026-10-07T12:19:37+00:00",
       "optional": true,
       "status": "ok",
-      "fetched_at": "2026-10-06T22:52:22+00:00",
+      "fetched_at": "2026-10-07T12:19:37+00:00",
       "observations": 138,
       "first": "2015-01-01",
       "last": "2026-06-01",
@@ -335,6 +335,6 @@
       }
     }
   },
-  "updated_at": "2026-10-06T22:52:23+00:00",
+  "updated_at": "2026-10-07T12:19:38+00:00",
   "mode": "live"
 }
