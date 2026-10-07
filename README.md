@@ -4,8 +4,8 @@ A scoring workflow for finance teams, built on the debtor ledger. It scores each
 **payment history**, **ageing** and **concentration/exposure**. From those scores it assigns a risk
 grade, recommends a **credit limit** and produces a ranked **collections worklist**.
 
-It has no dependencies beyond the Python standard library (3.9+). Inputs are plain CSV exports from
-any ERP or accounting system. Outputs are CSV and Markdown, ready for Excel, Power BI or an email to
+It has no dependencies beyond the Python standard library (3.9+); the optional Databricks connector
+is the only extra. Inputs come from CSV exports, **NetSuite** (SuiteQL) or **Databricks** tables. Outputs are CSV and Markdown, ready for Excel, Power BI or an email to
 the credit controller.
 
 ```
@@ -27,10 +27,46 @@ python -m scoring_engine run --ledger examples/ledger.csv --customers examples/c
 # 2. Run it on your own ledger
 python -m scoring_engine run --ledger my_ledger.csv --customers my_customers.csv --out out
 
+# open out/dashboard.html in a browser to explore the results
+
 # optional: install the `credit-score` command
 pip install -e .
 credit-score run --ledger my_ledger.csv --customers my_customers.csv --config my_policy.json
 ```
+
+### Pulling live data
+
+```bash
+# straight from NetSuite (SuiteQL + token-based auth; credentials in env vars)
+credit-score run --source netsuite --out out/
+
+# from Databricks, writing results back as Delta tables
+credit-score run --source databricks --invoices-table main.finance.credit_ar_invoices \
+       --customers-table main.finance.credit_customers --write-table-prefix main.finance.credit_risk
+```
+
+Setup steps, required permissions, the default queries and a scheduled Databricks job are in
+[`docs/integrations.md`](docs/integrations.md).
+
+### Every run checks itself
+
+```bash
+credit-score probe --source netsuite                         # connect, pull, run the data checks; no scoring
+credit-score run --source netsuite --previous out/last-month --control-total 1804429.62 --strict --out out/
+```
+
+- **Data health**: freshness, duplicates, impossible dates, missing master records, and agreement
+  to the ERP's AR ageing total. A failed check stops publishing.
+- **Backtest**: re-scores the ledger at past dates and checks that lower grades really did go 60+ days
+  overdue more often (AUC, Gini, bad rate by grade, verdict).
+- **What changed** since the last run: new P1 escalations, regrades, customers newly over their
+  limit, and changed limit actions.
+- **`credit_feed.json`**: a versioned contract (`scoring_engine/credit_feed@1`) for the ERP and
+  collections tools, with credit-hold flags.
+
+Scheduled runs (Databricks job or GitHub Actions) publish only when the results change. Live
+results stay private: artifacts and Databricks tables, never a public site. See
+[`docs/operations.md`](docs/operations.md).
 
 Worked outputs from the sample ledger are in [`examples/output/`](examples/output/). Start with
 [`portfolio_summary.md`](examples/output/portfolio_summary.md).
@@ -138,6 +174,10 @@ Disputed balances add *"resolve dispute"* to the action.
 | `collections_worklist.csv` | Overdue customers in work order, with tier, overdue split, priority score and action |
 | `portfolio_summary.md` | Management summary: headline KPIs, ageing profile, grade distribution, largest exposures, top of worklist, limit changes |
 | `portfolio_summary.json` | The same KPIs in machine-readable form, for dashboards and month-on-month tracking |
+| `credit_feed.json` | Versioned feed for downstream systems: grades, limits, credit holds, worklist, changes |
+| `data_health.json` · `backtest.json` · `changes.json` | Data checks, backtest evidence, and what changed since `--previous` |
+| `data_fingerprint.txt` | Hash of the results; unchanged data gives the same fingerprint |
+| `dashboard.html` | Interactive dashboard (open in any browser, no install): risk map, grade mix, ageing, searchable customer table with drill-down, collections worklist with tick-off, limit recommendations, a **Policy** tab that re-scores the ledger live as you move the sliders and exports the resulting `--config` JSON, and a **Data & evidence** tab (health checks, backtest, what changed). Hosted next to its files, it reloads itself when a new run lands |
 
 ## Tuning the policy
 
@@ -165,6 +205,33 @@ Weights must sum to 1.0. The engine checks this, and the grade ordering, before 
 5. **FD/CFO** receives `portfolio_summary.md`. Keep each month's `portfolio_summary.json` to track
    overdue %, the AR-weighted score and HHI over time.
 
+## Global Freight Activity Tracker (separate module)
+
+`freight_nowcast/` is a separate tool in the same repository. It tracks real-economy momentum from
+published freight series:
+
+- **road:** the German truck toll mileage index from Destatis GENESIS, monthly plus working-daily
+- **sea:** OECD AIS port calls and the Baltic Dry Index, plus optional aisstream.io port counts
+
+It produces a composite index, z-scores per geography, cycle phases and turning-point flags.
+Validation is built in: toll mileage is tested against manufacturing production, and port calls
+against trade statistics. It does not touch the ledger or scoring code. It feeds the capstone
+through `capstone_feed.json`: the real-economy read next to the yield curve in Tier 1, and the
+cycle/sector tilt in Tier 2.
+
+```bash
+python -m freight_nowcast live --out out/freight/live                      # real data: fetch + run
+python -m freight_nowcast demo --as-of 2026-09-30 --out out/freight-demo   # synthetic sandbox, offline
+```
+
+Geographies: Germany, Eurozone, United States, Arabia (GCC) and world sea trade. A GitHub Actions job
+checks every source every 3 hours. When a source has released new data, it republishes the nowcast to
+the `freight-live` branch and to the dashboard website (Cloudflare Pages or GitHub Pages; see
+[hosting](docs/freight_nowcast.md#running-live)).
+
+See [`docs/freight_nowcast.md`](docs/freight_nowcast.md) for sources, method, validation and the
+feed schema, and [`examples/freight/output/`](examples/freight/output/) for a demo run.
+
 ## Development
 
 ```bash
@@ -172,7 +239,10 @@ python -m unittest discover -s tests -v
 ```
 
 The code lives in the `scoring_engine/` package:
-- `loader.py`: CSV parsing and column aliases
+- `pipeline.py`: one run end to end (checks → score → backtest → changes → outputs), shared by the CLI, CI and the Databricks job
+- `health.py`, `backtest.py`, `changes.py`, `feed.py`: data checks, backtest, change detection, the credit feed
+- `loader.py`: row validation and column aliases, shared by every source
+- `sources/`: NetSuite (SuiteQL, OAuth 1.0a) and Databricks (SQL connector, Spark, write-back), plus the default queries
 - `features.py`: per-customer measurements
 - `scoring.py`: sub-scores, grades, overrides and explanations
 - `limits.py`: credit limit recommendations
@@ -180,3 +250,5 @@ The code lives in the `scoring_engine/` package:
 - `engine.py`: the pipeline and portfolio summary
 - `report.py`: output files
 - `cli.py`: the command-line interface
+
+The freight nowcaster lives in `freight_nowcast/`; see its [docs](docs/freight_nowcast.md).

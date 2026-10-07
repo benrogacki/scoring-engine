@@ -1,0 +1,340 @@
+{
+  "series": {
+    "de_toll_mileage": {
+      "source": "genesis",
+      "attempted_at": "2026-10-04T13:36:21+00:00",
+      "optional": false,
+      "status": "ok",
+      "fetched_at": "2026-10-04T13:36:21+00:00",
+      "observations": 224,
+      "first": "2008-01-01",
+      "last": "2026-08-01",
+      "origin": "destatis:daily-toll-xlsx",
+      "details": {
+        "url": "https://www.destatis.de/DE/Themen/Branchen-Unternehmen/Industrie-Verarbeitendes-Gewerbe/Publikationen/Downloads-Konjunktur/statistischer-bericht-lkw-maut-fahrleistungsindex-5421901.xlsx?__blob=publicationFile&v=26",
+        "sheet": "42191-b01",
+        "column": "kalender- und saisonbereinigt (ksb)",
+        "aggregated": "monthly mean of D",
+        "fallback_used": "1: destatis_daily (primary failed: GENESIS HTTP 401: b'{\"Code\":15,\"Content\":\"You are not allowed to call this service or the header of your request does not contain all the necessary information )"
+      }
+    },
+    "de_toll_mileage_daily": {
+      "source": "destatis_daily",
+      "attempted_at": "2026-10-04T13:36:25+00:00",
+      "optional": true,
+      "status": "ok",
+      "fetched_at": "2026-10-04T13:36:25+00:00",
+      "observations": 6844,
+      "first": "2008-01-01",
+      "last": "2026-09-26",
+      "origin": "destatis:daily-toll-xlsx",
+      "details": {
+        "url": "https://www.destatis.de/DE/Themen/Branchen-Unternehmen/Industrie-Verarbeitendes-Gewerbe/Publikationen/Downloads-Konjunktur/statistischer-bericht-lkw-maut-fahrleistungsindex-5421901.xlsx?__blob=publicationFile&v=26",
+        "sheet": "42191-b01",
+        "column": "kalender- und saisonbereinigt (ksb)"
+      }
+    },
+    "de_port_calls": {
+      "source": "portwatch",
+      "attempted_at": "2026-10-04T13:36:27+00:00",
+      "optional": true,
+      "status": "ok",
+      "fetched_at": "2026-10-04T13:36:27+00:00",
+      "observations": 2825,
+      "first": "2019-01-01",
+      "last": "2026-09-25",
+      "origin": "imf:portwatch",
+      "details": {
+        "countries": "DEU",
+        "field": "portcalls",
+        "query": "full",
+        "layer": "ports"
+      }
+    },
+    "ea_port_calls": {
+      "source": "portwatch",
+      "attempted_at": "2026-10-04T13:36:27+00:00",
+      "optional": true,
+      "status": "ok",
+      "fetched_at": "2026-10-04T13:36:27+00:00",
+      "observations": 2825,
+      "first": "2019-01-01",
+      "last": "2026-09-25",
+      "origin": "imf:portwatch",
+      "details": {
+        "countries": "AUT,BEL,HRV,CYP,EST,FIN,FRA,DEU,GRC,IRL,ITA,LVA,LTU,LUX,MLT,NLD,PRT,SVK,SVN,ESP",
+        "field": "portcalls",
+        "query": "full",
+        "layer": "ports"
+      }
+    },
+    "world_port_calls": {
+      "source": "portwatch",
+      "attempted_at": "2026-10-04T13:36:27+00:00",
+      "optional": true,
+      "status": "ok",
+      "fetched_at": "2026-10-04T13:36:27+00:00",
+      "observations": 2825,
+      "first": "2019-01-01",
+      "last": "2026-09-25",
+      "origin": "imf:portwatch",
+      "details": {
+        "countries": "WORLD",
+        "field": "portcalls",
+        "query": "full",
+        "layer": "ports"
+      }
+    },
+    "de_ais_stationary": {
+      "source": "csv",
+      "attempted_at": "2026-10-04T13:36:28+00:00",
+      "optional": true,
+      "status": "failed",
+      "error": "de_ais_stationary: file /home/runner/work/scoring-engine/scoring-engine/data/freight/ais_port_counts.csv not found (Written by `freight-nowcast ais-listen` (needs AISSTREAM_API_KEY; cron it daily). Enters the composite once it has 3 years of history.)",
+      "last_good_fetch": null,
+      "last": null,
+      "observations": null
+    },
+    "de_manufacturing_production": {
+      "source": "sdmx",
+      "attempted_at": "2026-10-04T13:36:29+00:00",
+      "optional": false,
+      "status": "ok",
+      "fetched_at": "2026-10-04T13:36:29+00:00",
+      "observations": 223,
+      "first": "2008-01-01",
+      "last": "2026-07-01",
+      "origin": "sdmx:eurostat",
+      "details": {
+        "url": "https://ec.europa.eu/eurostat/api/dissemination/sdmx/2.1/data/sts_inpr_m/M.PRD.C.SCA.I21.DE?format=SDMX-CSV&startPeriod=2008-01"
+      }
+    },
+    "ea_manufacturing_production": {
+      "source": "sdmx",
+      "attempted_at": "2026-10-04T13:36:30+00:00",
+      "optional": false,
+      "status": "ok",
+      "fetched_at": "2026-10-04T13:36:30+00:00",
+      "observations": 223,
+      "first": "2008-01-01",
+      "last": "2026-07-01",
+      "origin": "sdmx:eurostat",
+      "details": {
+        "url": "https://ec.europa.eu/eurostat/api/dissemination/sdmx/2.1/data/sts_inpr_m/M.PRD.C.SCA.I21.EA20?format=SDMX-CSV&startPeriod=2008-01"
+      }
+    },
+    "de_exports": {
+      "source": "genesis",
+      "attempted_at": "2026-10-04T13:36:30+00:00",
+      "optional": true,
+      "status": "ok",
+      "fetched_at": "2026-10-04T13:36:30+00:00",
+      "observations": 294,
+      "first": "2002-01-01",
+      "last": "2026-06-01",
+      "origin": "eurostat:jsonstat",
+      "details": {
+        "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/ei_eteu27_2020_m?format=JSON&lang=EN&geo=DE&stk_flow=EXP&partner=WORLD&indic=ET-T&unit=IVOL-SA",
+        "fallback_used": "1: eurostat_jsonstat (primary failed: GENESIS HTTP 401: b'{\"Code\":15,\"Content\":\"You are not allowed to call this service or the header of your request does not contain all the necessary information )"
+      }
+    },
+    "world_trade_volume": {
+      "source": "cpb",
+      "attempted_at": "2026-10-04T13:36:32+00:00",
+      "optional": true,
+      "status": "ok",
+      "fetched_at": "2026-10-04T13:36:32+00:00",
+      "observations": 319,
+      "first": "2000-01-01",
+      "last": "2026-07-01",
+      "origin": "cpb:world-trade-monitor",
+      "details": {
+        "url": "https://www.cpb.nl/system/files/cpbmedia/CPB-world-trade-monitor-july-2026.xlsx",
+        "sheet": "trade_out",
+        "row": "World trade tgz_w1_qnmi_sn"
+      }
+    },
+    "dry_bulk_freight": {
+      "source": "yahoo_chart",
+      "attempted_at": "2026-10-04T13:36:28+00:00",
+      "optional": true,
+      "status": "ok",
+      "fetched_at": "2026-10-04T13:36:28+00:00",
+      "observations": 2145,
+      "first": "2018-03-22",
+      "last": "2026-10-02",
+      "origin": "yahoo:BDRY",
+      "details": {
+        "url": "https://query1.finance.yahoo.com/v8/finance/chart/BDRY?period1=946684800&period2=1791120988&interval=1d&includeAdjustedClose=true"
+      }
+    },
+    "us_freight_tsi": {
+      "source": "fred",
+      "attempted_at": "2026-10-04T13:36:28+00:00",
+      "optional": false,
+      "status": "ok",
+      "fetched_at": "2026-10-04T13:36:28+00:00",
+      "observations": 319,
+      "first": "2000-01-01",
+      "last": "2026-07-01",
+      "origin": "fred:TSIFRGHT",
+      "details": {
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=TSIFRGHT"
+      }
+    },
+    "us_cass_shipments": {
+      "source": "fred",
+      "attempted_at": "2026-10-04T13:36:28+00:00",
+      "optional": true,
+      "status": "ok",
+      "fetched_at": "2026-10-04T13:36:28+00:00",
+      "observations": 128,
+      "first": "2016-01-01",
+      "last": "2026-08-01",
+      "origin": "fred:FRGSHPUSM649NCIS",
+      "details": {
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=FRGSHPUSM649NCIS"
+      }
+    },
+    "us_rail_carloads": {
+      "source": "fred",
+      "attempted_at": "2026-10-04T13:36:28+00:00",
+      "optional": true,
+      "status": "ok",
+      "fetched_at": "2026-10-04T13:36:28+00:00",
+      "observations": 319,
+      "first": "2000-01-01",
+      "last": "2026-07-01",
+      "origin": "fred:RAILFRTCARLOADSD11",
+      "details": {
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=RAILFRTCARLOADSD11"
+      }
+    },
+    "us_port_calls": {
+      "source": "portwatch",
+      "attempted_at": "2026-10-04T13:36:28+00:00",
+      "optional": true,
+      "status": "ok",
+      "fetched_at": "2026-10-04T13:36:28+00:00",
+      "observations": 2825,
+      "first": "2019-01-01",
+      "last": "2026-09-25",
+      "origin": "imf:portwatch",
+      "details": {
+        "countries": "USA",
+        "field": "portcalls",
+        "query": "full",
+        "layer": "ports"
+      }
+    },
+    "gcc_port_calls": {
+      "source": "portwatch",
+      "attempted_at": "2026-10-04T13:36:28+00:00",
+      "optional": true,
+      "status": "ok",
+      "fetched_at": "2026-10-04T13:36:28+00:00",
+      "observations": 2825,
+      "first": "2019-01-01",
+      "last": "2026-09-25",
+      "origin": "imf:portwatch",
+      "details": {
+        "countries": "SAU,ARE,QAT,KWT,OMN,BHR",
+        "field": "portcalls",
+        "query": "full",
+        "layer": "ports"
+      }
+    },
+    "hormuz_transits": {
+      "source": "portwatch",
+      "attempted_at": "2026-10-04T13:36:29+00:00",
+      "optional": true,
+      "status": "ok",
+      "fetched_at": "2026-10-04T13:36:29+00:00",
+      "observations": 2827,
+      "first": "2019-01-01",
+      "last": "2026-09-27",
+      "origin": "imf:portwatch",
+      "details": {
+        "countries": "Strait of Hormuz",
+        "field": "n_total",
+        "query": "full",
+        "layer": "chokepoints"
+      }
+    },
+    "bab_el_mandeb_transits": {
+      "source": "portwatch",
+      "attempted_at": "2026-10-04T13:36:29+00:00",
+      "optional": true,
+      "status": "ok",
+      "fetched_at": "2026-10-04T13:36:29+00:00",
+      "observations": 2827,
+      "first": "2019-01-01",
+      "last": "2026-09-27",
+      "origin": "imf:portwatch",
+      "details": {
+        "countries": "Bab el-Mandeb Strait",
+        "field": "n_total",
+        "query": "full",
+        "layer": "chokepoints"
+      }
+    },
+    "us_manufacturing_production": {
+      "source": "fred",
+      "attempted_at": "2026-10-04T13:36:36+00:00",
+      "optional": false,
+      "status": "ok",
+      "fetched_at": "2026-10-04T13:36:36+00:00",
+      "observations": 656,
+      "first": "1972-01-01",
+      "last": "2026-08-01",
+      "origin": "fred:IPMAN",
+      "details": {
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=IPMAN"
+      }
+    },
+    "us_goods_imports": {
+      "source": "fred",
+      "attempted_at": "2026-10-04T13:36:36+00:00",
+      "optional": true,
+      "status": "ok",
+      "fetched_at": "2026-10-04T13:36:36+00:00",
+      "observations": 415,
+      "first": "1992-01-01",
+      "last": "2026-07-01",
+      "origin": "fred:BOPGIMP",
+      "details": {
+        "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=BOPGIMP"
+      }
+    },
+    "ea_exports": {
+      "source": "eurostat_jsonstat",
+      "attempted_at": "2026-10-04T13:36:36+00:00",
+      "optional": true,
+      "status": "ok",
+      "fetched_at": "2026-10-04T13:36:36+00:00",
+      "observations": 294,
+      "first": "2002-01-01",
+      "last": "2026-06-01",
+      "origin": "eurostat:jsonstat",
+      "details": {
+        "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/ei_eteu27_2020_m?format=JSON&lang=EN&geo=EU27_2020&stk_flow=EXP&partner=EXT_EU27_2020&indic=ET-T&unit=IVOL-SA"
+      }
+    },
+    "gcc_exports": {
+      "source": "sdmx",
+      "attempted_at": "2026-10-04T13:36:37+00:00",
+      "optional": true,
+      "status": "ok",
+      "fetched_at": "2026-10-04T13:36:37+00:00",
+      "observations": 138,
+      "first": "2015-01-01",
+      "last": "2026-06-01",
+      "origin": "sdmx:imf",
+      "details": {
+        "url": "https://api.imf.org/external/sdmx/2.1/data/IMF.STA,IMTS/SAU.XG_FOB_USD.G001.M?startPeriod=2015-01"
+      }
+    }
+  },
+  "updated_at": "2026-10-04T13:36:37+00:00",
+  "mode": "live"
+}

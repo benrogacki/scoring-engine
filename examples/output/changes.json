@@ -1,0 +1,124 @@
+{
+  "previous_as_of": "2026-08-31",
+  "changes": [
+    {
+      "kind": "downgrade",
+      "customer_id": "C0023",
+      "customer_name": "Pinnacle Group",
+      "grade": "C",
+      "outstanding": 56426.79,
+      "detail": "Downgraded B \u2192 C (score 75.7 \u2192 65.5)"
+    },
+    {
+      "kind": "downgrade",
+      "customer_id": "C0025",
+      "customer_name": "Willow Group",
+      "grade": "C",
+      "outstanding": 50883.24,
+      "detail": "Downgraded B \u2192 C (score 68.4 \u2192 61.0)"
+    },
+    {
+      "kind": "downgrade",
+      "customer_id": "C0018",
+      "customer_name": "Vantage Services",
+      "grade": "D",
+      "outstanding": 29692.93,
+      "detail": "Downgraded C \u2192 D (score 58.4 \u2192 49.8)"
+    },
+    {
+      "kind": "over_limit",
+      "customer_id": "C0030",
+      "customer_name": "Iris Ltd",
+      "grade": "B",
+      "outstanding": 432569.02,
+      "detail": "Now over limit: 108% of 402,000"
+    },
+    {
+      "kind": "over_limit",
+      "customer_id": "C0010",
+      "customer_name": "Summit Partners",
+      "grade": "A",
+      "outstanding": 51432.51,
+      "detail": "Now over limit: 107% of 48,000"
+    },
+    {
+      "kind": "over_limit",
+      "customer_id": "C0019",
+      "customer_name": "Harbor Ltd",
+      "grade": "C",
+      "outstanding": 21747.64,
+      "detail": "Now over limit: 114% of 19,000"
+    },
+    {
+      "kind": "limit_action",
+      "customer_id": "C0023",
+      "customer_name": "Pinnacle Group",
+      "grade": "C",
+      "outstanding": 56426.79,
+      "detail": "Limit recommendation Maintain \u2192 Reduce (28,000 \u2192 24,000)"
+    },
+    {
+      "kind": "limit_action",
+      "customer_id": "C0025",
+      "customer_name": "Willow Group",
+      "grade": "C",
+      "outstanding": 50883.24,
+      "detail": "Limit recommendation Maintain \u2192 Reduce (29,000 \u2192 24,000)"
+    },
+    {
+      "kind": "limit_action",
+      "customer_id": "C0013",
+      "customer_name": "Granite Group",
+      "grade": "A",
+      "outstanding": 34522.07,
+      "detail": "Limit recommendation Maintain \u2192 Increase (60,000 \u2192 69,000)"
+    },
+    {
+      "kind": "limit_action",
+      "customer_id": "C0018",
+      "customer_name": "Vantage Services",
+      "grade": "D",
+      "outstanding": 29692.93,
+      "detail": "Limit recommendation Maintain \u2192 Reduce (17,000 \u2192 12,000)"
+    },
+    {
+      "kind": "limit_action",
+      "customer_id": "C0020",
+      "customer_name": "Everest Ltd",
+      "grade": "C",
+      "outstanding": 25236.88,
+      "detail": "Limit recommendation Reduce \u2192 Maintain (16,000 \u2192 16,000)"
+    },
+    {
+      "kind": "upgrade",
+      "customer_id": "C0034",
+      "customer_name": "Keystone Holdings",
+      "grade": "A",
+      "outstanding": 4486.51,
+      "detail": "Upgraded B \u2192 A (score 79.4 \u2192 85.8)"
+    },
+    {
+      "kind": "back_within_limit",
+      "customer_id": "C0021",
+      "customer_name": "Tidewater Holdings",
+      "grade": "C",
+      "outstanding": 15577.84,
+      "detail": "Back within credit limit"
+    },
+    {
+      "kind": "back_within_limit",
+      "customer_id": "C0008",
+      "customer_name": "Glacier Ltd",
+      "grade": "A",
+      "outstanding": 10736.04,
+      "detail": "Back within credit limit"
+    }
+  ],
+  "counts": {
+    "downgrade": 3,
+    "over_limit": 3,
+    "limit_action": 5,
+    "upgrade": 1,
+    "back_within_limit": 2
+  }
+}

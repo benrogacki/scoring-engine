@@ -1,0 +1,1165 @@
+<title>Debtor Risk Desk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+:root {
+  --bg: #f3f4f2;
+  --surface: #fcfcfb;
+  --surface-2: #eceeeb;
+  --ink: #15181a;
+  --ink-2: #4f555a;
+  --muted: #80868a;
+  --line: #e0e3de;
+  --line-strong: #c4c8c2;
+  --accent: #33479a;
+  --accent-wash: rgba(51, 71, 154, 0.08);
+  --shadow: 0 12px 40px rgba(20, 24, 26, 0.16);
+  /* Grades: diverging blue (low risk) -> neutral -> red (high risk) */
+  --g-A: #1c5cab; --g-B: #6da7ec; --g-C: #b3b1a9; --g-D: #ec8f86; --g-E: #c7383a;
+  --g-ink-A: #ffffff; --g-ink-B: #0b2340; --g-ink-C: #262521; --g-ink-D: #3d0f0c; --g-ink-E: #ffffff;
+  /* Ageing: ordinal blue ramp, not-due lightest */
+  --age-0: #9ec5f4; --age-1: #5598e7; --age-2: #256abf; --age-3: #184f95; --age-4: #0d366b;
+  /* Status (reserved) */
+  --good: #0a8a0a; --warning: #c98500; --serious: #d8683d; --critical: #c7383a;
+  --good-wash: rgba(12, 163, 12, 0.10); --warning-wash: rgba(250, 178, 25, 0.16);
+  --serious-wash: rgba(236, 131, 90, 0.15); --critical-wash: rgba(208, 59, 59, 0.11);
+  --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #0e1011; --surface: #171a1b; --surface-2: #202425; --ink: #f1f2f0; --ink-2: #b7bcb7;
+    --muted: #868c8f; --line: #2a2e2f; --line-strong: #3b4041; --accent: #a3b0f2; --accent-wash: rgba(163, 176, 242, 0.12);
+    --shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+    --g-A: #6da7ec; --g-B: #2a6cc0; --g-C: #5d5c57; --g-D: #b24b46; --g-E: #ef7f78;
+    --g-ink-A: #0b2340; --g-ink-B: #ffffff; --g-ink-C: #f1f2f0; --g-ink-D: #ffffff; --g-ink-E: #3d0f0c;
+    --age-0: #184f95; --age-1: #256abf; --age-2: #3987e5; --age-3: #6da7ec; --age-4: #b7d3f6;
+    --good: #2fbf2f; --warning: #fab219; --serious: #ec835a; --critical: #ef6b6b;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0e1011; --surface: #171a1b; --surface-2: #202425; --ink: #f1f2f0; --ink-2: #b7bcb7;
+  --muted: #868c8f; --line: #2a2e2f; --line-strong: #3b4041; --accent: #a3b0f2; --accent-wash: rgba(163, 176, 242, 0.12);
+  --shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+  --g-A: #6da7ec; --g-B: #2a6cc0; --g-C: #5d5c57; --g-D: #b24b46; --g-E: #ef7f78;
+  --g-ink-A: #0b2340; --g-ink-B: #ffffff; --g-ink-C: #f1f2f0; --g-ink-D: #ffffff; --g-ink-E: #3d0f0c;
+  --age-0: #184f95; --age-1: #256abf; --age-2: #3987e5; --age-3: #6da7ec; --age-4: #b7d3f6;
+  --good: #2fbf2f; --warning: #fab219; --serious: #ec835a; --critical: #ef6b6b;
+}
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 14px; line-height: 1.45; }
+.wrap { max-width: 1240px; margin: 0 auto; padding-inline: 20px; padding-block: 20px 56px; }
+@media (max-width: 520px) { .wrap { padding-inline: 16px; } }
+h1, h2, h3 { margin: 0; text-wrap: balance; }
+.num, td.n, th.n { font-variant-numeric: tabular-nums; }
+.mono { font-family: var(--mono); }
+button, input, select { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+
+/* Header */
+.masthead { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px 24px; padding-bottom: 18px; border-bottom: 1px solid var(--line-strong); }
+.eyebrow { font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.masthead h1 { font-size: 26px; font-weight: 600; letter-spacing: -0.01em; margin-top: 4px; }
+.meta { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.tag { flex: none; display: inline-flex; align-items: center; gap: 6px; font-size: 12px; padding: 3px 9px; border-radius: 999px; border: 1px solid var(--line-strong); color: var(--ink-2); background: var(--surface); white-space: nowrap; }
+button.tag { cursor: pointer; font-size: 12px; }
+.tag.policy { border-color: var(--accent); color: var(--accent); background: var(--accent-wash); }
+
+/* KPI strip */
+.kpis { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); margin-block: 18px 6px; }
+.kpi { padding: 4px 18px 6px; border-left: 1px solid var(--line); min-width: 0; }
+.kpi:first-child { border-left: 0; padding-left: 0; }
+.kpi .label { font-size: 12px; color: var(--ink-2); }
+.kpi .value { font-size: 24px; font-weight: 600; letter-spacing: -0.01em; margin-top: 2px; white-space: nowrap; }
+.kpi .sub { font-size: 12px; color: var(--muted); margin-top: 1px; }
+.kpi .delta { font-size: 12px; font-family: var(--mono); }
+@media (max-width: 980px) { .kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); row-gap: 14px; } .kpi:nth-child(4) { border-left: 0; padding-left: 0; } }
+@media (max-width: 520px) { .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } .kpi:nth-child(odd) { border-left: 0; padding-left: 0; } .kpi:nth-child(4) { border-left: 1px solid var(--line); padding-left: 18px; } .kpi .value { font-size: 21px; } }
+
+/* Tabs */
+.tabs { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); display: flex; gap: 2px; border-bottom: 1px solid var(--line-strong); margin-top: 14px; overflow-x: auto; scrollbar-width: none; }
+.tab { appearance: none; border: 0; background: none; padding: 12px 14px 11px; cursor: pointer; color: var(--ink-2); font-weight: 500; border-bottom: 2px solid transparent; margin-bottom: -1px; white-space: nowrap; }
+.tab:hover { color: var(--ink); }
+.tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--ink); }
+.tab .count { font-family: var(--mono); font-size: 11px; color: var(--muted); margin-left: 4px; }
+.panel { padding-top: 22px; }
+
+/* Sections */
+.grid-2 { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 20px; }
+@media (max-width: 900px) { .grid-2 { grid-template-columns: minmax(0, 1fr); } }
+.block { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 18px 20px 20px; min-width: 0; }
+.block + .block { margin-top: 0; }
+.stack { display: grid; gap: 20px; }
+.block-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+.block-head h2 { font-size: 15px; font-weight: 600; }
+.block-head .hint { font-size: 12.5px; color: var(--muted); }
+
+/* Grade chip */
+.grade { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 6px; font-weight: 700; font-size: 13px; font-family: var(--mono); flex: none; }
+.grade.lg { width: 52px; height: 52px; border-radius: 12px; font-size: 28px; }
+.g-A { background: var(--g-A); color: var(--g-ink-A); } .g-B { background: var(--g-B); color: var(--g-ink-B); }
+.g-C { background: var(--g-C); color: var(--g-ink-C); } .g-D { background: var(--g-D); color: var(--g-ink-D); }
+.g-E { background: var(--g-E); color: var(--g-ink-E); }
+.was { font-family: var(--mono); font-size: 11px; color: var(--muted); margin-left: 6px; white-space: nowrap; }
+
+/* Pills (status) */
+.pill { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; padding: 2px 9px 2px 7px; border-radius: 999px; white-space: nowrap; }
+.pill::before { content: ""; width: 7px; height: 7px; border-radius: 2px; background: currentColor; flex: none; }
+.pill.critical { color: var(--critical); background: var(--critical-wash); }
+.pill.serious { color: var(--serious); background: var(--serious-wash); }
+.pill.warning { color: var(--warning); background: var(--warning-wash); }
+.pill.good { color: var(--good); background: var(--good-wash); }
+.pill.neutral { color: var(--ink-2); background: var(--surface-2); }
+.pill.accent { color: var(--accent); background: var(--accent-wash); }
+
+/* Ageing bar */
+.agebar { display: flex; gap: 2px; height: 34px; border-radius: 6px; overflow: hidden; }
+.agebar.sm { height: 14px; border-radius: 4px; }
+.agebar > div { min-width: 2px; cursor: default; }
+.agebar > div:hover { filter: brightness(1.12); }
+.age-legend { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; margin-top: 14px; }
+.age-legend .k { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--ink-2); }
+.age-legend .k i { width: 10px; height: 10px; border-radius: 2px; flex: none; }
+.age-legend .v { font-weight: 600; font-size: 15px; margin-top: 2px; }
+.age-legend .p { font-size: 12px; color: var(--muted); }
+@media (max-width: 520px) { .age-legend { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
+/* Bar rows */
+.rows { display: grid; gap: 10px; }
+.row { display: grid; grid-template-columns: 24px minmax(90px, 150px) minmax(0, 1fr) 84px; align-items: center; gap: 10px; font-size: 13px; }
+.row .name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ink); }
+.row .name small { color: var(--muted); display: block; font-size: 11.5px; }
+.row .track { height: 12px; background: var(--surface-2); border-radius: 0 4px 4px 0; position: relative; }
+.row .fill { height: 100%; border-radius: 0 4px 4px 0; }
+.row .val { text-align: right; font-variant-numeric: tabular-nums; }
+.row .val small { display: block; color: var(--muted); font-size: 11.5px; }
+.row.link { cursor: pointer; border-radius: 6px; }
+.row.link:hover .name { text-decoration: underline; text-underline-offset: 2px; }
+@media (max-width: 520px) { .row { grid-template-columns: 24px minmax(70px, 110px) minmax(0, 1fr) 74px; gap: 8px; } }
+
+/* Chart */
+.chart { position: relative; width: 100%; }
+.chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+.chart text { font-family: var(--sans); font-size: 11px; fill: var(--muted); }
+.chart .band-label { font-family: var(--mono); font-weight: 600; font-size: 11.5px; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12px; color: var(--ink-2); margin-bottom: 10px; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { width: 10px; height: 10px; border-radius: 50%; }
+
+/* Tooltip */
+#tip { position: fixed; z-index: 50; pointer-events: none; background: var(--surface); color: var(--ink); border: 1px solid var(--line-strong); box-shadow: var(--shadow); border-radius: 8px; padding: 8px 10px; font-size: 12.5px; max-width: 280px; }
+#tip b { font-size: 14px; }
+#tip .t-sub { color: var(--muted); }
+
+/* Toolbar */
+.toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 14px; }
+.search { flex: 1 1 220px; max-width: 320px; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--line-strong); background: var(--surface); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { appearance: none; border: 1px solid var(--line-strong); background: var(--surface); padding: 5px 11px; border-radius: 999px; cursor: pointer; font-size: 12.5px; color: var(--ink-2); display: inline-flex; align-items: center; gap: 6px; }
+.chip:hover { border-color: var(--ink-2); }
+.chip[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+.chip .grade { width: 16px; height: 16px; font-size: 10px; border-radius: 4px; }
+.toolbar .spacer { flex: 1; }
+.toolbar .note { font-size: 12.5px; color: var(--muted); }
+
+/* Tables */
+.table-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+table { border-collapse: collapse; width: 100%; font-size: 13px; }
+th, td { padding: 9px 12px; text-align: left; border-bottom: 1px solid var(--line); vertical-align: middle; }
+th { font-weight: 500; font-size: 12px; color: var(--ink-2); background: var(--surface); position: sticky; top: 0; white-space: nowrap; }
+th.sortable { cursor: pointer; user-select: none; }
+th.sortable:hover { color: var(--ink); }
+th .arrow { font-family: var(--mono); color: var(--accent); margin-left: 3px; }
+td.n, th.n { text-align: right; white-space: nowrap; }
+tbody tr:last-child td { border-bottom: 0; }
+tbody tr.clickable { cursor: pointer; }
+tbody tr.clickable:hover td { background: var(--accent-wash); }
+td .cust { font-weight: 500; white-space: nowrap; }
+td .cust small { display: block; font-weight: 400; color: var(--muted); font-size: 11.5px; }
+td.drivers { color: var(--ink-2); font-size: 12.5px; min-width: 260px; max-width: 420px; }
+.mini { display: inline-block; width: 46px; height: 6px; background: var(--surface-2); border-radius: 3px; vertical-align: middle; margin-right: 6px; overflow: hidden; }
+.mini i { display: block; height: 100%; background: var(--ink-2); border-radius: 3px; }
+.neg { color: var(--critical); } .pos { color: var(--good); }
+.dim { color: var(--muted); }
+tr.done td { opacity: 0.45; }
+tr.done td:first-child, tr.done td:last-child { opacity: 1; }
+.check { width: 18px; height: 18px; accent-color: var(--accent); cursor: pointer; }
+.empty { padding: 28px; text-align: center; color: var(--muted); }
+
+/* Tier summary */
+.tiers { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-bottom: 16px; }
+.tier { appearance: none; text-align: left; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; cursor: pointer; }
+.tier:hover { border-color: var(--line-strong); }
+.tier[aria-pressed="true"] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.tier .amt { font-size: 20px; font-weight: 600; margin-top: 6px; }
+.tier .desc { font-size: 12px; color: var(--muted); margin-top: 2px; }
+@media (max-width: 760px) { .tiers { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* Drawer */
+.scrim { position: fixed; inset: 0; background: rgba(10, 12, 13, 0.35); z-index: 30; }
+.drawer { position: fixed; z-index: 31; top: 0; right: 0; bottom: 0; width: min(460px, 100vw); background: var(--surface); box-shadow: var(--shadow); overflow-y: auto; padding: calc(18px + env(safe-area-inset-top, 0px)) 22px calc(28px + env(safe-area-inset-bottom, 0px)); border-left: 1px solid var(--line-strong); }
+@media (prefers-reduced-motion: no-preference) { .drawer { animation: slide 0.18s ease-out; } @keyframes slide { from { transform: translateX(24px); opacity: 0.6; } } }
+.drawer .close { position: absolute; top: calc(12px + env(safe-area-inset-top, 0px)); right: 12px; border: 1px solid var(--line-strong); background: var(--surface); border-radius: 8px; width: 32px; height: 32px; cursor: pointer; font-size: 16px; line-height: 1; }
+.d-head { display: flex; gap: 14px; align-items: center; padding-right: 40px; }
+.d-head h2 { font-size: 19px; font-weight: 600; }
+.d-head .sub { font-size: 12.5px; color: var(--muted); }
+.d-sec { margin-top: 22px; }
+.d-sec h3 { font-size: 11.5px; font-family: var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 500; margin-bottom: 10px; }
+.score-line { display: flex; align-items: baseline; gap: 8px; margin-top: 4px; }
+.score-line .big { font-size: 22px; font-weight: 600; }
+.sub-scores { display: grid; gap: 9px; }
+.ss { display: grid; grid-template-columns: 128px minmax(0, 1fr) 40px; gap: 10px; align-items: center; font-size: 13px; }
+.ss small { color: var(--muted); }
+.ss .track { height: 8px; background: var(--surface-2); border-radius: 4px; overflow: hidden; }
+.ss .track i { display: block; height: 100%; background: var(--ink-2); border-radius: 4px; }
+.ss .v { text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; }
+dl.facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 18px; margin: 0; }
+dl.facts dt { font-size: 12px; color: var(--muted); }
+dl.facts dd { margin: 2px 0 0; font-weight: 500; font-variant-numeric: tabular-nums; }
+ul.drivers { margin: 0; padding-left: 18px; display: grid; gap: 5px; color: var(--ink-2); }
+.action-box { border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; display: grid; gap: 6px; }
+.action-box .line { display: flex; justify-content: space-between; gap: 10px; align-items: center; flex-wrap: wrap; }
+.arrow-r { color: var(--muted); margin: 0 6px; }
+
+/* Policy */
+.policy { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 20px; align-items: start; }
+@media (max-width: 960px) { .policy { grid-template-columns: minmax(0, 1fr); } }
+.pol-sections { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+@media (max-width: 720px) { .pol-sections { grid-template-columns: minmax(0, 1fr); } }
+.field { display: grid; grid-template-columns: minmax(0, 1fr) 64px; gap: 2px 12px; align-items: center; padding-block: 7px; border-top: 1px solid var(--line); }
+.field:first-of-type { border-top: 0; }
+.field label { font-size: 13px; }
+.field .out { text-align: right; font-family: var(--mono); font-size: 12.5px; }
+.field .out.changed { color: var(--accent); font-weight: 500; }
+.field input[type="range"] { grid-column: 1 / -1; width: 100%; accent-color: var(--accent); margin: 2px 0 0; }
+.field select { grid-column: 2; padding: 3px 6px; border-radius: 6px; border: 1px solid var(--line-strong); background: var(--surface); }
+.field .help { grid-column: 1 / -1; font-size: 11.5px; color: var(--muted); }
+.checks { display: flex; gap: 10px; grid-column: 1 / -1; flex-wrap: wrap; }
+.checks label { display: inline-flex; gap: 5px; align-items: center; font-family: var(--mono); font-size: 12.5px; }
+.warn-text { color: var(--critical); font-size: 12px; margin-top: 8px; }
+.impact { position: sticky; top: calc(56px + env(safe-area-inset-top, 0px)); }
+.impact table { font-size: 12.5px; }
+.impact th, .impact td { padding: 6px 8px; }
+.changes { max-height: 240px; overflow-y: auto; margin-top: 10px; display: grid; gap: 4px; font-size: 13px; }
+.changes .c { display: flex; align-items: center; gap: 6px; cursor: pointer; padding: 3px 4px; border-radius: 6px; }
+.changes .c:hover { background: var(--accent-wash); }
+.changes .c span.nm { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.btn { appearance: none; border: 1px solid var(--line-strong); background: var(--surface); padding: 7px 12px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 500; }
+.btn:hover { border-color: var(--ink-2); }
+.btn.primary { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+pre.json { background: var(--surface-2); border-radius: 8px; padding: 10px 12px; font-family: var(--mono); font-size: 11.5px; overflow-x: auto; max-height: 220px; margin: 10px 0 0; white-space: pre; }
+/* Data & evidence */
+.ev-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+@media (max-width: 900px) { .ev-grid { grid-template-columns: minmax(0, 1fr); } }
+.ev-big { font-size: 20px; font-weight: 600; margin-top: 8px; }
+.ev-note { font-size: 13px; color: var(--ink-2); margin-top: 6px; }
+.kv { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 14px; font-size: 12.5px; margin-top: 12px; }
+.kv dt { color: var(--muted); } .kv dd { margin: 0; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.change-list { display: grid; gap: 2px; }
+.change-list .c { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 10px; align-items: baseline; padding: 7px 8px; border-radius: 6px; cursor: pointer; font-size: 13px; }
+.change-list .c:hover { background: var(--accent-wash); }
+.change-list .c b { font-weight: 500; }
+@media (max-width: 520px) { .change-list .c { grid-template-columns: minmax(0, 1fr); gap: 2px; } }
+.checks-list { display: grid; }
+.checks-list .ck { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 3px 12px; padding: 10px 0; border-top: 1px solid var(--line); font-size: 13px; }
+.checks-list .ck:first-child { border-top: 0; padding-top: 0; }
+.checks-list .ck .d { grid-column: 1 / -1; color: var(--ink-2); font-size: 12.5px; }
+ul.downloads { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; font-size: 13px; }
+ul.downloads a { color: var(--accent); font-family: var(--mono); font-size: 12.5px; margin-right: 10px; }
+.foot { margin-top: 32px; font-size: 12.5px; color: var(--muted); max-width: 80ch; }
+</style>
+
+<div class="wrap">
+  <header class="masthead">
+    <div>
+      <div class="eyebrow" id="eyebrow">Credit control · debtor ledger</div>
+      <h1>Debtor Risk Desk</h1>
+    </div>
+    <div class="meta" id="meta"></div>
+  </header>
+
+  <section class="kpis" id="kpis" aria-label="Portfolio headline figures"></section>
+
+  <nav class="tabs" role="tablist" id="tabs">
+    <button class="tab" role="tab" id="tab-overview" data-tab="overview">Overview</button>
+    <button class="tab" role="tab" id="tab-customers" data-tab="customers">Customers<span class="count" id="n-customers"></span></button>
+    <button class="tab" role="tab" id="tab-collections" data-tab="collections">Collections<span class="count" id="n-collections"></span></button>
+    <button class="tab" role="tab" id="tab-limits" data-tab="limits">Credit limits<span class="count" id="n-limits"></span></button>
+    <button class="tab" role="tab" id="tab-policy" data-tab="policy">Policy</button>
+    <button class="tab" role="tab" id="tab-data" data-tab="data" hidden>Data &amp; evidence</button>
+  </nav>
+
+  <main>
+    <section class="panel" id="panel-overview" role="tabpanel">
+      <div class="stack">
+        <div class="block">
+          <div class="block-head"><h2>Ageing profile</h2><span class="hint" id="age-hint"></span></div>
+          <div class="agebar" id="agebar"></div>
+          <div class="age-legend" id="age-legend"></div>
+        </div>
+        <div class="grid-2">
+          <div class="block">
+            <div class="block-head"><h2>Risk map</h2><span class="hint">Credit score vs balance · click a dot to open the customer</span></div>
+            <div class="legend" id="map-legend"></div>
+            <div class="chart" id="riskmap"></div>
+          </div>
+          <div class="stack">
+            <div class="block">
+              <div class="block-head"><h2>Balance by risk grade</h2><span class="hint">Customers · share of receivables</span></div>
+              <div class="rows" id="grade-rows"></div>
+            </div>
+            <div class="block">
+              <div class="block-head"><h2>Largest exposures</h2><span class="hint" id="conc-hint"></span></div>
+              <div class="rows" id="exposure-rows"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-customers" role="tabpanel" hidden>
+      <div class="toolbar">
+        <input class="search" id="cust-search" type="search" placeholder="Search customer, ID or industry" aria-label="Search customers">
+        <div class="chips" id="grade-filter"></div>
+        <span class="spacer"></span>
+        <span class="note" id="cust-note"></span>
+      </div>
+      <div class="table-wrap"><table id="cust-table"></table></div>
+    </section>
+
+    <section class="panel" id="panel-collections" role="tabpanel" hidden>
+      <div class="tiers" id="tiers"></div>
+      <div class="toolbar"><span class="note" id="coll-note"></span><span class="spacer"></span><button class="btn" id="coll-clear" type="button">Clear ticks</button></div>
+      <div class="table-wrap"><table id="coll-table"></table></div>
+    </section>
+
+    <section class="panel" id="panel-limits" role="tabpanel" hidden>
+      <div class="toolbar"><div class="chips" id="limit-filter"></div><span class="spacer"></span><span class="note" id="limit-note"></span></div>
+      <div class="table-wrap"><table id="limit-table"></table></div>
+    </section>
+
+    <section class="panel" id="panel-policy" role="tabpanel" hidden>
+      <div class="policy">
+        <div>
+          <div class="toolbar" style="margin-bottom:16px">
+            <span class="note">Move a slider and every grade, limit and worklist rank updates. Changes stay in this browser tab.</span>
+            <span class="spacer"></span>
+            <button class="btn" id="pol-reset" type="button">Reset to default policy</button>
+          </div>
+          <div class="pol-sections" id="pol-sections"></div>
+        </div>
+        <aside class="block impact" id="impact"></aside>
+      </div>
+    </section>
+    <section class="panel" id="panel-data" role="tabpanel" hidden>
+      <div class="stack">
+        <div class="ev-grid">
+          <div class="block" id="ev-health"></div>
+          <div class="block" id="ev-backtest"></div>
+          <div class="block" id="ev-changes"></div>
+        </div>
+        <div class="grid-2">
+          <div class="block">
+            <div class="block-head"><h2>Backtest by grade</h2><span class="hint" id="bt-hint"></span></div>
+            <div class="rows" id="bt-rows"></div>
+          </div>
+          <div class="block">
+            <div class="block-head"><h2>Data checks</h2><span class="hint">Run before scoring</span></div>
+            <div class="checks-list" id="health-list"></div>
+          </div>
+        </div>
+        <div class="block">
+          <div class="block-head"><h2 id="changes-title">Changes since the last run</h2><span class="hint">Most severe first · click to open the customer</span></div>
+          <div class="change-list" id="change-list"></div>
+        </div>
+        <div class="block" id="downloads-block" hidden>
+          <div class="block-head"><h2>Files from this run</h2></div>
+          <ul class="downloads" id="downloads"></ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <p class="foot" id="foot"></p>
+</div>
+
+<div id="tip" hidden></div>
+<div class="scrim" id="scrim" hidden></div>
+<aside class="drawer" id="drawer" hidden aria-label="Customer detail"></aside>
+
+<script id="payload" type="application/json">__PAYLOAD__</script>
+<script>
+(() => {
+"use strict";
+const DATA = JSON.parse(document.getElementById("payload").textContent);
+const GRADES = ["A", "B", "C", "D", "E"];
+const BUCKETS = ["current", "1_30", "31_60", "61_90", "90_plus"];
+const BUCKET_LABEL = { current: "Not due", "1_30": "1–30 days", "31_60": "31–60 days", "61_90": "61–90 days", "90_plus": "90+ days" };
+const TIER_ACTIONS = {
+  P1: "Escalate: stop supply, final demand, consider agency/legal referral",
+  P2: "Senior call + formal demand letter; agree dated payment plan",
+  P3: "Phone call to accounts payable; confirm payment date",
+  P4: "Automated reminder / statement",
+};
+const TIER_META = {
+  P1: { cls: "critical", name: "P1 · Escalate", desc: "90+ days or grade E" },
+  P2: { cls: "serious", name: "P2 · Formal demand", desc: "61–90 days or grade D" },
+  P3: { cls: "warning", name: "P3 · Call", desc: "31–60 days" },
+  P4: { cls: "neutral", name: "P4 · Reminder", desc: "Under 30 days / small" },
+};
+const LIMIT_META = {
+  Increase: "good", Reduce: "serious", Suspend: "critical", Maintain: "neutral", "Set limit": "accent", Review: "warning",
+};
+const RUN = DATA.run || null;
+const HEALTH_META = { ok: { cls: "good", short: "passed" }, warn: { cls: "warning", short: "warnings" }, fail: { cls: "critical", short: "failed" }, info: { cls: "neutral", short: "info" } };
+const VERDICT_META = { evidenced: { cls: "good" }, weak: { cls: "warning" }, "not evidenced": { cls: "critical" }, "insufficient data": { cls: "neutral" } };
+const CHANGE_META = {
+  escalated: ["critical", "New P1"], downgrade: ["serious", "Downgrade"], over_limit: ["serious", "Over limit"],
+  limit_action: ["accent", "Limit action"], new: ["neutral", "New customer"], upgrade: ["good", "Upgrade"],
+  de_escalated: ["good", "Left P1"], back_within_limit: ["good", "Within limit"], gone: ["neutral", "Left ledger"],
+};
+const clone = (o) => JSON.parse(JSON.stringify(o));
+const DEFAULT = clone(DATA.config);
+let policy = clone(DATA.config);
+
+/* ---------- formatting ---------- */
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const cur = DATA.currency || "";
+const money = (v) => cur + Math.round(v).toLocaleString("en-GB");
+const compact = (v) => {
+  const a = Math.abs(v);
+  if (a >= 1e6) return cur + (v / 1e6).toFixed(a >= 1e7 ? 1 : 2) + "m";
+  if (a >= 1e3) return cur + (v / 1e3).toFixed(a >= 1e5 ? 0 : 1) + "k";
+  return cur + Math.round(v);
+};
+const pct = (v, d = 0) => (v == null ? "—" : (v * 100).toFixed(d) + "%");
+const fx = (v, d = 1) => (v == null ? "—" : Number(v).toFixed(d));
+
+/* ---------- scoring engine (mirrors scoring_engine/*.py) ---------- */
+const roundHalfEven = (x) => { const r = Math.round(x); return Math.abs(x % 1) === 0.5 && r % 2 !== 0 ? r - 1 : r; };
+const round1 = (x) => roundHalfEven(x * 10) / 10;
+const round2 = (x) => roundHalfEven(x * 100) / 100;
+const clamp = (v, lo = 0, hi = 100) => Math.max(lo, Math.min(hi, v));
+const decline = (v, full, zero) => (v <= full ? 100 : v >= zero ? 0 : (100 * (zero - v)) / (zero - full));
+const trendOf = (f) => (f.recent == null || f.prior == null ? null : f.recent - f.prior);
+const gIdx = (g) => GRADES.indexOf(g);
+const worse = (g, cap) => (gIdx(g) >= gIdx(cap) ? g : cap);
+
+function paymentScore(f, cfg) {
+  const p = cfg.payment_history, thin = +p.thin_file_score;
+  if (f.wadl == null) return thin;
+  const lateness = 100 * (1 - Math.min(1, f.wadl / p.days_late_floor));
+  const onTime = 100 * (f.otr || 0);
+  let s = (1 - p.on_time_weight) * lateness + p.on_time_weight * onTime;
+  const t = trendOf(f);
+  if (t != null && t > 0) s -= p.trend_max_penalty * Math.min(1, t / p.trend_full_penalty_days);
+  const conf = Math.min(1, f.paid / p.min_invoices_for_full_confidence);
+  if (s > thin) s = thin + (s - thin) * conf;
+  return clamp(s);
+}
+function ageingScore(f, cfg) {
+  if (f.out <= 0) return 100;
+  const a = cfg.ageing;
+  let idx = 0;
+  for (const [b, w] of Object.entries(a.bucket_weights)) idx += ((f.ageing[b] || 0) / f.out) * w;
+  return clamp(100 * (1 - idx) - a.disputed_penalty * (f.disputed / f.out));
+}
+function concScore(f, cfg) {
+  const c = cfg.concentration;
+  const share = decline(f.share, 0, c.max_portfolio_share);
+  if (f.util == null) return share;
+  return (share + decline(f.util, c.utilisation_comfortable, c.utilisation_breach)) / 2;
+}
+function gradeFor(score, cfg) {
+  for (const b of cfg.grades) if (score >= b.min_score) return b.grade;
+  return "E";
+}
+function applyOverrides(grade, f, cfg, notes) {
+  const o = cfg.overrides, severe = f.ageing["90_plus"] || 0;
+  if (f.out > 0 && severe >= o.materiality) {
+    const share = severe / f.out;
+    const cap = share >= o.severe_arrears_share ? o.severe_arrears_cap : o.any_90_plus_cap;
+    if (worse(grade, cap) !== grade) { notes.push(`Grade capped at ${cap}: ${pct(share)} of balance is 90+ days overdue`); grade = cap; }
+  }
+  if (f.util != null && f.util >= o.limit_breach_utilisation) {
+    const cap = o.limit_breach_cap;
+    if (worse(grade, cap) !== grade) { notes.push(`Grade capped at ${cap}: balance is ${pct(f.util)} of credit limit`); grade = cap; }
+  }
+  return grade;
+}
+function explain(f, cfg) {
+  const r = [];
+  if (f.wadl == null) r.push("Thin file: no payment history in lookback window");
+  else {
+    if (f.wadl >= 1) r.push(`Pays on average ${f.wadl.toFixed(0)} days late`);
+    if (f.otr != null && f.otr < 0.8) r.push(`Only ${pct(f.otr)} of invoice value paid on time`);
+    if (f.paid < cfg.payment_history.min_invoices_for_full_confidence) r.push(`Limited history (${f.paid} settled invoices)`);
+  }
+  const t = trendOf(f);
+  if (t != null && t >= 5) r.push(`Deteriorating: paying ${t.toFixed(0)} days later than prior period`);
+  else if (t != null && t <= -5) r.push(`Improving: paying ${(-t).toFixed(0)} days sooner than prior period`);
+  if (f.out > 0) {
+    const severe = f.ageing["90_plus"] || 0, late = (f.ageing["61_90"] || 0) + severe;
+    if (severe > 0) r.push(`${pct(late / f.out)} of balance is 60+ days overdue (${pct(severe / f.out)} is 90+)`);
+    else if (late > 0) r.push(`${pct(late / f.out)} of balance is 60+ days overdue`);
+    if (f.disputed > 0) r.push(`${money(f.disputed)} in dispute`);
+  }
+  if (f.share >= cfg.concentration.max_portfolio_share / 2) r.push(`Concentration: ${pct(f.share, 1)} of total receivables`);
+  if (f.util != null && f.util > 1) r.push(`Over credit limit (${pct(f.util)} utilised)`);
+  else if (f.limit <= 0 && f.out > 0) r.push("No credit limit on file");
+  return r;
+}
+function recommendLimit(r, cfg) {
+  const c = cfg.credit_limits, f = r.f, current = r.c.limit, mult = c.grade_multipliers[r.grade];
+  r.overLimit = current > 0 && f.out > current;
+  r.concCap = false;
+  if (mult <= 0) { r.rec = 0; r.action = "Suspend"; r.actionText = "Suspend credit (cash with order)"; r.overLimit = false; return; }
+  if (f.sales_m <= 0) { r.rec = current; r.action = "Review"; r.actionText = "Review (no sales in lookback)"; r.overLimit = false; return; }
+  let rec = (f.sales_m * (r.c.terms + c.buffer_days)) / 30 * mult;
+  const concentrated = f.share >= c.block_increase_at_portfolio_share;
+  if (current > 0) {
+    const may = c.increase_allowed_grades.includes(r.grade) && !concentrated;
+    rec = Math.min(rec, current * (may ? 1 + c.max_increase_pct : 1));
+  }
+  rec = Math.max(0, c.rounding > 0 ? roundHalfEven(rec / c.rounding) * c.rounding : round2(rec));
+  const tol = c.tolerance_pct;
+  let action;
+  if (current <= 0) action = "Set limit";
+  else if (rec > current * (1 + tol)) action = "Increase";
+  else if (rec < current * (1 - tol)) action = "Reduce";
+  else { action = "Maintain"; rec = current; r.concCap = concentrated; }
+  r.rec = rec; r.action = action;
+  r.actionText = action + (r.concCap ? " (concentration cap)" : "") + (r.overLimit ? " - currently over limit" : "");
+}
+function tierFor(r, minBal) {
+  const f = r.f;
+  if (f.overdue < minBal) return "P4";
+  if ((f.ageing["90_plus"] || 0) >= minBal || r.grade === "E") return "P1";
+  if ((f.ageing["61_90"] || 0) >= minBal || r.grade === "D") return "P2";
+  if ((f.ageing["31_60"] || 0) >= minBal) return "P3";
+  return "P4";
+}
+function prioritise(results, cfg) {
+  const cc = cfg.collections, list = [];
+  for (const r of results) {
+    r.tier = ""; r.rank = null; r.prio = 0; r.collAction = "";
+    if (r.f.overdue <= 0) continue;
+    let weighted = 0;
+    for (const [b, u] of Object.entries(cc.bucket_urgency)) weighted += (r.f.ageing[b] || 0) * u;
+    r.prio = round2(weighted * (1 + (100 - r.score) / 100));
+    r.tier = tierFor(r, cc.min_balance);
+    r.collAction = TIER_ACTIONS[r.tier] + (r.f.disputed > 0 ? `; resolve dispute (${money(r.f.disputed)})` : "");
+    list.push(r);
+  }
+  list.sort((a, b) => (a.tier < b.tier ? -1 : a.tier > b.tier ? 1 : b.prio - a.prio));
+  list.forEach((r, i) => (r.rank = i + 1));
+  return list;
+}
+function scoreAll(cfg) {
+  const w = cfg.weights, wsum = w.payment + w.ageing + w.concentration || 1;
+  const results = DATA.customers.map((c) => {
+    const f = c.f;
+    const ps = paymentScore(f, cfg), ag = ageingScore(f, cfg), cs = concScore(f, cfg);
+    const score = round1((w.payment * ps + w.ageing * ag + w.concentration * cs) / wsum);
+    const notes = [];
+    const grade = applyOverrides(gradeFor(score, cfg), f, cfg, notes);
+    const r = { c, f, id: c.id, ps: round1(ps), ag: round1(ag), cs: round1(cs), score, grade, reasons: notes.concat(explain(f, cfg)) };
+    recommendLimit(r, cfg);
+    return r;
+  });
+  const worklist = prioritise(results, cfg);
+  results.sort((a, b) => gIdx(a.grade) - gIdx(b.grade) || b.f.out - a.f.out);
+  return { results, worklist, byId: Object.fromEntries(results.map((r) => [r.id, r])), summary: summarise(results) };
+}
+function summarise(results) {
+  const total = results.reduce((s, r) => s + r.f.out, 0);
+  const overdue = results.reduce((s, r) => s + r.f.overdue, 0);
+  const ageing = Object.fromEntries(BUCKETS.map((b) => [b, results.reduce((s, r) => s + (r.f.ageing[b] || 0), 0)]));
+  const byGrade = Object.fromEntries(GRADES.map((g) => {
+    const rs = results.filter((r) => r.grade === g);
+    return [g, { n: rs.length, out: rs.reduce((s, r) => s + r.f.out, 0) }];
+  }));
+  const ranked = [...results].sort((a, b) => b.f.out - a.f.out);
+  const top10 = ranked.slice(0, 10).reduce((s, r) => s + r.f.out, 0);
+  const wScore = total ? results.reduce((s, r) => s + r.score * r.f.out, 0) / total : null;
+  const hhi = results.reduce((s, r) => s + (r.f.share * 100) ** 2, 0);
+  return {
+    total, overdue, ageing, byGrade, top10Share: total ? top10 / total : 0, wScore, hhi,
+    overLimit: results.filter((r) => r.f.util != null && r.f.util > 1).length,
+    limitCurrent: results.reduce((s, r) => s + r.c.limit, 0),
+    limitRec: results.reduce((s, r) => s + r.rec, 0),
+  };
+}
+
+/* ---------- state ---------- */
+const BASE = scoreAll(DEFAULT);
+let S = BASE;
+const ui = {
+  tab: "overview", search: "", gradeFilter: "all", sort: { key: "grade", dir: 1 }, tier: "all", limitFilter: "changes", openId: null,
+};
+const storeKey = "done:" + DATA.as_of;
+let done = {};
+try { done = JSON.parse(localStorage.getItem(storeKey) || "{}") || {}; } catch (e) { done = {}; }
+const saveDone = () => { try { localStorage.setItem(storeKey, JSON.stringify(done)); } catch (e) { /* storage unavailable */ } };
+const policyChanged = () => JSON.stringify(policy) !== JSON.stringify(DEFAULT);
+
+/* ---------- tooltip ---------- */
+const tip = document.getElementById("tip");
+function showTip(html, x, y) {
+  tip.innerHTML = html; tip.hidden = false;
+  const r = tip.getBoundingClientRect();
+  let left = x + 14, top = y + 14;
+  if (left + r.width > window.innerWidth - 8) left = x - r.width - 14;
+  if (top + r.height > window.innerHeight - 8) top = y - r.height - 14;
+  tip.style.left = Math.max(8, left) + "px"; tip.style.top = Math.max(8, top) + "px";
+}
+document.addEventListener("pointermove", (e) => {
+  const t = e.target.closest?.("[data-tip]");
+  if (t) showTip(t.getAttribute("data-tip"), e.clientX, e.clientY); else tip.hidden = true;
+});
+document.addEventListener("focusin", (e) => {
+  const t = e.target.closest?.("[data-tip]");
+  if (t) { const r = t.getBoundingClientRect(); showTip(t.getAttribute("data-tip"), r.right, r.top); }
+});
+document.addEventListener("focusout", () => { tip.hidden = true; });
+const tipAttr = (html) => `data-tip="${esc(html)}"`;
+
+/* ---------- header & KPIs ---------- */
+function renderHeader() {
+  const meta = document.getElementById("meta");
+  meta.innerHTML =
+    `<span class="tag">As at <b class="mono">${esc(DATA.as_of)}</b></span>` +
+    `<span class="tag">${esc(DATA.source || "Debtor ledger")}</span>` +
+    (policyChanged() ? `<button class="tag policy" type="button" id="policy-tag">Custom policy · view changes</button>` : `<span class="tag">Default policy</span>`) +
+    (RUN ? `<button class="tag" type="button" data-goto="data"><span class="pill ${HEALTH_META[RUN.health_status].cls}" style="padding:0 6px 0 4px">${HEALTH_META[RUN.health_status].short}</span>Data checks</button>` : "") +
+    (RUN && RUN.backtest ? `<button class="tag" type="button" data-goto="data"><span class="pill ${VERDICT_META[RUN.backtest.verdict].cls}" style="padding:0 6px 0 4px">${esc(RUN.backtest.verdict)}</span>Backtest</button>` : "");
+  const pt = document.getElementById("policy-tag");
+  if (pt) pt.addEventListener("click", () => setTab("policy"));
+  meta.querySelectorAll("[data-goto]").forEach((b) => b.addEventListener("click", () => setTab(b.dataset.goto)));
+}
+function deltaHtml(now, base, fmt, goodWhenUp) {
+  if (!policyChanged() || base == null || now == null) return "";
+  const d = now - base;
+  if (Math.abs(d) < 1e-9) return `<div class="delta dim">no change</div>`;
+  const good = goodWhenUp ? d > 0 : d < 0;
+  return `<div class="delta ${good ? "pos" : "neg"}">${d > 0 ? "+" : "−"}${fmt(Math.abs(d))} vs default</div>`;
+}
+function renderKPIs() {
+  const s = S.summary, b = BASE.summary;
+  const p1 = S.worklist.filter((r) => r.tier === "P1");
+  const hhiBand = s.hhi < 1500 ? "diversified" : s.hhi < 2500 ? "moderately concentrated" : "highly concentrated";
+  const k = [
+    ["Receivables", compact(s.total), `${S.results.filter((r) => r.f.out > 0).length} customers with a balance`],
+    ["Overdue", compact(s.overdue), `${pct(s.total ? s.overdue / s.total : 0, 1)} of receivables`],
+    ["AR-weighted score", s.wScore == null ? "—" : s.wScore.toFixed(1), "0–100, higher = lower risk" + deltaHtml(s.wScore, b.wScore, (v) => v.toFixed(1), true)],
+    ["High-risk balance", compact(s.byGrade.D.out + s.byGrade.E.out), `grades D–E · ${s.byGrade.D.n + s.byGrade.E.n} customers` + deltaHtml(s.byGrade.D.out + s.byGrade.E.out, b.byGrade.D.out + b.byGrade.E.out, compact, false)],
+    ["Concentration", Math.round(s.hhi).toLocaleString("en-GB"), `HHI · ${hhiBand} · top 10 = ${pct(s.top10Share)}`],
+    ["Escalations", String(p1.length), `P1 · ${compact(p1.reduce((a, r) => a + r.f.overdue, 0))} overdue`],
+  ];
+  document.getElementById("kpis").innerHTML = k.map(([l, v, sub]) =>
+    `<div class="kpi"><div class="label">${l}</div><div class="value">${v}</div><div class="sub">${sub}</div></div>`).join("");
+  document.getElementById("n-customers").textContent = S.results.length;
+  document.getElementById("n-collections").textContent = S.worklist.length;
+  document.getElementById("n-limits").textContent = S.results.filter((r) => !["Maintain"].includes(r.action)).length;
+}
+
+/* ---------- overview ---------- */
+function ageBarHtml(ageing, total, sm) {
+  if (!total) return `<div class="agebar${sm ? " sm" : ""}" style="background:var(--surface-2)"></div>`;
+  return `<div class="agebar${sm ? " sm" : ""}">` + BUCKETS.map((b, i) => {
+    const v = ageing[b] || 0;
+    if (v <= 0) return "";
+    return `<div style="flex:${v / total};background:var(--age-${i})" ${tipAttr(`<b>${money(v)}</b> · ${pct(v / total, 1)}<div class="t-sub">${BUCKET_LABEL[b]}</div>`)}></div>`;
+  }).join("") + `</div>`;
+}
+function renderOverview() {
+  const s = S.summary;
+  document.getElementById("age-hint").textContent = `${compact(s.total)} open · ${pct(s.total ? s.overdue / s.total : 0, 1)} overdue`;
+  document.getElementById("agebar").outerHTML = ageBarHtml(s.ageing, s.total).replace('class="agebar"', 'class="agebar" id="agebar"');
+  document.getElementById("age-legend").innerHTML = BUCKETS.map((b, i) =>
+    `<div><div class="k"><i style="background:var(--age-${i})"></i>${BUCKET_LABEL[b]}</div><div class="v num">${compact(s.ageing[b])}</div><div class="p num">${pct(s.total ? s.ageing[b] / s.total : 0, 1)}</div></div>`).join("");
+
+  const maxOut = Math.max(...GRADES.map((g) => s.byGrade[g].out), 1);
+  const labels = Object.fromEntries(policy.grades.map((g) => [g.grade, g.label]));
+  document.getElementById("grade-rows").innerHTML = GRADES.map((g) => {
+    const d = s.byGrade[g], bd = BASE.summary.byGrade[g];
+    const was = policyChanged() && bd.n !== d.n ? `<span class="was">was ${bd.n}</span>` : "";
+    return `<div class="row link" data-grade-link="${g}" ${tipAttr(`<b>${money(d.out)}</b> · ${pct(s.total ? d.out / s.total : 0, 1)} of receivables<div class="t-sub">Grade ${g} · ${esc(labels[g])} · ${d.n} customers</div>`)}>
+      <span class="grade g-${g}">${g}</span>
+      <span class="name">${esc(labels[g])}<small>${d.n} customer${d.n === 1 ? "" : "s"}${was}</small></span>
+      <span class="track"><span class="fill" style="display:block;width:${(d.out / maxOut) * 100}%;background:var(--g-${g})"></span></span>
+      <span class="val">${compact(d.out)}<small>${pct(s.total ? d.out / s.total : 0)}</small></span></div>`;
+  }).join("");
+
+  const top = [...S.results].filter((r) => r.f.out > 0).sort((a, b) => b.f.out - a.f.out).slice(0, 8);
+  const maxShare = Math.max(...top.map((r) => r.f.share), 0.0001);
+  document.getElementById("conc-hint").textContent = `Top 10 hold ${pct(s.top10Share)} of receivables`;
+  document.getElementById("exposure-rows").innerHTML = top.map((r) => {
+    const used = r.f.util == null ? "no limit" : `${pct(r.f.util)} of limit`;
+    return `<div class="row link" data-open="${esc(r.id)}" tabindex="0" ${tipAttr(`<b>${money(r.f.out)}</b> · ${pct(r.f.share, 1)} of receivables<div class="t-sub">${esc(r.c.name)} · ${used}</div>`)}>
+      <span class="grade g-${r.grade}">${r.grade}</span>
+      <span class="name">${esc(r.c.name)}<small>${used}</small></span>
+      <span class="track"><span class="fill" style="display:block;width:${(r.f.share / maxShare) * 100}%;background:var(--ink-2)"></span></span>
+      <span class="val">${pct(r.f.share, 1)}<small>${compact(r.f.out)}</small></span></div>`;
+  }).join("");
+  renderRiskMap();
+}
+function renderRiskMap() {
+  const el = document.getElementById("riskmap");
+  const W = Math.max(300, el.clientWidth || 600), H = Math.round(Math.min(460, Math.max(280, W * 0.72)));
+  const m = { l: 48, r: 12, t: 26, b: 34 };
+  const pts = S.results.filter((r) => r.f.out > 0);
+  const vals = pts.map((r) => r.f.out);
+  const lo = Math.pow(10, Math.floor(Math.log10(Math.max(1, Math.min(...vals, 1000)))));
+  const hi = Math.pow(10, Math.ceil(Math.log10(Math.max(...vals, 10))));
+  const x = (v) => m.l + (v / 100) * (W - m.l - m.r);
+  const y = (v) => H - m.b - ((Math.log10(Math.max(v, lo)) - Math.log10(lo)) / (Math.log10(hi) - Math.log10(lo))) * (H - m.t - m.b);
+  let svg = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Scatter of credit score against outstanding balance">`;
+  // grade bands along the score axis
+  const cuts = policy.grades.map((g) => ({ g: g.grade, min: Math.max(0, Math.min(100, g.min_score)) }));
+  let upper = 100;
+  for (const c of cuts) {
+    if (c.min < upper) {
+      svg += `<rect x="${x(c.min)}" y="${m.t}" width="${x(upper) - x(c.min)}" height="${H - m.t - m.b}" fill="var(--g-${c.g})" fill-opacity="0.08"/>`;
+      if (x(upper) - x(c.min) > 16) svg += `<text class="band-label" x="${(x(upper) + x(c.min)) / 2}" y="${m.t - 9}" text-anchor="middle" style="fill:var(--ink-2)">${c.g}</text>`;
+      if (c.min > 0) svg += `<line x1="${x(c.min)}" x2="${x(c.min)}" y1="${m.t}" y2="${H - m.b}" stroke="var(--line-strong)" stroke-dasharray="3 3"/>`;
+      upper = c.min;
+    }
+  }
+  for (let p = lo; p <= hi; p *= 10) {
+    svg += `<line x1="${m.l}" x2="${W - m.r}" y1="${y(p)}" y2="${y(p)}" stroke="var(--line)"/>`;
+    svg += `<text x="${m.l - 8}" y="${y(p) + 4}" text-anchor="end">${compact(p)}</text>`;
+  }
+  for (let v = 0; v <= 100; v += 20) svg += `<text x="${x(v)}" y="${H - m.b + 16}" text-anchor="middle">${v}</text>`;
+  svg += `<line x1="${m.l}" x2="${W - m.r}" y1="${H - m.b}" y2="${H - m.b}" stroke="var(--line-strong)"/>`;
+  svg += `<text x="${W - m.r}" y="${H - 4}" text-anchor="end">Composite credit score →</text>`;
+  svg += `<text x="${m.l - 8}" y="${m.t - 9}" text-anchor="end">Balance</text>`;
+  // dots: larger balances drawn first so small ones stay visible
+  const sorted = [...pts].sort((a, b) => b.f.out - a.f.out);
+  for (const r of sorted) svg += `<circle cx="${x(r.score)}" cy="${y(r.f.out)}" r="5.5" fill="var(--g-${r.grade})" stroke="var(--surface)" stroke-width="2"/>`;
+  for (const r of sorted) {
+    const t = `<b>${esc(r.c.name)}</b><div>Grade ${r.grade} · score ${r.score.toFixed(1)}</div><div class="t-sub">${money(r.f.out)} balance · ${money(r.f.overdue)} overdue</div>`;
+    svg += `<circle cx="${x(r.score)}" cy="${y(r.f.out)}" r="12" fill="transparent" style="cursor:pointer" data-open="${esc(r.id)}" tabindex="0" ${tipAttr(t)}/>`;
+  }
+  // label the three largest exposures directly
+  for (const r of sorted.slice(0, 3)) {
+    const px = x(r.score), right = px < W * 0.7;
+    svg += `<text x="${px + (right ? 10 : -10)}" y="${y(r.f.out) + 4}" text-anchor="${right ? "start" : "end"}" style="fill:var(--ink-2)">${esc(r.c.name)}</text>`;
+  }
+  el.innerHTML = svg + `</svg>`;
+  const labels = Object.fromEntries(policy.grades.map((g) => [g.grade, g.label]));
+  document.getElementById("map-legend").innerHTML = GRADES.map((g) => `<span><i style="background:var(--g-${g})"></i>${g} · ${esc(labels[g])}</span>`).join("");
+}
+
+/* ---------- customers ---------- */
+const COLS = [
+  { key: "name", label: "Customer", get: (r) => r.c.name.toLowerCase() },
+  { key: "grade", label: "Grade", get: (r) => gIdx(r.grade) * 1000 - r.score },
+  { key: "score", label: "Score", n: true, get: (r) => r.score },
+  { key: "ps", label: "Payment", n: true, get: (r) => r.ps },
+  { key: "ag", label: "Ageing", n: true, get: (r) => r.ag },
+  { key: "cs", label: "Concentration", n: true, get: (r) => r.cs },
+  { key: "out", label: "Balance", n: true, get: (r) => r.f.out },
+  { key: "overdue", label: "Overdue", n: true, get: (r) => r.f.overdue },
+  { key: "wadl", label: "Avg days late", n: true, get: (r) => r.f.wadl ?? -1 },
+  { key: "util", label: "Limit used", n: true, get: (r) => r.f.util ?? -1 },
+  { key: "drivers", label: "Risk drivers", get: (r) => r.reasons.length },
+];
+function wasGrade(r) {
+  const b = BASE.byId[r.id];
+  return policyChanged() && b.grade !== r.grade ? `<span class="was">was ${b.grade}</span>` : "";
+}
+function renderCustomers() {
+  const fc = document.getElementById("grade-filter");
+  fc.innerHTML = [`<button class="chip" type="button" data-g="all" aria-pressed="${ui.gradeFilter === "all"}">All</button>`]
+    .concat(GRADES.map((g) => `<button class="chip" type="button" data-g="${g}" aria-pressed="${ui.gradeFilter === g}"><span class="grade g-${g}">${g}</span>${S.summary.byGrade[g].n}</button>`)).join("");
+  const q = ui.search.trim().toLowerCase();
+  let rows = S.results.filter((r) => (ui.gradeFilter === "all" || r.grade === ui.gradeFilter) &&
+    (!q || `${r.c.name} ${r.id} ${r.c.industry}`.toLowerCase().includes(q)));
+  const col = COLS.find((c) => c.key === ui.sort.key);
+  rows.sort((a, b) => { const va = col.get(a), vb = col.get(b); return (va < vb ? -1 : va > vb ? 1 : 0) * ui.sort.dir; });
+  document.getElementById("cust-note").textContent = `${rows.length} of ${S.results.length} customers · click a row for detail`;
+  const scoreCell = (v) => `<span class="mini"><i style="width:${v}%"></i></span>${v.toFixed(0)}`;
+  const head = `<thead><tr>${COLS.map((c) => `<th class="sortable${c.n ? " n" : ""}" data-sort="${c.key}" scope="col">${c.label}${ui.sort.key === c.key ? `<span class="arrow">${ui.sort.dir > 0 ? "↑" : "↓"}</span>` : ""}</th>`).join("")}</tr></thead>`;
+  const body = rows.map((r) => `<tr class="clickable" data-open="${esc(r.id)}" tabindex="0">
+      <td><div class="cust">${esc(r.c.name)}<small>${esc(r.id)}${r.c.industry ? " · " + esc(r.c.industry) : ""}</small></div></td>
+      <td><span class="grade g-${r.grade}">${r.grade}</span>${wasGrade(r)}</td>
+      <td class="n"><b>${r.score.toFixed(1)}</b></td>
+      <td class="n">${scoreCell(r.ps)}</td><td class="n">${scoreCell(r.ag)}</td><td class="n">${scoreCell(r.cs)}</td>
+      <td class="n">${money(r.f.out)}</td>
+      <td class="n">${r.f.overdue > 0 ? money(r.f.overdue) : '<span class="dim">—</span>'}</td>
+      <td class="n">${fx(r.f.wadl, 0)}</td>
+      <td class="n ${r.f.util != null && r.f.util > 1 ? "neg" : ""}">${r.f.util == null ? '<span class="dim">no limit</span>' : pct(r.f.util)}</td>
+      <td class="drivers">${esc(r.reasons.slice(0, 2).join("; ")) || '<span class="dim">No adverse indicators</span>'}${r.reasons.length > 2 ? ` <span class="dim">+${r.reasons.length - 2} more</span>` : ""}</td></tr>`).join("");
+  document.getElementById("cust-table").innerHTML = head + `<tbody>${body || `<tr><td colspan="${COLS.length}" class="empty">No customers match this filter.</td></tr>`}</tbody>`;
+}
+
+/* ---------- collections ---------- */
+function renderCollections() {
+  const tiers = ["P1", "P2", "P3", "P4"];
+  document.getElementById("tiers").innerHTML = tiers.map((t) => {
+    const rs = S.worklist.filter((r) => r.tier === t);
+    return `<button class="tier" type="button" data-tier="${t}" aria-pressed="${ui.tier === t}">
+      <span class="pill ${TIER_META[t].cls}">${TIER_META[t].name}</span>
+      <div class="amt num">${compact(rs.reduce((s, r) => s + r.f.overdue, 0))}</div>
+      <div class="desc">${rs.length} customer${rs.length === 1 ? "" : "s"} · ${TIER_META[t].desc}</div></button>`;
+  }).join("");
+  const rows = S.worklist.filter((r) => ui.tier === "all" || r.tier === ui.tier);
+  const nDone = S.worklist.filter((r) => done[r.id]).length;
+  document.getElementById("coll-note").textContent =
+    `${ui.tier === "all" ? "All tiers" : TIER_META[ui.tier].name} · ${rows.length} customers · ${nDone} of ${S.worklist.length} ticked as actioned (saved in this browser)`;
+  const head = `<thead><tr><th class="n">#</th><th>Tier</th><th>Customer</th><th>Grade</th><th class="n">Overdue</th><th class="n">31–60</th><th class="n">61–90</th><th class="n">90+</th><th class="n">Oldest</th><th>Action</th><th>Done</th></tr></thead>`;
+  const cell = (v) => (v > 0 ? money(v) : '<span class="dim">—</span>');
+  const body = rows.map((r) => `<tr class="clickable${done[r.id] ? " done" : ""}" data-open="${esc(r.id)}" tabindex="0">
+      <td class="n mono">${r.rank}</td>
+      <td><span class="pill ${TIER_META[r.tier].cls}">${r.tier}</span></td>
+      <td><div class="cust">${esc(r.c.name)}<small>${esc(r.id)} · priority ${Math.round(r.prio).toLocaleString("en-GB")}</small></div></td>
+      <td><span class="grade g-${r.grade}">${r.grade}</span>${wasGrade(r)}</td>
+      <td class="n"><b>${money(r.f.overdue)}</b></td>
+      <td class="n">${cell(r.f.ageing["31_60"])}</td><td class="n">${cell(r.f.ageing["61_90"])}</td><td class="n">${cell(r.f.ageing["90_plus"])}</td>
+      <td class="n">${r.f.oldest}d</td>
+      <td style="min-width:240px">${esc(r.collAction)}</td>
+      <td><input class="check" type="checkbox" id="done-${esc(r.id)}" data-done="${esc(r.id)}" aria-label="Mark ${esc(r.c.name)} as actioned" ${done[r.id] ? "checked" : ""}></td></tr>`).join("");
+  document.getElementById("coll-table").innerHTML = head + `<tbody>${body || `<tr><td colspan="11" class="empty">Nothing overdue in this tier.</td></tr>`}</tbody>`;
+}
+
+/* ---------- limits ---------- */
+function renderLimits() {
+  const acts = ["changes", "Increase", "Reduce", "Suspend", "Set limit", "Maintain"];
+  const count = (a) => (a === "changes" ? S.results.filter((r) => r.action !== "Maintain").length : S.results.filter((r) => r.action === a).length);
+  document.getElementById("limit-filter").innerHTML = acts.map((a) =>
+    `<button class="chip" type="button" data-act="${a}" aria-pressed="${ui.limitFilter === a}">${a === "changes" ? "All changes" : a} <span class="mono dim">${count(a)}</span></button>`).join("");
+  const rows = S.results.filter((r) => ui.limitFilter === "changes" ? r.action !== "Maintain" : r.action === ui.limitFilter)
+    .sort((a, b) => gIdx(b.grade) - gIdx(a.grade) || Math.abs(b.rec - b.c.limit) - Math.abs(a.rec - a.c.limit));
+  const s = S.summary;
+  document.getElementById("limit-note").innerHTML =
+    `Total limits <b class="num">${compact(s.limitCurrent)}</b> <span class="arrow-r">→</span> <b class="num">${compact(s.limitRec)}</b> recommended`;
+  const head = `<thead><tr><th>Customer</th><th>Grade</th><th class="n">Balance</th><th class="n">Avg monthly sales</th><th class="n">Current limit</th><th class="n">Recommended</th><th class="n">Change</th><th>Action</th></tr></thead>`;
+  const body = rows.map((r) => {
+    const d = r.rec - r.c.limit;
+    return `<tr class="clickable" data-open="${esc(r.id)}" tabindex="0">
+      <td><div class="cust">${esc(r.c.name)}<small>${esc(r.id)} · ${r.c.terms}-day terms</small></div></td>
+      <td><span class="grade g-${r.grade}">${r.grade}</span>${wasGrade(r)}</td>
+      <td class="n ${r.overLimit ? "neg" : ""}">${money(r.f.out)}</td>
+      <td class="n">${money(r.f.sales_m)}</td>
+      <td class="n">${r.c.limit > 0 ? money(r.c.limit) : '<span class="dim">none</span>'}</td>
+      <td class="n"><b>${money(r.rec)}</b></td>
+      <td class="n ${d > 0 ? "pos" : d < 0 ? "neg" : "dim"}">${d === 0 ? "—" : (d > 0 ? "+" : "−") + money(Math.abs(d))}</td>
+      <td><span class="pill ${LIMIT_META[r.action]}">${esc(r.action)}</span>${r.concCap ? ' <span class="dim">concentration cap</span>' : ""}${r.overLimit ? ' <span class="neg" style="font-size:12px">over limit</span>' : ""}</td></tr>`;
+  }).join("");
+  document.getElementById("limit-table").innerHTML = head + `<tbody>${body || '<tr><td colspan="8" class="empty">No customers with this recommendation.</td></tr>'}</tbody>`;
+}
+
+/* ---------- drawer ---------- */
+function openCustomer(id) {
+  ui.openId = id;
+  const r = S.byId[id];
+  if (!r) return;
+  const f = r.f, w = policy.weights, ws = w.payment + w.ageing + w.concentration || 1;
+  const b = BASE.byId[id];
+  const t = trendOf(f);
+  const labels = Object.fromEntries(policy.grades.map((g) => [g.grade, g.label]));
+  const ss = (label, weight, v) => `<div class="ss"><span>${label} <small>${pct(weight / ws)}</small></span><span class="track"><i style="width:${v}%"></i></span><span class="v">${v.toFixed(0)}</span></div>`;
+  const d = document.getElementById("drawer");
+  d.innerHTML = `<button class="close" type="button" id="drawer-close" aria-label="Close">✕</button>
+    <div class="d-head"><span class="grade lg g-${r.grade}">${r.grade}</span><div>
+      <h2>${esc(r.c.name)}</h2>
+      <div class="sub">${esc(r.id)}${r.c.industry ? " · " + esc(r.c.industry) : ""} · ${r.c.terms}-day terms</div>
+      <div class="score-line"><span class="big num">${r.score.toFixed(1)}</span><span class="dim">/ 100 · ${esc(labels[r.grade])}</span>${policyChanged() && b.grade !== r.grade ? `<span class="was">default policy: ${b.grade} (${b.score.toFixed(1)})</span>` : ""}</div>
+    </div></div>
+    <div class="d-sec"><h3>Score build-up</h3><div class="sub-scores">
+      ${ss("Payment history", w.payment, r.ps)}${ss("Ageing", w.ageing, r.ag)}${ss("Concentration", w.concentration, r.cs)}
+    </div></div>
+    <div class="d-sec"><h3>Risk drivers</h3>${r.reasons.length ? `<ul class="drivers">${r.reasons.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>` : '<p class="dim" style="margin:0">No adverse indicators.</p>'}</div>
+    <div class="d-sec"><h3>Open balance · ${money(f.out)}</h3>${ageBarHtml(f.ageing, f.out, true)}
+      <dl class="facts" style="margin-top:12px">${BUCKETS.map((bk) => `<div><dt>${BUCKET_LABEL[bk]}</dt><dd>${f.ageing[bk] > 0 ? money(f.ageing[bk]) : "—"}</dd></div>`).join("")}
+      <div><dt>In dispute</dt><dd>${f.disputed > 0 ? money(f.disputed) : "—"}</dd></div></dl></div>
+    <div class="d-sec"><h3>Behaviour & exposure</h3><dl class="facts">
+      <div><dt>Avg days late (value-weighted)</dt><dd>${fx(f.wadl, 1)}</dd></div>
+      <div><dt>Paid on time</dt><dd>${pct(f.otr)}</dd></div>
+      <div><dt>Trend (last 3m vs prior)</dt><dd class="${t > 0 ? "neg" : t < 0 ? "pos" : ""}">${t == null ? "—" : (t > 0 ? "+" : "") + t.toFixed(1) + " days"}</dd></div>
+      <div><dt>Settled invoices (12m)</dt><dd>${f.paid}</dd></div>
+      <div><dt>Avg monthly sales</dt><dd>${money(f.sales_m)}</dd></div>
+      <div><dt>Share of receivables</dt><dd>${pct(f.share, 1)}</dd></div>
+      <div><dt>Credit limit</dt><dd>${r.c.limit > 0 ? money(r.c.limit) : "none"}</dd></div>
+      <div><dt>Limit used</dt><dd class="${f.util > 1 ? "neg" : ""}">${f.util == null ? "—" : pct(f.util)}</dd></div>
+    </dl></div>
+    <div class="d-sec"><h3>Recommended actions</h3><div class="action-box">
+      <div class="line"><span>Credit limit</span><span><span class="num">${r.c.limit > 0 ? money(r.c.limit) : "none"}</span><span class="arrow-r">→</span><b class="num">${money(r.rec)}</b></span></div>
+      <div class="line"><span class="pill ${LIMIT_META[r.action]}">${esc(r.actionText)}</span></div>
+    </div>
+    <div class="action-box" style="margin-top:10px">
+      ${r.tier ? `<div class="line"><span>Collections</span><span class="pill ${TIER_META[r.tier].cls}">${r.tier} · rank ${r.rank} of ${S.worklist.length}</span></div><div>${esc(r.collAction)}</div>` : '<div class="line"><span>Collections</span><span class="dim">Nothing overdue</span></div>'}
+    </div></div>`;
+  d.hidden = false; document.getElementById("scrim").hidden = false;
+  document.getElementById("drawer-close").addEventListener("click", closeDrawer);
+  document.getElementById("drawer-close").focus({ preventScroll: true });
+}
+function closeDrawer() { ui.openId = null; document.getElementById("drawer").hidden = true; document.getElementById("scrim").hidden = true; }
+document.getElementById("scrim").addEventListener("click", closeDrawer);
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") closeDrawer();
+  if (e.key === "Enter" && e.target.matches?.("[data-open]")) openCustomer(e.target.getAttribute("data-open"));
+});
+
+/* ---------- policy ---------- */
+const getPath = (o, p) => p.split(".").reduce((a, k) => a[k], o);
+const setPath = (o, p, v) => { const ks = p.split("."); const last = ks.pop(); ks.reduce((a, k) => a[k], o)[last] = v; };
+const F = {
+  pct: (v) => pct(v), pct1: (v) => pct(v, 1), num: (v) => String(v), days: (v) => v + "d", x: (v) => Number(v).toFixed(2) + "×", money: (v) => money(v), pts: (v) => v + " pts",
+};
+const gradeOpts = (path, label, help) => ({ path, label, type: "grade", help });
+const SECTIONS = [
+  { title: "Score weights", hint: "Normalised to 100%", fields: [
+    { path: "weights.payment", label: "Payment history", min: 0, max: 1, step: 0.05, fmt: "wpct" },
+    { path: "weights.ageing", label: "Ageing", min: 0, max: 1, step: 0.05, fmt: "wpct" },
+    { path: "weights.concentration", label: "Concentration & exposure", min: 0, max: 1, step: 0.05, fmt: "wpct" },
+  ] },
+  { title: "Grade cut-offs", hint: "Minimum composite score", fields: [0, 1, 2, 3].map((i) => (
+    { path: `grades.${i}.min_score`, label: `Grade ${DEFAULT.grades[i].grade} from`, min: 0, max: 100, step: 1, fmt: "num" })) },
+  { title: "Payment history", fields: [
+    { path: "payment_history.days_late_floor", label: "Days late that scores zero", min: 10, max: 120, step: 5, fmt: "days" },
+    { path: "payment_history.on_time_weight", label: "Weight on on-time rate", min: 0, max: 1, step: 0.05, fmt: "pct" },
+    { path: "payment_history.trend_max_penalty", label: "Max penalty for slowing down", min: 0, max: 40, step: 1, fmt: "pts" },
+    { path: "payment_history.thin_file_score", label: "Score for no history", min: 0, max: 100, step: 1, fmt: "num" },
+  ] },
+  { title: "Ageing severity", hint: "0 = no risk, 1 = maximum", fields: [
+    ...["1_30", "31_60", "61_90", "90_plus"].map((b) => ({ path: `ageing.bucket_weights.${b}`, label: BUCKET_LABEL[b], min: 0, max: 1, step: 0.05, fmt: "x2" })),
+    { path: "ageing.disputed_penalty", label: "Disputed balance penalty", min: 0, max: 40, step: 1, fmt: "pts" },
+  ] },
+  { title: "Concentration & exposure", fields: [
+    { path: "concentration.max_portfolio_share", label: "Share of AR that scores zero", min: 0.02, max: 0.5, step: 0.01, fmt: "pct" },
+    { path: "concentration.utilisation_comfortable", label: "Limit use still comfortable", min: 0.3, max: 1.5, step: 0.05, fmt: "pct" },
+    { path: "concentration.utilisation_breach", label: "Limit use that scores zero", min: 0.5, max: 2.5, step: 0.05, fmt: "pct" },
+  ] },
+  { title: "Policy caps", hint: "Applied after scoring", fields: [
+    { path: "overrides.severe_arrears_share", label: "90+ share for severe cap", min: 0.05, max: 1, step: 0.05, fmt: "pct" },
+    gradeOpts("overrides.severe_arrears_cap", "Severe arrears → grade no better than"),
+    gradeOpts("overrides.any_90_plus_cap", "Any 90+ balance → no better than"),
+    { path: "overrides.limit_breach_utilisation", label: "Limit breach at", min: 1, max: 3, step: 0.05, fmt: "pct" },
+    gradeOpts("overrides.limit_breach_cap", "Limit breach → no better than"),
+    { path: "overrides.materiality", label: "Ignore 90+ balances under", min: 0, max: 5000, step: 100, fmt: "money" },
+  ] },
+  { title: "Credit limits", hint: "Sales × (terms + buffer) / 30 × multiplier", fields: [
+    { path: "credit_limits.buffer_days", label: "Buffer days on top of terms", min: 0, max: 60, step: 1, fmt: "days" },
+    ...GRADES.map((g) => ({ path: `credit_limits.grade_multipliers.${g}`, label: `Grade ${g} multiplier`, min: 0, max: 3, step: 0.05, fmt: "x" })),
+    { path: "credit_limits.max_increase_pct", label: "Max increase per review", min: 0, max: 2, step: 0.05, fmt: "pct" },
+    { path: "credit_limits.block_increase_at_portfolio_share", label: "No increases above share of AR", min: 0.02, max: 1, step: 0.01, fmt: "pct" },
+    { path: "credit_limits.increase_allowed_grades", label: "Grades eligible for increases", type: "grades" },
+  ] },
+  { title: "Collections", hint: "Urgency weight on overdue value", fields: [
+    ...["1_30", "31_60", "61_90", "90_plus"].map((b) => ({ path: `collections.bucket_urgency.${b}`, label: BUCKET_LABEL[b], min: 0, max: 10, step: 0.25, fmt: "x" })),
+    { path: "collections.min_balance", label: "Minimum balance to chase", min: 0, max: 5000, step: 50, fmt: "money" },
+  ] },
+];
+function fmtField(fd, v) {
+  if (fd.fmt === "wpct") { const w = policy.weights; return pct(v / ((w.payment + w.ageing + w.concentration) || 1)); }
+  if (fd.fmt === "x2") return Number(v).toFixed(2);
+  return F[fd.fmt](v);
+}
+const fid = (p) => "pol-" + p.replace(/\./g, "-");
+function buildPolicy() {
+  document.getElementById("pol-sections").innerHTML = SECTIONS.map((s) => `<div class="block"><div class="block-head"><h2>${s.title}</h2>${s.hint ? `<span class="hint">${s.hint}</span>` : ""}</div>${s.fields.map((fd) => {
+    const id = fid(fd.path);
+    if (fd.type === "grade") return `<div class="field"><label for="${id}">${fd.label}</label><select id="${id}" data-path="${fd.path}">${GRADES.map((g) => `<option>${g}</option>`).join("")}</select></div>`;
+    if (fd.type === "grades") return `<div class="field"><span>${fd.label}</span><span></span><div class="checks">${GRADES.map((g) => `<label><input type="checkbox" id="${id}-${g}" data-grades="${fd.path}" value="${g}">${g}</label>`).join("")}</div></div>`;
+    return `<div class="field"><label for="${id}">${fd.label}</label><output class="out" id="${id}-out" for="${id}"></output><input type="range" id="${id}" data-path="${fd.path}" min="${fd.min}" max="${fd.max}" step="${fd.step}"></div>`;
+  }).join("")}${s.title === "Grade cut-offs" ? '<div class="warn-text" id="cut-warn" hidden>Cut-offs must fall from A to D. Grades will look odd until they do.</div>' : ""}</div>`).join("");
+  syncPolicyInputs();
+}
+function syncPolicyInputs() {
+  for (const s of SECTIONS) for (const fd of s.fields) {
+    const id = fid(fd.path), v = getPath(policy, fd.path), dv = getPath(DEFAULT, fd.path);
+    if (fd.type === "grades") { GRADES.forEach((g) => { document.getElementById(`${id}-${g}`).checked = v.includes(g); }); continue; }
+    const el = document.getElementById(id);
+    el.value = v;
+    if (fd.type === "grade") { el.style.color = v !== dv ? "var(--accent)" : ""; continue; }
+    const out = document.getElementById(id + "-out");
+    out.textContent = fmtField(fd, v);
+    out.classList.toggle("changed", Math.abs(v - dv) > 1e-9);
+  }
+  const mins = policy.grades.map((g) => g.min_score);
+  document.getElementById("cut-warn").hidden = mins.every((m, i) => i === 0 || m <= mins[i - 1]);
+}
+function policyDiff() {
+  const out = {};
+  const walk = (a, b, path, target) => {
+    for (const k of Object.keys(a)) {
+      if (JSON.stringify(a[k]) === JSON.stringify(b[k])) continue;
+      if (a[k] && typeof a[k] === "object" && !Array.isArray(a[k]) && k !== "weights") { target[k] = {}; walk(a[k], b[k], path + k + ".", target[k]); }
+      else target[k] = clone(a[k]);
+    }
+  };
+  walk(policy, DEFAULT, "", out);
+  if (out.weights) {
+    const w = policy.weights, s = (w.payment + w.ageing + w.concentration) || 1;
+    const p = Math.round((w.payment / s) * 1e4) / 1e4, a = Math.round((w.ageing / s) * 1e4) / 1e4;
+    out.weights = { payment: p, ageing: a, concentration: Math.round((1 - p - a) * 1e4) / 1e4 };
+  }
+  return out;
+}
+function renderImpact() {
+  const el = document.getElementById("impact");
+  const changed = S.results.filter((r) => BASE.byId[r.id].grade !== r.grade)
+    .sort((a, b) => b.f.out - a.f.out);
+  const limitMoves = S.results.filter((r) => BASE.byId[r.id].action !== r.action).length;
+  const tierMoves = S.results.filter((r) => BASE.byId[r.id].tier !== r.tier).length;
+  const s = S.summary, b = BASE.summary;
+  const diff = policyDiff();
+  const json = JSON.stringify(diff, null, 2);
+  const row = (label, bv, nv, fmt) => `<tr><td>${label}</td><td class="n dim">${fmt(bv)}</td><td class="n"><b>${fmt(nv)}</b></td></tr>`;
+  el.innerHTML = `<div class="block-head"><h2>Impact vs default policy</h2></div>
+    ${policyChanged() ? "" : '<p class="dim" style="margin:0 0 12px">You are on the default policy. Move a slider to see what changes.</p>'}
+    <table><thead><tr><th></th><th class="n">Default</th><th class="n">Now</th></tr></thead><tbody>
+      ${GRADES.map((g) => row(`<span class="grade g-${g}" style="width:18px;height:18px;font-size:11px">${g}</span> customers`, b.byGrade[g].n, s.byGrade[g].n, String)).join("")}
+      ${row("AR-weighted score", b.wScore, s.wScore, (v) => (v == null ? "—" : v.toFixed(1)))}
+      ${row("Recommended limits", b.limitRec, s.limitRec, compact)}
+      ${row("P1 escalations", BASE.worklist.filter((r) => r.tier === "P1").length, S.worklist.filter((r) => r.tier === "P1").length, String)}
+    </tbody></table>
+    <p style="margin:14px 0 0;font-size:13px"><b>${changed.length}</b> regraded · <b>${limitMoves}</b> limit actions changed · <b>${tierMoves}</b> tier moves</p>
+    <div class="changes">${changed.map((r) => `<div class="c" data-open="${esc(r.id)}" tabindex="0"><span class="nm">${esc(r.c.name)}</span><span class="grade g-${BASE.byId[r.id].grade}" style="width:18px;height:18px;font-size:11px">${BASE.byId[r.id].grade}</span><span class="dim">→</span><span class="grade g-${r.grade}" style="width:18px;height:18px;font-size:11px">${r.grade}</span></div>`).join("")}</div>
+    <div class="d-sec" style="margin-top:18px"><h3>Use this policy in the engine</h3>
+      <p class="dim" style="margin:0;font-size:12.5px">Save as <span class="mono">policy.json</span> and run <span class="mono">credit-score run … --config policy.json</span></p>
+      <pre class="json" id="pol-json">${esc(Object.keys(diff).length ? json : "{}")}</pre>
+      <div style="display:flex;gap:8px;margin-top:8px;align-items:center"><button class="btn primary" type="button" id="pol-copy">Copy policy JSON</button><span class="dim" id="pol-copied" style="font-size:12.5px"></span></div>
+    </div>`;
+  document.getElementById("pol-copy").addEventListener("click", () => {
+    const txt = document.getElementById("pol-json").textContent, msg = document.getElementById("pol-copied");
+    const fallback = () => { const r = document.createRange(); r.selectNodeContents(document.getElementById("pol-json")); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); msg.textContent = "Selected. Press Ctrl/⌘+C to copy."; };
+    try { navigator.clipboard.writeText(txt).then(() => { msg.textContent = "Copied"; }, fallback); } catch (e) { fallback(); }
+  });
+}
+
+/* ---------- data & evidence ---------- */
+const fmtTime = (t) => (t ? String(t).replace("T", " ").replace("+00:00", " UTC") : "—");
+function renderData() {
+  if (!RUN) return;
+  const src = RUN.source || {}, hm = HEALTH_META[RUN.health_status];
+  const problems = RUN.health.filter((c) => c.status === "warn" || c.status === "fail").length;
+  document.getElementById("ev-health").innerHTML = `<div class="block-head"><h2>Data health</h2></div>
+    <span class="pill ${hm.cls}">${RUN.health_status === "ok" ? "All checks passed" : RUN.health_status === "warn" ? `${problems} warning${problems === 1 ? "" : "s"}` : "Checks failed: do not act on this run"}</span>
+    <dl class="kv"><dt>Source</dt><dd>${esc(src.label || "—")}</dd><dt>Extracted</dt><dd>${esc(fmtTime(src.extracted_at))}</dd>
+    <dt>Rows</dt><dd>${(src.invoice_rows ?? 0).toLocaleString("en-GB")} invoices · ${(src.customer_rows ?? 0).toLocaleString("en-GB")} customers</dd>
+    <dt>Newest invoice</dt><dd>${esc(src.latest_invoice_date || "—")}</dd><dt>Newest payment</dt><dd>${esc(src.latest_payment_date || "—")}</dd></dl>`;
+
+  const bt = RUN.backtest;
+  const evb = document.getElementById("ev-backtest");
+  if (!bt) evb.innerHTML = `<div class="block-head"><h2>Backtest</h2></div><p class="dim" style="margin:0">Skipped for this run.</p>`;
+  else evb.innerHTML = `<div class="block-head"><h2>Backtest</h2><span class="hint">Do the grades predict late payment?</span></div>
+    <span class="pill ${VERDICT_META[bt.verdict].cls}">${esc(bt.verdict)}</span>
+    <div class="ev-big num">${bt.auc == null ? "AUC —" : `AUC ${bt.auc.toFixed(2)} · Gini ${bt.gini.toFixed(2)}`}</div>
+    <div class="ev-note">${esc(bt.note)}</div>
+    <dl class="kv"><dt>Scored at</dt><dd>${esc(bt.points.join(", ") || "—")}</dd><dt>Outcome</dt><dd>${bt.bad_days_past_due}+ days overdue within ${bt.horizon_days} days</dd>
+    <dt>Sample</dt><dd>${bt.observations} customer-dates · ${bt.bads} went bad</dd></dl>`;
+
+  const ch = RUN.changes || [];
+  const counts = {};
+  ch.forEach((c) => (counts[c.kind] = (counts[c.kind] || 0) + 1));
+  document.getElementById("ev-changes").innerHTML = `<div class="block-head"><h2>Since the last run</h2><span class="hint">${RUN.previous_as_of ? "vs " + esc(RUN.previous_as_of) : ""}</span></div>` +
+    (!RUN.previous_as_of ? '<p class="dim" style="margin:0">No previous run to compare against. The next run will list regrades, new escalations and limit breaches here.</p>'
+      : !ch.length ? '<p style="margin:0">No changes.</p>'
+      : `<div class="chips" style="gap:8px">${Object.keys(CHANGE_META).filter((k) => counts[k]).map((k) => `<span class="pill ${CHANGE_META[k][0]}">${counts[k]} ${CHANGE_META[k][1].toLowerCase()}</span>`).join("")}</div>`);
+
+  if (bt) {
+    document.getElementById("bt-hint").textContent = `Share that went ${bt.bad_days_past_due}+ days overdue within ${bt.horizon_days} days`;
+    document.getElementById("bt-rows").innerHTML = GRADES.map((g) => {
+      const d = bt.by_grade[g] || { observations: 0, bads: 0, bad_rate: null };
+      const rate = d.bad_rate;
+      return `<div class="row" ${tipAttr(`<b>${rate == null ? "—" : pct(rate, 1)}</b> went bad<div class="t-sub">Grade ${g}: ${d.bads} of ${d.observations} customer-dates</div>`)}>
+        <span class="grade g-${g}">${g}</span><span class="name">${d.observations} observed<small>${d.bads} went bad</small></span>
+        <span class="track"><span class="fill" style="display:block;width:${(rate || 0) * 100}%;background:var(--g-${g})"></span></span>
+        <span class="val">${rate == null ? "—" : pct(rate)}</span></div>`;
+    }).join("");
+  }
+  document.getElementById("health-list").innerHTML = RUN.health.map((c) =>
+    `<div class="ck"><span>${esc(c.label)}</span><span class="pill ${HEALTH_META[c.status].cls}">${esc(c.status)}</span><span class="d">${esc(c.detail)}</span></div>`).join("");
+
+  document.getElementById("changes-title").textContent = RUN.previous_as_of ? `Changes since ${RUN.previous_as_of}` : "Changes since the last run";
+  document.getElementById("change-list").innerHTML = !RUN.previous_as_of ? '<p class="dim" style="margin:0">No previous run yet.</p>'
+    : !ch.length ? '<p class="dim" style="margin:0">Nothing moved.</p>'
+    : ch.slice(0, 200).map((c) => `<div class="c" data-open="${esc(c.customer_id)}" tabindex="0"><span><span class="pill ${CHANGE_META[c.kind][0]}">${CHANGE_META[c.kind][1]}</span></span><span><b>${esc(c.customer_name)}</b> <span class="dim">· ${esc(c.detail)}</span></span></div>`).join("");
+}
+
+/* ---------- wiring ---------- */
+function recompute() {
+  S = scoreAll(policy);
+  renderAll();
+  if (ui.openId) openCustomer(ui.openId);
+}
+function renderAll() {
+  renderHeader(); renderKPIs();
+  if (ui.tab === "overview") renderOverview();
+  if (ui.tab === "customers") renderCustomers();
+  if (ui.tab === "collections") renderCollections();
+  if (ui.tab === "limits") renderLimits();
+  if (ui.tab === "policy") { syncPolicyInputs(); renderImpact(); }
+  if (ui.tab === "data") renderData();
+}
+function setTab(tab, fromHash) {
+  ui.tab = tab;
+  document.querySelectorAll(".tab").forEach((t) => t.setAttribute("aria-selected", String(t.dataset.tab === tab)));
+  document.querySelectorAll("[role=tabpanel]").forEach((p) => (p.hidden = p.id !== "panel-" + tab));
+  if (!fromHash) { try { history.replaceState(null, "", "#" + tab); } catch (e) { /* ignore */ } }
+  renderAll();
+}
+document.getElementById("tabs").addEventListener("click", (e) => { const t = e.target.closest(".tab"); if (t) setTab(t.dataset.tab); });
+document.addEventListener("click", (e) => {
+  if (e.target.closest("[data-done]") || e.target.closest(".drawer")) return;
+  const o = e.target.closest("[data-open]"); if (o) { openCustomer(o.getAttribute("data-open")); return; }
+  const gl = e.target.closest("[data-grade-link]"); if (gl) { ui.gradeFilter = gl.getAttribute("data-grade-link"); setTab("customers"); return; }
+  const g = e.target.closest("[data-g]"); if (g) { ui.gradeFilter = g.dataset.g; renderCustomers(); return; }
+  const th = e.target.closest("th[data-sort]"); if (th) { const k = th.dataset.sort; ui.sort = { key: k, dir: ui.sort.key === k ? -ui.sort.dir : COLS.find((c) => c.key === k).n ? -1 : 1 }; renderCustomers(); return; }
+  const tr = e.target.closest("[data-tier]"); if (tr) { ui.tier = ui.tier === tr.dataset.tier ? "all" : tr.dataset.tier; renderCollections(); return; }
+  const la = e.target.closest("[data-act]"); if (la) { ui.limitFilter = la.dataset.act; renderLimits(); return; }
+});
+document.addEventListener("change", (e) => {
+  const d = e.target.closest("[data-done]");
+  if (d) { if (d.checked) done[d.dataset.done] = true; else delete done[d.dataset.done]; saveDone(); renderCollections(); return; }
+  const gs = e.target.closest("[data-grades]");
+  if (gs) { setPath(policy, gs.dataset.grades, GRADES.filter((g) => document.getElementById(`${fid(gs.dataset.grades)}-${g}`).checked)); recompute(); return; }
+  const sel = e.target.closest("select[data-path]");
+  if (sel) { setPath(policy, sel.dataset.path, sel.value); recompute(); }
+});
+document.addEventListener("input", (e) => {
+  const r = e.target.closest("input[type=range][data-path]");
+  if (r) { setPath(policy, r.dataset.path, parseFloat(r.value)); recompute(); }
+});
+document.getElementById("cust-search").addEventListener("input", (e) => { ui.search = e.target.value; renderCustomers(); });
+document.getElementById("coll-clear").addEventListener("click", () => { done = {}; saveDone(); renderCollections(); });
+document.getElementById("pol-reset").addEventListener("click", () => { policy = clone(DEFAULT); recompute(); });
+let rt; window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => { if (ui.tab === "overview") renderRiskMap(); }, 120); });
+
+document.getElementById("foot").textContent =
+  `Scores run 0–100 (higher = lower risk): ${pct(DEFAULT.weights.payment)} payment history, ${pct(DEFAULT.weights.ageing)} ageing, ${pct(DEFAULT.weights.concentration)} concentration and exposure, then policy caps. ` +
+  `Payment history covers ${DEFAULT.lookback_months} months to ${DATA.as_of}. Generated by the scoring-engine CLI; the Policy tab recalculates in your browser and does not change the source data.` +
+  (RUN ? ` Data extracted ${fmtTime(RUN.source.extracted_at)}; run fingerprint ${RUN.fingerprint}. Backtest and data checks use the policy this run was scored with.` : "");
+buildPolicy();
+const initial = (location.hash || "").slice(1);
+if (RUN) document.getElementById("tab-data").hidden = false;
+setTab(["overview", "customers", "collections", "limits", "policy"].concat(RUN ? ["data"] : []).includes(initial) ? initial : "overview", true);
+
+// Hosted next to its data files (e.g. a Databricks Volume or an internal web server), the page
+// lists the run's files and reloads itself when a newer run is published (the fingerprint file
+// changes). Opened as a file or in a sandboxed viewer, the fetch fails and it stays a snapshot.
+(async () => {
+  if (!RUN || !/^https?:$/.test(location.protocol)) return;
+  try {
+    const res = await fetch("data_fingerprint.txt", { cache: "no-store" });
+    if (!res.ok) return;
+    document.getElementById("downloads-block").hidden = false;
+    document.getElementById("downloads").innerHTML = RUN.downloads.map(([f, label]) => `<li><a href="${esc(f)}">${esc(f)}</a><span class="dim">${esc(label)}</span></li>`).join("");
+    document.getElementById("foot").textContent += " This page checks for a newer run every 10 minutes and reloads when one is published.";
+    setInterval(async () => {
+      try {
+        const r = await fetch("data_fingerprint.txt", { cache: "no-store" });
+        if (r.ok && (await r.text()).trim() !== RUN.fingerprint) location.reload();
+      } catch (e) { /* offline: try again next time */ }
+    }, 600000);
+  } catch (e) { /* not hosted with its data files */ }
+})();
+})();
+</script>

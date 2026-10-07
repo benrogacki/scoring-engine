@@ -1,0 +1,51 @@
+{
+  "status": "ok",
+  "source": {
+    "kind": "csv",
+    "label": "Synthetic sample ledger",
+    "extracted_at": "2026-10-04T14:09:21+00:00",
+    "invoice_rows": 1362,
+    "customer_rows": 36,
+    "first_invoice_date": "2025-06-30",
+    "latest_invoice_date": "2026-09-30",
+    "latest_payment_date": "2026-09-30"
+  },
+  "checks": [
+    {
+      "id": "invoices",
+      "label": "Invoices loaded",
+      "status": "ok",
+      "detail": "1,362 invoices for 36 customers."
+    },
+    {
+      "id": "freshness",
+      "label": "Extract is current",
+      "status": "ok",
+      "detail": "Newest invoice 2026-09-30, newest payment 2026-09-30."
+    },
+    {
+      "id": "duplicates",
+      "label": "No duplicate invoices",
+      "status": "ok",
+      "detail": "Every invoice ID is unique."
+    },
+    {
+      "id": "dates",
+      "label": "Due dates after invoice dates",
+      "status": "ok",
+      "detail": "All due dates are on or after the invoice date."
+    },
+    {
+      "id": "master",
+      "label": "Customers in the master file",
+      "status": "ok",
+      "detail": "Every debtor is in the customer master."
+    },
+    {
+      "id": "control_total",
+      "label": "Agrees to AR ageing control total",
+      "status": "info",
+      "detail": "Open balance 1,804,429.62. Pass --control-total with the ERP's AR ageing total to reconcile automatically."
+    }
+  ]
+}

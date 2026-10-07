@@ -101,3 +101,47 @@
 ## Method
 
 Composite score (0-100, higher = lower risk) = 45% payment history + 35% ageing + 20% concentration/exposure, then policy caps (90+ arrears, limit breach). Payment history covers the last 12 months. See `scorecard.csv` for every customer's sub-scores and risk drivers.
+
+## Data health
+
+Source: Synthetic sample ledger · extracted 2026-10-04T14:09:21+00:00 · checks **passed**
+
+| Check | Status | Detail |
+|---|---|---|
+| Invoices loaded | ok | 1,362 invoices for 36 customers. |
+| Extract is current | ok | Newest invoice 2026-09-30, newest payment 2026-09-30. |
+| No duplicate invoices | ok | Every invoice ID is unique. |
+| Due dates after invoice dates | ok | All due dates are on or after the invoice date. |
+| Customers in the master file | ok | Every debtor is in the customer master. |
+| Agrees to AR ageing control total | info | Open balance 1,804,429.62. Pass --control-total with the ERP's AR ageing total to reconcile automatically. |
+
+## Backtest
+
+**evidenced**: Lower grades went bad more often, and the score ranks bad customers below good ones. Reversals: A 4% > B 0%. (AUC 0.94, Gini 0.88; 132 customer-dates, 23 went 60+ days overdue within 90 days; scored at 2026-04-03, 2026-05-03, 2026-06-02, 2026-07-02.)
+
+| Grade | Observed | Went bad | Bad rate |
+|---|---:|---:|---:|
+| A | 70 | 3 | 4% |
+| B | 8 | 0 | 0% |
+| C | 32 | 0 | 0% |
+| D | 6 | 4 | 67% |
+| E | 16 | 16 | 100% |
+
+## Changes since the last run
+
+Changes since the run as at 2026-08-31:
+
+- **Pinnacle Group** (C0023): Downgraded B → C (score 75.7 → 65.5)
+- **Willow Group** (C0025): Downgraded B → C (score 68.4 → 61.0)
+- **Vantage Services** (C0018): Downgraded C → D (score 58.4 → 49.8)
+- **Iris Ltd** (C0030): Now over limit: 108% of 402,000
+- **Summit Partners** (C0010): Now over limit: 107% of 48,000
+- **Harbor Ltd** (C0019): Now over limit: 114% of 19,000
+- **Pinnacle Group** (C0023): Limit recommendation Maintain → Reduce (28,000 → 24,000)
+- **Willow Group** (C0025): Limit recommendation Maintain → Reduce (29,000 → 24,000)
+- **Granite Group** (C0013): Limit recommendation Maintain → Increase (60,000 → 69,000)
+- **Vantage Services** (C0018): Limit recommendation Maintain → Reduce (17,000 → 12,000)
+- **Everest Ltd** (C0020): Limit recommendation Reduce → Maintain (16,000 → 16,000)
+- **Keystone Holdings** (C0034): Upgraded B → A (score 79.4 → 85.8)
+- **Tidewater Holdings** (C0021): Back within credit limit
+- **Glacier Ltd** (C0008): Back within credit limit

@@ -1,0 +1,773 @@
+{
+  "_comment": "Freight nowcaster catalog. Codes marked _verify were set from publishers' documentation; `freight-nowcast probe` prints what each source returns (and GENESIS table codes) so they can be confirmed. Entries with \"enabled\": false are alternative sources kept on file.",
+  "cache_dir": "data/freight/live",
+  "zscore": {
+    "window": 60,
+    "min_periods": 24,
+    "clip": 4.0
+  },
+  "composite": {
+    "min_coverage": 0.5,
+    "phase_horizon": 3
+  },
+  "turning_points": {
+    "window": 5,
+    "min_phase": 5,
+    "min_cycle": 15,
+    "min_amplitude": 0.5,
+    "lookback": 12,
+    "threshold": 0.5,
+    "confirm_months": 2
+  },
+  "geographies": {
+    "DE": {
+      "label": "Germany",
+      "weight": 0.2
+    },
+    "EA": {
+      "label": "Eurozone",
+      "weight": 0.25
+    },
+    "US": {
+      "label": "United States",
+      "weight": 0.3
+    },
+    "GCC": {
+      "label": "Arabia (GCC)",
+      "weight": 0.1
+    },
+    "WORLD": {
+      "label": "World sea trade",
+      "weight": 0.15
+    }
+  },
+  "series": [
+    {
+      "id": "de_toll_mileage",
+      "label": "Truck toll mileage index (sa)",
+      "role": "indicator",
+      "mode": "road",
+      "geography": "DE",
+      "frequency": "M",
+      "transform": "3m3m",
+      "weight": 1.0,
+      "publication_lag_days": 9,
+      "source": "genesis",
+      "params": {
+        "table": "42191-0001",
+        "filters": {
+          "WERTE4": "X13JDKSB"
+        },
+        "startyear": 2008
+      },
+      "_verify": "filter code for the calendar- and seasonally-adjusted line",
+      "fallback": {
+        "source": "destatis_daily",
+        "frequency": "D",
+        "params": {}
+      },
+      "_note": "GENESIS needs DESTATIS_TOKEN; without it the monthly index is the monthly mean of the Destatis daily index (same source, published from 2008)."
+    },
+    {
+      "id": "de_toll_mileage_daily",
+      "label": "Truck toll mileage index, working-daily",
+      "role": "indicator",
+      "mode": "road",
+      "geography": "DE",
+      "frequency": "D",
+      "extends": "de_toll_mileage",
+      "optional": true,
+      "min_month_coverage": 0.25,
+      "source": "destatis_daily",
+      "params": {},
+      "how_to_get": "Fetched automatically from the Destatis daily toll index xlsx (experimental statistics)."
+    },
+    {
+      "id": "de_port_calls",
+      "label": "Port calls, Germany (IMF PortWatch, AIS)",
+      "role": "indicator",
+      "mode": "sea",
+      "geography": "DE",
+      "frequency": "D",
+      "transform": "yoy",
+      "weight": 0.5,
+      "optional": true,
+      "publication_lag_days": 10,
+      "source": "portwatch",
+      "params": {
+        "countries": [
+          "DEU"
+        ],
+        "start_year": 2019
+      }
+    },
+    {
+      "id": "oecd_de_port_calls",
+      "label": "Port calls, Germany (OECD AIS)",
+      "role": "indicator",
+      "mode": "sea",
+      "geography": "DE",
+      "frequency": "M",
+      "transform": "yoy",
+      "weight": 0.5,
+      "optional": true,
+      "publication_lag_days": 7,
+      "source": "csv",
+      "params": {
+        "path": "data/freight/raw/oecd_ais_port_calls_DEU.csv"
+      },
+      "how_to_get": "OECD 'Monitoring maritime trade: the OECD AIS vessel tracking dashboard' -> country DEU -> port calls -> download CSV.",
+      "enabled": false,
+      "_note": "OECD AIS dashboard export; enable this and disable de_port_calls to use the OECD series instead of IMF PortWatch"
+    },
+    {
+      "id": "ea_port_calls",
+      "label": "Port calls, Eurozone ports (IMF PortWatch, AIS)",
+      "role": "indicator",
+      "mode": "sea",
+      "geography": "EA",
+      "frequency": "D",
+      "transform": "yoy",
+      "weight": 1.0,
+      "optional": true,
+      "publication_lag_days": 10,
+      "source": "portwatch",
+      "params": {
+        "countries": [
+          "AUT",
+          "BEL",
+          "HRV",
+          "CYP",
+          "EST",
+          "FIN",
+          "FRA",
+          "DEU",
+          "GRC",
+          "IRL",
+          "ITA",
+          "LVA",
+          "LTU",
+          "LUX",
+          "MLT",
+          "NLD",
+          "PRT",
+          "SVK",
+          "SVN",
+          "ESP"
+        ],
+        "start_year": 2019
+      }
+    },
+    {
+      "id": "oecd_ea_port_calls",
+      "label": "Port calls, euro-area ports (OECD AIS)",
+      "role": "indicator",
+      "mode": "sea",
+      "geography": "EA",
+      "frequency": "M",
+      "transform": "yoy",
+      "weight": 1.0,
+      "optional": true,
+      "publication_lag_days": 7,
+      "source": "csv",
+      "params": {
+        "path": "data/freight/raw/oecd_ais_port_calls_EA.csv"
+      },
+      "how_to_get": "OECD AIS dashboard export summed over euro-area countries (or the EU aggregate if offered).",
+      "enabled": false,
+      "_note": "OECD AIS dashboard export; enable this and disable ea_port_calls to use the OECD series instead of IMF PortWatch"
+    },
+    {
+      "id": "world_port_calls",
+      "label": "Port calls, world (IMF PortWatch, AIS)",
+      "role": "indicator",
+      "mode": "sea",
+      "geography": "WORLD",
+      "frequency": "D",
+      "transform": "yoy",
+      "weight": 1.0,
+      "optional": true,
+      "publication_lag_days": 10,
+      "source": "portwatch",
+      "params": {
+        "start_year": 2019
+      },
+      "kind": "global_volume"
+    },
+    {
+      "id": "oecd_world_port_calls",
+      "label": "Port calls, world (OECD AIS)",
+      "role": "indicator",
+      "mode": "sea",
+      "geography": "WORLD",
+      "frequency": "M",
+      "transform": "yoy",
+      "weight": 1.0,
+      "optional": true,
+      "publication_lag_days": 7,
+      "source": "csv",
+      "params": {
+        "path": "data/freight/raw/oecd_ais_port_calls_WLD.csv"
+      },
+      "how_to_get": "OECD AIS dashboard, world aggregate -> download CSV.",
+      "enabled": false,
+      "_note": "OECD AIS dashboard export; enable this and disable world_port_calls to use the OECD series instead of IMF PortWatch"
+    },
+    {
+      "id": "dry_bulk_freight",
+      "label": "Dry-bulk freight (Breakwave BDRY, BDI futures)",
+      "role": "indicator",
+      "mode": "sea",
+      "geography": "WORLD",
+      "frequency": "D",
+      "transform": "yoy",
+      "weight": 0.5,
+      "optional": true,
+      "publication_lag_days": 1,
+      "source": "yahoo_chart",
+      "params": {
+        "symbol": "BDRY"
+      },
+      "fallback": [
+        {
+          "source": "csv_url",
+          "frequency": "D",
+          "params": {
+            "url": "https://stooq.com/q/d/l/?s=bdry.us&i=d",
+            "value_col": "Close"
+          }
+        },
+        {
+          "source": "fred",
+          "frequency": "M",
+          "params": {
+            "fred_id": "PCU483111483111"
+          }
+        }
+      ],
+      "_note": "Free stand-in for the licensed Baltic Dry: the BDRY ETF holds the dry-bulk freight futures (Capesize/Panamax/Supramax) that settle on Baltic indices. Fallbacks: Stooq CSV, then the US deep-sea freight PPI (FRED).",
+      "kind": "freight_rate"
+    },
+    {
+      "id": "world_dry_bulk_calls",
+      "label": "Dry-bulk port calls, major bulk traders (IMF PortWatch)",
+      "role": "indicator",
+      "mode": "sea",
+      "geography": "WORLD",
+      "frequency": "D",
+      "transform": "yoy",
+      "weight": 0.5,
+      "optional": true,
+      "publication_lag_days": 10,
+      "source": "portwatch",
+      "params": {
+        "field": "portcalls_dry_bulk",
+        "start_year": 2019,
+        "countries": [
+          "AUS",
+          "BRA",
+          "CHN",
+          "IDN",
+          "ZAF",
+          "CAN",
+          "USA",
+          "IND",
+          "JPN",
+          "KOR",
+          "RUS",
+          "UKR"
+        ],
+        "variant": "sum_only",
+        "chunk": "year"
+      },
+      "_note": "Off by default: the PortWatch server rejects sums of portcalls_dry_bulk (world, country-group, yearly and monthly all tested 2026-10-01) while plain portcalls works. Re-enable to retry; BDRY covers dry bulk meanwhile.",
+      "enabled": false
+    },
+    {
+      "id": "baltic_dry",
+      "label": "Baltic Dry Index",
+      "role": "indicator",
+      "mode": "sea",
+      "geography": "WORLD",
+      "frequency": "D",
+      "transform": "yoy",
+      "weight": 0.5,
+      "optional": true,
+      "publication_lag_days": 1,
+      "source": "csv",
+      "params": {
+        "path": "data/freight/raw/baltic_dry.csv"
+      },
+      "how_to_get": "Baltic Exchange (licensed) or a market-data export with Date and Close/Price columns. For US-style dates add \"date_format\": \"%m/%d/%Y\".",
+      "enabled": false,
+      "_note": "Licensed Baltic Exchange BDI export; enable instead of dry_bulk_freight if you have it."
+    },
+    {
+      "id": "de_ais_stationary",
+      "label": "Vessels in port, Hamburg/Bremerhaven (aisstream.io)",
+      "role": "indicator",
+      "mode": "sea",
+      "geography": "DE",
+      "frequency": "D",
+      "transform": "yoy",
+      "weight": 0.25,
+      "optional": true,
+      "source": "csv",
+      "params": {
+        "path": "data/freight/ais_port_counts.csv",
+        "value_col": "stationary",
+        "filters": {
+          "port": "Hamburg"
+        }
+      },
+      "how_to_get": "Written by `freight-nowcast ais-listen` (needs AISSTREAM_API_KEY; cron it daily). Enters the composite once it has 3 years of history."
+    },
+    {
+      "id": "us_freight_tsi",
+      "label": "Freight Transportation Services Index (BTS)",
+      "role": "indicator",
+      "mode": "road/rail",
+      "geography": "US",
+      "frequency": "M",
+      "transform": "3m3m",
+      "weight": 1.0,
+      "publication_lag_days": 45,
+      "source": "fred",
+      "params": {
+        "fred_id": "TSIFRGHT"
+      }
+    },
+    {
+      "id": "us_cass_shipments",
+      "label": "Cass Freight Index, shipments",
+      "role": "indicator",
+      "mode": "road",
+      "geography": "US",
+      "frequency": "M",
+      "transform": "yoy",
+      "weight": 0.75,
+      "optional": true,
+      "publication_lag_days": 15,
+      "source": "fred",
+      "params": {
+        "fred_id": "FRGSHPUSM649NCIS"
+      }
+    },
+    {
+      "id": "us_rail_carloads",
+      "label": "Rail freight carloads",
+      "role": "indicator",
+      "mode": "rail",
+      "geography": "US",
+      "frequency": "M",
+      "transform": "3m3m",
+      "weight": 0.5,
+      "optional": true,
+      "publication_lag_days": 40,
+      "source": "fred",
+      "params": {
+        "fred_id": "RAILFRTCARLOADSD11"
+      }
+    },
+    {
+      "id": "us_port_calls",
+      "label": "Port calls, United States (IMF PortWatch, AIS)",
+      "role": "indicator",
+      "mode": "sea",
+      "geography": "US",
+      "frequency": "D",
+      "transform": "yoy",
+      "weight": 1.0,
+      "optional": true,
+      "publication_lag_days": 10,
+      "source": "portwatch",
+      "params": {
+        "countries": [
+          "USA"
+        ],
+        "start_year": 2019
+      }
+    },
+    {
+      "id": "gcc_port_calls",
+      "label": "Port calls, Gulf states (IMF PortWatch, AIS)",
+      "role": "indicator",
+      "mode": "sea",
+      "geography": "GCC",
+      "frequency": "D",
+      "transform": "yoy",
+      "weight": 1.0,
+      "optional": true,
+      "publication_lag_days": 10,
+      "source": "portwatch",
+      "params": {
+        "countries": [
+          "SAU",
+          "ARE",
+          "QAT",
+          "KWT",
+          "OMN",
+          "BHR"
+        ],
+        "start_year": 2019
+      },
+      "_note": "Saudi Arabia, UAE, Qatar, Kuwait, Oman, Bahrain."
+    },
+    {
+      "id": "hormuz_transits",
+      "label": "Strait of Hormuz transits (IMF PortWatch)",
+      "role": "indicator",
+      "mode": "sea",
+      "geography": "GCC",
+      "frequency": "D",
+      "transform": "yoy",
+      "weight": 0.75,
+      "optional": true,
+      "publication_lag_days": 10,
+      "source": "portwatch",
+      "params": {
+        "layer": "chokepoints",
+        "names": [
+          "Strait of Hormuz"
+        ],
+        "field": "n_total",
+        "start_year": 2019
+      },
+      "kind": "chokepoint",
+      "chokepoint_energy": true,
+      "chokepoint_note": "normally carries about a fifth of the world's oil and much of its LNG"
+    },
+    {
+      "id": "bab_el_mandeb_transits",
+      "label": "Bab el-Mandeb transits (IMF PortWatch)",
+      "role": "indicator",
+      "mode": "sea",
+      "geography": "GCC",
+      "frequency": "D",
+      "transform": "yoy",
+      "weight": 0.5,
+      "optional": true,
+      "publication_lag_days": 10,
+      "source": "portwatch",
+      "params": {
+        "layer": "chokepoints",
+        "names": [
+          "Bab el-Mandeb Strait"
+        ],
+        "field": "n_total",
+        "start_year": 2019
+      },
+      "kind": "chokepoint",
+      "chokepoint_note": "is the southern gate to the Red Sea and the Suez Canal, the shortest Asia–Europe sea route"
+    },
+    {
+      "id": "de_manufacturing_production",
+      "label": "Manufacturing production, Germany (sca)",
+      "role": "target",
+      "geography": "DE",
+      "frequency": "M",
+      "publication_lag_days": 38,
+      "source": "sdmx",
+      "params": {
+        "agency": "eurostat",
+        "flow": "sts_inpr_m",
+        "key": "M.PRD.C.SCA.I21.DE",
+        "start": "2008-01"
+      },
+      "_verify": "Eurostat STS codes (indic_bt PRD, unit I21); GENESIS 42153-0001 is the national alternative"
+    },
+    {
+      "id": "ea_manufacturing_production",
+      "label": "Manufacturing production, euro area (sca)",
+      "role": "target",
+      "geography": "EA",
+      "frequency": "M",
+      "publication_lag_days": 45,
+      "source": "sdmx",
+      "params": {
+        "agency": "eurostat",
+        "flow": "sts_inpr_m",
+        "key": "M.PRD.C.SCA.I21.EA20",
+        "start": "2008-01"
+      },
+      "_verify": "as above"
+    },
+    {
+      "id": "de_exports",
+      "label": "Exports, Germany (foreign trade statistics)",
+      "role": "target",
+      "geography": "DE",
+      "frequency": "M",
+      "publication_lag_days": 38,
+      "source": "genesis",
+      "params": {
+        "table": "51000-0002",
+        "value_variable": "WERTAUS",
+        "startyear": 2008
+      },
+      "fallback": [
+        {
+          "source": "eurostat_jsonstat",
+          "frequency": "M",
+          "params": {
+            "flow": "ei_eteu27_2020_m",
+            "dims": {
+              "geo": "DE",
+              "stk_flow": "EXP",
+              "partner": "WORLD",
+              "indic": "ET-T",
+              "unit": "IVOL-SA"
+            }
+          }
+        },
+        {
+          "source": "eurostat_jsonstat",
+          "frequency": "M",
+          "params": {
+            "flow": "ei_eteu27_2020_m",
+            "dims": {
+              "geo": "DE",
+              "stk_flow": "EXP",
+              "partner": "WORLD",
+              "indic": "ET-T",
+              "unit": "MIO-EUR-SA"
+            }
+          }
+        }
+      ],
+      "optional": true
+    },
+    {
+      "id": "world_trade_volume",
+      "label": "World trade volume (CPB World Trade Monitor)",
+      "role": "target",
+      "geography": "WORLD",
+      "frequency": "M",
+      "publication_lag_days": 55,
+      "optional": true,
+      "source": "cpb",
+      "params": {},
+      "fallback": [
+        {
+          "source": "eurostat_jsonstat",
+          "frequency": "M",
+          "params": {
+            "flow": "ei_eteu27_2020_m",
+            "dims": {
+              "geo": "EU27_2020",
+              "stk_flow": "EXP",
+              "partner": "EXT_EU27_2020",
+              "indic": "ET-T",
+              "unit": "IVOL-SA"
+            }
+          }
+        }
+      ],
+      "_note": "CPB publishes the monitor as a free xlsx; the connector follows the newest link. Fallback: Eurostat extra-EU export volume (sa)."
+    },
+    {
+      "id": "us_manufacturing_production",
+      "label": "Manufacturing production, United States",
+      "role": "target",
+      "geography": "US",
+      "frequency": "M",
+      "publication_lag_days": 16,
+      "source": "fred",
+      "params": {
+        "fred_id": "IPMAN"
+      }
+    },
+    {
+      "id": "us_goods_imports",
+      "label": "Goods imports, United States (BOP basis)",
+      "role": "target",
+      "geography": "US",
+      "frequency": "M",
+      "optional": true,
+      "publication_lag_days": 35,
+      "source": "fred",
+      "params": {
+        "fred_id": "BOPGIMP"
+      }
+    },
+    {
+      "id": "ea_exports",
+      "label": "Extra-EU export volume, sa (Eurozone proxy)",
+      "role": "target",
+      "geography": "EA",
+      "frequency": "M",
+      "optional": true,
+      "publication_lag_days": 45,
+      "source": "eurostat_jsonstat",
+      "params": {
+        "flow": "ei_eteu27_2020_m",
+        "dims": {
+          "geo": "EU27_2020",
+          "stk_flow": "EXP",
+          "partner": "EXT_EU27_2020",
+          "indic": "ET-T",
+          "unit": "IVOL-SA"
+        }
+      },
+      "_note": "Eurostat's monthly trade dataset has no euro-area aggregate; EU-27 extra-EU exports (mostly euro-area exporters) stand in."
+    },
+    {
+      "id": "gcc_exports",
+      "label": "Merchandise exports, Saudi Arabia (IMF IMTS)",
+      "role": "target",
+      "geography": "GCC",
+      "frequency": "M",
+      "optional": true,
+      "publication_lag_days": 60,
+      "source": "sdmx",
+      "params": {
+        "agency": "imf",
+        "flow": "IMF.STA,IMTS",
+        "key": "SAU.XG_FOB_USD.G001.M",
+        "start": "2015-01"
+      },
+      "fallback": [
+        {
+          "source": "sdmx",
+          "frequency": "M",
+          "params": {
+            "agency": "imf",
+            "flow": "IMF.STA,IMTS",
+            "key": "SAU..G001.M",
+            "start": "2024-01"
+          }
+        }
+      ]
+    }
+  ],
+  "validation": [
+    {
+      "indicator": "de_toll_mileage",
+      "target": "de_manufacturing_production",
+      "transform": "mom",
+      "max_lag": 3
+    },
+    {
+      "indicator": "de_port_calls",
+      "target": "de_exports",
+      "transform": "yoy",
+      "max_lag": 3
+    },
+    {
+      "indicator": "ea_port_calls",
+      "target": "ea_manufacturing_production",
+      "transform": "yoy",
+      "max_lag": 3
+    },
+    {
+      "indicator": "world_port_calls",
+      "target": "world_trade_volume",
+      "transform": "yoy",
+      "max_lag": 3
+    },
+    {
+      "indicator": "dry_bulk_freight",
+      "target": "world_trade_volume",
+      "transform": "yoy",
+      "max_lag": 6
+    },
+    {
+      "indicator": "world_dry_bulk_calls",
+      "target": "world_trade_volume",
+      "transform": "yoy",
+      "max_lag": 3
+    },
+    {
+      "indicator": "us_freight_tsi",
+      "target": "us_manufacturing_production",
+      "transform": "mom",
+      "max_lag": 3
+    },
+    {
+      "indicator": "us_cass_shipments",
+      "target": "us_manufacturing_production",
+      "transform": "yoy",
+      "max_lag": 3
+    },
+    {
+      "indicator": "us_rail_carloads",
+      "target": "us_manufacturing_production",
+      "transform": "mom",
+      "max_lag": 3
+    },
+    {
+      "indicator": "us_port_calls",
+      "target": "us_goods_imports",
+      "transform": "yoy",
+      "max_lag": 3
+    },
+    {
+      "indicator": "ea_port_calls",
+      "target": "ea_exports",
+      "transform": "yoy",
+      "max_lag": 3
+    },
+    {
+      "indicator": "gcc_port_calls",
+      "target": "gcc_exports",
+      "transform": "yoy",
+      "max_lag": 3
+    },
+    {
+      "indicator": "hormuz_transits",
+      "target": "gcc_exports",
+      "transform": "yoy",
+      "max_lag": 3
+    },
+    {
+      "indicator": "bab_el_mandeb_transits",
+      "target": "world_trade_volume",
+      "transform": "yoy",
+      "max_lag": 3
+    }
+  ],
+  "ais": {
+    "ports": {
+      "Hamburg": [
+        [
+          53.5,
+          9.8
+        ],
+        [
+          53.56,
+          10.05
+        ]
+      ],
+      "Bremerhaven": [
+        [
+          53.52,
+          8.5
+        ],
+        [
+          53.62,
+          8.6
+        ]
+      ],
+      "Rotterdam": [
+        [
+          51.88,
+          3.95
+        ],
+        [
+          51.99,
+          4.55
+        ]
+      ],
+      "Antwerp": [
+        [
+          51.22,
+          4.2
+        ],
+        [
+          51.4,
+          4.42
+        ]
+      ]
+    }
+  }
+}

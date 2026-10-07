@@ -1,0 +1,44 @@
+{
+  "points": [
+    "2026-04-03",
+    "2026-05-03",
+    "2026-06-02",
+    "2026-07-02"
+  ],
+  "horizon_days": 90,
+  "bad_days_past_due": 60,
+  "observations": 132,
+  "bads": 23,
+  "by_grade": {
+    "A": {
+      "observations": 70,
+      "bads": 3,
+      "bad_rate": 0.0429
+    },
+    "B": {
+      "observations": 8,
+      "bads": 0,
+      "bad_rate": 0.0
+    },
+    "C": {
+      "observations": 32,
+      "bads": 0,
+      "bad_rate": 0.0
+    },
+    "D": {
+      "observations": 6,
+      "bads": 4,
+      "bad_rate": 0.6667
+    },
+    "E": {
+      "observations": 16,
+      "bads": 16,
+      "bad_rate": 1.0
+    }
+  },
+  "auc": 0.938,
+  "gini": 0.875,
+  "monotonic": true,
+  "verdict": "evidenced",
+  "note": "Lower grades went bad more often, and the score ranks bad customers below good ones. Reversals: A 4% > B 0%."
+}

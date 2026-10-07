@@ -1,0 +1,1171 @@
+{
+  "schema": "scoring_engine/credit_feed@1",
+  "as_of": "2026-09-30",
+  "generated_at": "2026-10-04T14:09:21+00:00",
+  "fingerprint": "730f41a55aa1cba4",
+  "source": {
+    "kind": "csv",
+    "label": "Synthetic sample ledger",
+    "extracted_at": "2026-10-04T14:09:21+00:00",
+    "invoice_rows": 1362,
+    "customer_rows": 36,
+    "first_invoice_date": "2025-06-30",
+    "latest_invoice_date": "2026-09-30",
+    "latest_payment_date": "2026-09-30"
+  },
+  "data_health": "ok",
+  "backtest": {
+    "verdict": "evidenced",
+    "auc": 0.938,
+    "gini": 0.875,
+    "monotonic": true,
+    "observations": 132,
+    "bads": 23
+  },
+  "portfolio": {
+    "customers": 36,
+    "total_outstanding": 1804429.62,
+    "total_overdue": 464448.49,
+    "ar_weighted_score": 67.2,
+    "grades": {
+      "A": 15,
+      "B": 4,
+      "C": 11,
+      "D": 1,
+      "E": 5
+    },
+    "collection_tiers": {
+      "P1": 5,
+      "P2": 2,
+      "P3": 3,
+      "P4": 9
+    },
+    "credit_holds": 5
+  },
+  "changes": [
+    {
+      "kind": "downgrade",
+      "customer_id": "C0023",
+      "customer_name": "Pinnacle Group",
+      "grade": "C",
+      "outstanding": 56426.79,
+      "detail": "Downgraded B \u2192 C (score 75.7 \u2192 65.5)"
+    },
+    {
+      "kind": "downgrade",
+      "customer_id": "C0025",
+      "customer_name": "Willow Group",
+      "grade": "C",
+      "outstanding": 50883.24,
+      "detail": "Downgraded B \u2192 C (score 68.4 \u2192 61.0)"
+    },
+    {
+      "kind": "downgrade",
+      "customer_id": "C0018",
+      "customer_name": "Vantage Services",
+      "grade": "D",
+      "outstanding": 29692.93,
+      "detail": "Downgraded C \u2192 D (score 58.4 \u2192 49.8)"
+    },
+    {
+      "kind": "over_limit",
+      "customer_id": "C0030",
+      "customer_name": "Iris Ltd",
+      "grade": "B",
+      "outstanding": 432569.02,
+      "detail": "Now over limit: 108% of 402,000"
+    },
+    {
+      "kind": "over_limit",
+      "customer_id": "C0010",
+      "customer_name": "Summit Partners",
+      "grade": "A",
+      "outstanding": 51432.51,
+      "detail": "Now over limit: 107% of 48,000"
+    },
+    {
+      "kind": "over_limit",
+      "customer_id": "C0019",
+      "customer_name": "Harbor Ltd",
+      "grade": "C",
+      "outstanding": 21747.64,
+      "detail": "Now over limit: 114% of 19,000"
+    },
+    {
+      "kind": "limit_action",
+      "customer_id": "C0023",
+      "customer_name": "Pinnacle Group",
+      "grade": "C",
+      "outstanding": 56426.79,
+      "detail": "Limit recommendation Maintain \u2192 Reduce (28,000 \u2192 24,000)"
+    },
+    {
+      "kind": "limit_action",
+      "customer_id": "C0025",
+      "customer_name": "Willow Group",
+      "grade": "C",
+      "outstanding": 50883.24,
+      "detail": "Limit recommendation Maintain \u2192 Reduce (29,000 \u2192 24,000)"
+    },
+    {
+      "kind": "limit_action",
+      "customer_id": "C0013",
+      "customer_name": "Granite Group",
+      "grade": "A",
+      "outstanding": 34522.07,
+      "detail": "Limit recommendation Maintain \u2192 Increase (60,000 \u2192 69,000)"
+    },
+    {
+      "kind": "limit_action",
+      "customer_id": "C0018",
+      "customer_name": "Vantage Services",
+      "grade": "D",
+      "outstanding": 29692.93,
+      "detail": "Limit recommendation Maintain \u2192 Reduce (17,000 \u2192 12,000)"
+    },
+    {
+      "kind": "limit_action",
+      "customer_id": "C0020",
+      "customer_name": "Everest Ltd",
+      "grade": "C",
+      "outstanding": 25236.88,
+      "detail": "Limit recommendation Reduce \u2192 Maintain (16,000 \u2192 16,000)"
+    },
+    {
+      "kind": "upgrade",
+      "customer_id": "C0034",
+      "customer_name": "Keystone Holdings",
+      "grade": "A",
+      "outstanding": 4486.51,
+      "detail": "Upgraded B \u2192 A (score 79.4 \u2192 85.8)"
+    },
+    {
+      "kind": "back_within_limit",
+      "customer_id": "C0021",
+      "customer_name": "Tidewater Holdings",
+      "grade": "C",
+      "outstanding": 15577.84,
+      "detail": "Back within credit limit"
+    },
+    {
+      "kind": "back_within_limit",
+      "customer_id": "C0008",
+      "customer_name": "Glacier Ltd",
+      "grade": "A",
+      "outstanding": 10736.04,
+      "detail": "Back within credit limit"
+    }
+  ],
+  "customers": [
+    {
+      "customer_id": "C0001",
+      "customer_name": "Umber Trading",
+      "grade": "A",
+      "score": 98.7,
+      "sub_scores": {
+        "payment": 98.6,
+        "ageing": 100.0,
+        "concentration": 96.7
+      },
+      "outstanding": 17678.77,
+      "overdue": 0.0,
+      "oldest_days_overdue": 0,
+      "credit_limit": 43000.0,
+      "recommended_limit": 64000,
+      "limit_action": "Increase",
+      "over_limit": false,
+      "credit_hold": false,
+      "collection": {
+        "tier": null,
+        "rank": null,
+        "action": null
+      },
+      "risk_drivers": []
+    },
+    {
+      "customer_id": "C0002",
+      "customer_name": "Juniper Services",
+      "grade": "A",
+      "score": 98.4,
+      "sub_scores": {
+        "payment": 98.6,
+        "ageing": 100.0,
+        "concentration": 94.9
+      },
+      "outstanding": 27404.39,
+      "overdue": 0.0,
+      "oldest_days_overdue": 0,
+      "credit_limit": 43000.0,
+      "recommended_limit": 63000,
+      "limit_action": "Increase",
+      "over_limit": false,
+      "credit_hold": false,
+      "collection": {
+        "tier": null,
+        "rank": null,
+        "action": null
+      },
+      "risk_drivers": []
+    },
+    {
+      "customer_id": "C0003",
+      "customer_name": "Zephyr Partners",
+      "grade": "A",
+      "score": 95.5,
+      "sub_scores": {
+        "payment": 99.1,
+        "ageing": 100.0,
+        "concentration": 79.8
+      },
+      "outstanding": 43586.47,
+      "overdue": 0.0,
+      "oldest_days_overdue": 0,
+      "credit_limit": 50000.0,
+      "recommended_limit": 67000,
+      "limit_action": "Increase",
+      "over_limit": false,
+      "credit_hold": false,
+      "collection": {
+        "tier": null,
+        "rank": null,
+        "action": null
+      },
+      "risk_drivers": []
+    },
+    {
+      "customer_id": "C0004",
+      "customer_name": "Delta Group",
+      "grade": "A",
+      "score": 97.5,
+      "sub_scores": {
+        "payment": 98.2,
+        "ageing": 100.0,
+        "concentration": 91.4
+      },
+      "outstanding": 42408.18,
+      "overdue": 0.0,
+      "oldest_days_overdue": 0,
+      "credit_limit": 56000.0,
+      "recommended_limit": 75000,
+      "limit_action": "Increase",
+      "over_limit": false,
+      "credit_hold": false,
+      "collection": {
+        "tier": null,
+        "rank": null,
+        "action": null
+      },
+      "risk_drivers": [
+        "Pays on average 1 days late"
+      ]
+    },
+    {
+      "customer_id": "C0005",
+      "customer_name": "Ember Services",
+      "grade": "A",
+      "score": 96.1,
+      "sub_scores": {
+        "payment": 99.1,
+        "ageing": 100.0,
+        "concentration": 82.7
+      },
+      "outstanding": 37552.71,
+      "overdue": 0.0,
+      "oldest_days_overdue": 0,
+      "credit_limit": 44000.0,
+      "recommended_limit": 66000,
+      "limit_action": "Increase",
+      "over_limit": false,
+      "credit_hold": false,
+      "collection": {
+        "tier": null,
+        "rank": null,
+        "action": null
+      },
+      "risk_drivers": []
+    },
+    {
+      "customer_id": "C0006",
+      "customer_name": "Atlas Trading",
+      "grade": "A",
+      "score": 99.2,
+      "sub_scores": {
+        "payment": 99.1,
+        "ageing": 100.0,
+        "concentration": 98.0
+      },
+      "outstanding": 10583.0,
+      "overdue": 0.0,
+      "oldest_days_overdue": 0,
+      "credit_limit": 56000.0,
+      "recommended_limit": 56000.0,
+      "limit_action": "Maintain",
+      "over_limit": false,
+      "credit_hold": false,
+      "collection": {
+        "tier": null,
+        "rank": null,
+        "action": null
+      },
+      "risk_drivers": []
+    },
+    {
+      "customer_id": "C0007",
+      "customer_name": "Redwood Services",
+      "grade": "A",
+      "score": 99.4,
+      "sub_scores": {
+        "payment": 99.6,
+        "ageing": 100.0,
+        "concentration": 98.2
+      },
+      "outstanding": 9675.14,
+      "overdue": 0.0,
+      "oldest_days_overdue": 0,
+      "credit_limit": 31000.0,
+      "recommended_limit": 41000,
+      "limit_action": "Increase",
+      "over_limit": false,
+      "credit_hold": false,
+      "collection": {
+        "tier": null,
+        "rank": null,
+        "action": null
+      },
+      "risk_drivers": []
+    },
+    {
+      "customer_id": "C0008",
+      "customer_name": "Glacier Ltd",
+      "grade": "A",
+      "score": 99.3,
+      "sub_scores": {
+        "payment": 99.3,
+        "ageing": 100.0,
+        "concentration": 98.0
+      },
+      "outstanding": 10736.04,
+      "overdue": 0.0,
+      "oldest_days_overdue": 0,
+      "credit_limit": 32000.0,
+      "recommended_limit": 48000,
+      "limit_action": "Increase",
+      "over_limit": false,
+      "credit_hold": false,
+      "collection": {
+        "tier": null,
+        "rank": null,
+        "action": null
+      },
+      "risk_drivers": []
+    },
+    {
+      "customer_id": "C0009",
+      "customer_name": "Lumen Services",
+      "grade": "A",
+      "score": 99.6,
+      "sub_scores": {
+        "payment": 99.1,
+        "ageing": 100.0,
+        "concentration": 100.0
+      },
+      "outstanding": 0.0,
+      "overdue": 0.0,
+      "oldest_days_overdue": 0,
+      "credit_limit": 38000.0,
+      "recommended_limit": 56000,
+      "limit_action": "Increase",
+      "over_limit": false,
+      "credit_hold": false,
+      "collection": {
+        "tier": null,
+        "rank": null,
+        "action": null
+      },
+      "risk_drivers": []
+    },
+    {
+      "customer_id": "C0010",
+      "customer_name": "Summit Partners",
+      "grade": "A",
+      "score": 91.3,
+      "sub_scores": {
+        "payment": 99.2,
+        "ageing": 100.0,
+        "concentration": 58.3
+      },
+      "outstanding": 51432.51,
+      "overdue": 0.0,
+      "oldest_days_overdue": 0,
+      "credit_limit": 48000.0,
+      "recommended_limit": 72000,
+      "limit_action": "Increase",
+      "over_limit": true,
+      "credit_hold": false,
+      "collection": {
+        "tier": null,
+        "rank": null,
+        "action": null
+      },
+      "risk_drivers": [
+        "Over credit limit (107% utilised)"
+      ]
+    },
+    {
+      "customer_id": "C0011",
+      "customer_name": "Birch Partners",
+      "grade": "A",
+      "score": 98.8,
+      "sub_scores": {
+        "payment": 99.1,
+        "ageing": 100.0,
+        "concentration": 96.0
+      },
+      "outstanding": 21822.61,
+      "overdue": 0.0,
+      "oldest_days_overdue": 0,
+      "credit_limit": 35000.0,
+      "recommended_limit": 45000,
+      "limit_action": "Increase",
+      "over_limit": false,
+      "credit_hold": false,
+      "collection": {
+        "tier": null,
+        "rank": null,
+        "action": null
+      },
+      "risk_drivers": []
+    },
+    {
+      "customer_id": "C0012",
+      "customer_name": "Quarry Group",
+      "grade": "A",
+      "score": 98.3,
+      "sub_scores": {
+        "payment": 98.8,
+        "ageing": 100.0,
+        "concentration": 94.2
+      },
+      "outstanding": 31250.19,
+      "overdue": 0.0,
+      "oldest_days_overdue": 0,
+      "credit_limit": 65000.0,
+      "recommended_limit": 93000,
+      "limit_action": "Increase",
+      "over_limit": false,
+      "credit_hold": false,
+      "collection": {
+        "tier": null,
+        "rank": null,
+        "action": null
+      },
+      "risk_drivers": []
+    },
+    {
+      "customer_id": "C0013",
+      "customer_name": "Granite Group",
+      "grade": "A",
+      "score": 98.4,
+      "sub_scores": {
+        "payment": 99.3,
+        "ageing": 100.0,
+        "concentration": 93.6
+      },
+      "outstanding": 34522.07,
+      "overdue": 0.0,
+      "oldest_days_overdue": 0,
+      "credit_limit": 60000.0,
+      "recommended_limit": 69000,
+      "limit_action": "Increase",
+      "over_limit": false,
+      "credit_hold": false,
+      "collection": {
+        "tier": null,
+        "rank": null,
+        "action": null
+      },
+      "risk_drivers": []
+    },
+    {
+      "customer_id": "C0014",
+      "customer_name": "Horizon Group",
+      "grade": "A",
+      "score": 98.7,
+      "sub_scores": {
+        "payment": 99.2,
+        "ageing": 100.0,
+        "concentration": 95.3
+      },
+      "outstanding": 25258.17,
+      "overdue": 0.0,
+      "oldest_days_overdue": 0,
+      "credit_limit": 57000.0,
+      "recommended_limit": 67000,
+      "limit_action": "Increase",
+      "over_limit": false,
+      "credit_hold": false,
+      "collection": {
+        "tier": null,
+        "rank": null,
+        "action": null
+      },
+      "risk_drivers": []
+    },
+    {
+      "customer_id": "C0015",
+      "customer_name": "Cobalt Services",
+      "grade": "C",
+      "score": 54.3,
+      "sub_scores": {
+        "payment": 31.1,
+        "ageing": 89.7,
+        "concentration": 44.6
+      },
+      "outstanding": 29111.48,
+      "overdue": 14974.41,
+      "oldest_days_overdue": 23,
+      "credit_limit": 9000.0,
+      "recommended_limit": 9000.0,
+      "limit_action": "Maintain",
+      "over_limit": true,
+      "credit_hold": false,
+      "collection": {
+        "tier": "P4",
+        "rank": 13,
+        "action": "Automated reminder / statement"
+      },
+      "risk_drivers": [
+        "Pays on average 22 days late",
+        "Only 0% of invoice value paid on time",
+        "Over credit limit (323% utilised)"
+      ]
+    },
+    {
+      "customer_id": "C0016",
+      "customer_name": "Northgate Group",
+      "grade": "C",
+      "score": 54.7,
+      "sub_scores": {
+        "payment": 30.1,
+        "ageing": 86.0,
+        "concentration": 55.2
+      },
+      "outstanding": 24215.56,
+      "overdue": 16903.92,
+      "oldest_days_overdue": 16,
+      "credit_limit": 21000.0,
+      "recommended_limit": 21000.0,
+      "limit_action": "Maintain",
+      "over_limit": true,
+      "credit_hold": false,
+      "collection": {
+        "tier": "P4",
+        "rank": 12,
+        "action": "Automated reminder / statement"
+      },
+      "risk_drivers": [
+        "Pays on average 22 days late",
+        "Only 0% of invoice value paid on time",
+        "Improving: paying 7 days sooner than prior period",
+        "Over credit limit (115% utilised)"
+      ]
+    },
+    {
+      "customer_id": "C0017",
+      "customer_name": "Jade Trading",
+      "grade": "C",
+      "score": 56.0,
+      "sub_scores": {
+        "payment": 26.2,
+        "ageing": 93.9,
+        "concentration": 56.4
+      },
+      "outstanding": 30492.03,
+      "overdue": 9259.66,
+      "oldest_days_overdue": 19,
+      "credit_limit": 27000.0,
+      "recommended_limit": 27000.0,
+      "limit_action": "Maintain",
+      "over_limit": true,
+      "credit_hold": false,
+      "collection": {
+        "tier": "P4",
+        "rank": 14,
+        "action": "Automated reminder / statement"
+      },
+      "risk_drivers": [
+        "Pays on average 25 days late",
+        "Only 0% of invoice value paid on time",
+        "Over credit limit (113% utilised)"
+      ]
+    },
+    {
+      "customer_id": "C0018",
+      "customer_name": "Vantage Services",
+      "grade": "D",
+      "score": 49.8,
+      "sub_scores": {
+        "payment": 22.1,
+        "ageing": 88.3,
+        "concentration": 44.5
+      },
+      "outstanding": 29692.93,
+      "overdue": 17389.8,
+      "oldest_days_overdue": 28,
+      "credit_limit": 17000.0,
+      "recommended_limit": 12000,
+      "limit_action": "Reduce",
+      "over_limit": true,
+      "credit_hold": false,
+      "collection": {
+        "tier": "P2",
+        "rank": 7,
+        "action": "Senior call + formal demand letter; agree dated payment plan"
+      },
+      "risk_drivers": [
+        "Pays on average 28 days late",
+        "Only 0% of invoice value paid on time",
+        "Improving: paying 5 days sooner than prior period",
+        "Over credit limit (175% utilised)"
+      ]
+    },
+    {
+      "customer_id": "C0019",
+      "customer_name": "Harbor Ltd",
+      "grade": "C",
+      "score": 55.0,
+      "sub_scores": {
+        "payment": 23.9,
+        "ageing": 94.1,
+        "concentration": 56.5
+      },
+      "outstanding": 21747.64,
+      "overdue": 6375.75,
+      "oldest_days_overdue": 6,
+      "credit_limit": 19000.0,
+      "recommended_limit": 16000,
+      "limit_action": "Reduce",
+      "over_limit": true,
+      "credit_hold": false,
+      "collection": {
+        "tier": "P4",
+        "rank": 16,
+        "action": "Automated reminder / statement"
+      },
+      "risk_drivers": [
+        "Pays on average 27 days late",
+        "Only 0% of invoice value paid on time",
+        "Improving: paying 6 days sooner than prior period",
+        "Over credit limit (114% utilised)"
+      ]
+    },
+    {
+      "customer_id": "C0020",
+      "customer_name": "Everest Ltd",
+      "grade": "C",
+      "score": 52.1,
+      "sub_scores": {
+        "payment": 23.2,
+        "ageing": 93.1,
+        "concentration": 45.3
+      },
+      "outstanding": 25236.88,
+      "overdue": 8688.02,
+      "oldest_days_overdue": 17,
+      "credit_limit": 16000.0,
+      "recommended_limit": 16000.0,
+      "limit_action": "Maintain",
+      "over_limit": true,
+      "credit_hold": false,
+      "collection": {
+        "tier": "P4",
+        "rank": 15,
+        "action": "Automated reminder / statement"
+      },
+      "risk_drivers": [
+        "Pays on average 27 days late",
+        "Only 0% of invoice value paid on time",
+        "Over credit limit (158% utilised)"
+      ]
+    },
+    {
+      "customer_id": "C0021",
+      "customer_name": "Tidewater Holdings",
+      "grade": "C",
+      "score": 60.9,
+      "sub_scores": {
+        "payment": 22.9,
+        "ageing": 93.1,
+        "concentration": 90.1
+      },
+      "outstanding": 15577.84,
+      "overdue": 5405.85,
+      "oldest_days_overdue": 15,
+      "credit_limit": 19000.0,
+      "recommended_limit": 19000.0,
+      "limit_action": "Maintain",
+      "over_limit": false,
+      "credit_hold": false,
+      "collection": {
+        "tier": "P4",
+        "rank": 17,
+        "action": "Automated reminder / statement"
+      },
+      "risk_drivers": [
+        "Pays on average 28 days late",
+        "Only 0% of invoice value paid on time"
+      ]
+    },
+    {
+      "customer_id": "C0022",
+      "customer_name": "Apex Trading",
+      "grade": "C",
+      "score": 58.6,
+      "sub_scores": {
+        "payment": 18.6,
+        "ageing": 87.2,
+        "concentration": 98.5
+      },
+      "outstanding": 7880.12,
+      "overdue": 5039.37,
+      "oldest_days_overdue": 4,
+      "credit_limit": 18000.0,
+      "recommended_limit": 13000,
+      "limit_action": "Reduce",
+      "over_limit": false,
+      "credit_hold": false,
+      "collection": {
+        "tier": "P4",
+        "rank": 18,
+        "action": "Automated reminder / statement"
+      },
+      "risk_drivers": [
+        "Pays on average 31 days late",
+        "Only 0% of invoice value paid on time"
+      ]
+    },
+    {
+      "customer_id": "C0023",
+      "customer_name": "Pinnacle Group",
+      "grade": "C",
+      "score": 65.5,
+      "sub_scores": {
+        "payment": 62.0,
+        "ageing": 84.8,
+        "concentration": 39.6
+      },
+      "outstanding": 56426.79,
+      "overdue": 28219.21,
+      "oldest_days_overdue": 52,
+      "credit_limit": 28000.0,
+      "recommended_limit": 24000,
+      "limit_action": "Reduce",
+      "over_limit": true,
+      "credit_hold": false,
+      "collection": {
+        "tier": "P3",
+        "rank": 10,
+        "action": "Phone call to accounts payable; confirm payment date"
+      },
+      "risk_drivers": [
+        "Grade capped at C: balance is 202% of credit limit",
+        "Pays on average 11 days late",
+        "Only 78% of invoice value paid on time",
+        "Deteriorating: paying 34 days later than prior period",
+        "Over credit limit (202% utilised)"
+      ]
+    },
+    {
+      "customer_id": "C0024",
+      "customer_name": "Ironbark Ltd",
+      "grade": "C",
+      "score": 64.2,
+      "sub_scores": {
+        "payment": 62.5,
+        "ageing": 78.7,
+        "concentration": 42.9
+      },
+      "outstanding": 49222.79,
+      "overdue": 29375.39,
+      "oldest_days_overdue": 44,
+      "credit_limit": 40000.0,
+      "recommended_limit": 40000.0,
+      "limit_action": "Maintain",
+      "over_limit": true,
+      "credit_hold": false,
+      "collection": {
+        "tier": "P3",
+        "rank": 9,
+        "action": "Phone call to accounts payable; confirm payment date"
+      },
+      "risk_drivers": [
+        "Pays on average 10 days late",
+        "Only 78% of invoice value paid on time",
+        "Deteriorating: paying 34 days later than prior period",
+        "Over credit limit (123% utilised)"
+      ]
+    },
+    {
+      "customer_id": "C0025",
+      "customer_name": "Willow Group",
+      "grade": "C",
+      "score": 61.0,
+      "sub_scores": {
+        "payment": 56.5,
+        "ageing": 78.4,
+        "concentration": 40.6
+      },
+      "outstanding": 50883.24,
+      "overdue": 27822.36,
+      "oldest_days_overdue": 49,
+      "credit_limit": 29000.0,
+      "recommended_limit": 24000,
+      "limit_action": "Reduce",
+      "over_limit": true,
+      "credit_hold": false,
+      "collection": {
+        "tier": "P3",
+        "rank": 8,
+        "action": "Phone call to accounts payable; confirm payment date"
+      },
+      "risk_drivers": [
+        "Pays on average 14 days late",
+        "Only 74% of invoice value paid on time",
+        "Deteriorating: paying 42 days later than prior period",
+        "Over credit limit (175% utilised)"
+      ]
+    },
+    {
+      "customer_id": "C0026",
+      "customer_name": "Cedar Partners",
+      "grade": "C",
+      "score": 60.6,
+      "sub_scores": {
+        "payment": 60.7,
+        "ageing": 71.5,
+        "concentration": 41.3
+      },
+      "outstanding": 47087.14,
+      "overdue": 33216.02,
+      "oldest_days_overdue": 65,
+      "credit_limit": 28000.0,
+      "recommended_limit": 28000.0,
+      "limit_action": "Maintain",
+      "over_limit": true,
+      "credit_hold": false,
+      "collection": {
+        "tier": "P2",
+        "rank": 6,
+        "action": "Senior call + formal demand letter; agree dated payment plan"
+      },
+      "risk_drivers": [
+        "Pays on average 11 days late",
+        "Only 75% of invoice value paid on time",
+        "Deteriorating: paying 35 days later than prior period",
+        "14% of balance is 60+ days overdue",
+        "Over credit limit (168% utilised)"
+      ]
+    },
+    {
+      "customer_id": "C0027",
+      "customer_name": "Meridian Ltd",
+      "grade": "E",
+      "score": 18.3,
+      "sub_scores": {
+        "payment": 0.0,
+        "ageing": 29.8,
+        "concentration": 39.5
+      },
+      "outstanding": 56725.24,
+      "overdue": 44197.58,
+      "oldest_days_overdue": 216,
+      "credit_limit": 9000.0,
+      "recommended_limit": 0.0,
+      "limit_action": "Suspend credit",
+      "over_limit": true,
+      "credit_hold": true,
+      "collection": {
+        "tier": "P1",
+        "rank": 2,
+        "action": "Escalate: stop supply, final demand, consider agency/legal referral"
+      },
+      "risk_drivers": [
+        "Pays on average 93 days late",
+        "Only 0% of invoice value paid on time",
+        "Deteriorating: paying 73 days later than prior period",
+        "67% of balance is 60+ days overdue (56% is 90+)",
+        "Over credit limit (630% utilised)"
+      ]
+    },
+    {
+      "customer_id": "C0028",
+      "customer_name": "Orchid Services",
+      "grade": "E",
+      "score": 16.5,
+      "sub_scores": {
+        "payment": 0.0,
+        "ageing": 26.4,
+        "concentration": 36.4
+      },
+      "outstanding": 73777.11,
+      "overdue": 66316.35,
+      "oldest_days_overdue": 185,
+      "credit_limit": 11000.0,
+      "recommended_limit": 0.0,
+      "limit_action": "Suspend credit",
+      "over_limit": true,
+      "credit_hold": true,
+      "collection": {
+        "tier": "P1",
+        "rank": 1,
+        "action": "Escalate: stop supply, final demand, consider agency/legal referral"
+      },
+      "risk_drivers": [
+        "Pays on average 99 days late",
+        "Only 0% of invoice value paid on time",
+        "Deteriorating: paying 57 days later than prior period",
+        "71% of balance is 60+ days overdue (53% is 90+)",
+        "Over credit limit (671% utilised)"
+      ]
+    },
+    {
+      "customer_id": "C0029",
+      "customer_name": "Xenon Partners",
+      "grade": "E",
+      "score": 23.3,
+      "sub_scores": {
+        "payment": 0.0,
+        "ageing": 44.9,
+        "concentration": 38.1
+      },
+      "outstanding": 64544.5,
+      "overdue": 51085.0,
+      "oldest_days_overdue": 174,
+      "credit_limit": 15000.0,
+      "recommended_limit": 0.0,
+      "limit_action": "Suspend credit",
+      "over_limit": true,
+      "credit_hold": true,
+      "collection": {
+        "tier": "P1",
+        "rank": 3,
+        "action": "Escalate: stop supply, final demand, consider agency/legal referral"
+      },
+      "risk_drivers": [
+        "Pays on average 79 days late",
+        "Only 0% of invoice value paid on time",
+        "Deteriorating: paying 6 days later than prior period",
+        "54% of balance is 60+ days overdue (35% is 90+)",
+        "Over credit limit (430% utilised)"
+      ]
+    },
+    {
+      "customer_id": "C0030",
+      "customer_name": "Iris Ltd",
+      "grade": "B",
+      "score": 72.4,
+      "sub_scores": {
+        "payment": 75.5,
+        "ageing": 100.0,
+        "concentration": 17.4
+      },
+      "outstanding": 432569.02,
+      "overdue": 0.0,
+      "oldest_days_overdue": 0,
+      "credit_limit": 402000.0,
+      "recommended_limit": 402000.0,
+      "limit_action": "Maintain",
+      "over_limit": true,
+      "credit_hold": false,
+      "collection": {
+        "tier": null,
+        "rank": null,
+        "action": null
+      },
+      "risk_drivers": [
+        "Pays on average 5 days late",
+        "Only 55% of invoice value paid on time",
+        "Concentration: 24.0% of total receivables",
+        "Over credit limit (108% utilised)"
+      ]
+    },
+    {
+      "customer_id": "C0031",
+      "customer_name": "Beacon Holdings",
+      "grade": "B",
+      "score": 77.8,
+      "sub_scores": {
+        "payment": 74.4,
+        "ageing": 98.1,
+        "concentration": 50.0
+      },
+      "outstanding": 326858.42,
+      "overdue": 30517.89,
+      "oldest_days_overdue": 1,
+      "credit_limit": 513000.0,
+      "recommended_limit": 513000.0,
+      "limit_action": "Maintain",
+      "over_limit": false,
+      "credit_hold": false,
+      "collection": {
+        "tier": "P4",
+        "rank": 11,
+        "action": "Automated reminder / statement"
+      },
+      "risk_drivers": [
+        "Pays on average 5 days late",
+        "Only 53% of invoice value paid on time",
+        "Concentration: 18.1% of total receivables"
+      ]
+    },
+    {
+      "customer_id": "C0032",
+      "customer_name": "Dune Services",
+      "grade": "B",
+      "score": 76.2,
+      "sub_scores": {
+        "payment": 55.0,
+        "ageing": 91.4,
+        "concentration": 97.1
+      },
+      "outstanding": 7952.14,
+      "overdue": 3408.58,
+      "oldest_days_overdue": 1,
+      "credit_limit": 0.0,
+      "recommended_limit": 15000,
+      "limit_action": "Set limit",
+      "over_limit": false,
+      "credit_hold": false,
+      "collection": {
+        "tier": "P4",
+        "rank": 19,
+        "action": "Automated reminder / statement"
+      },
+      "risk_drivers": [
+        "Thin file: no payment history in lookback window",
+        "No credit limit on file"
+      ]
+    },
+    {
+      "customer_id": "C0033",
+      "customer_name": "Fjord Partners",
+      "grade": "B",
+      "score": 79.5,
+      "sub_scores": {
+        "payment": 55.0,
+        "ageing": 100.0,
+        "concentration": 98.7
+      },
+      "outstanding": 3579.09,
+      "overdue": 0.0,
+      "oldest_days_overdue": 0,
+      "credit_limit": 0.0,
+      "recommended_limit": 6000,
+      "limit_action": "Set limit",
+      "over_limit": false,
+      "credit_hold": false,
+      "collection": {
+        "tier": null,
+        "rank": null,
+        "action": null
+      },
+      "risk_drivers": [
+        "Thin file: no payment history in lookback window",
+        "No credit limit on file"
+      ]
+    },
+    {
+      "customer_id": "C0034",
+      "customer_name": "Keystone Holdings",
+      "grade": "A",
+      "score": 85.8,
+      "sub_scores": {
+        "payment": 69.1,
+        "ageing": 100.0,
+        "concentration": 98.3
+      },
+      "outstanding": 4486.51,
+      "overdue": 0.0,
+      "oldest_days_overdue": 0,
+      "credit_limit": 0.0,
+      "recommended_limit": 12000,
+      "limit_action": "Set limit",
+      "over_limit": false,
+      "credit_hold": false,
+      "collection": {
+        "tier": null,
+        "rank": null,
+        "action": null
+      },
+      "risk_drivers": [
+        "Pays on average 2 days late",
+        "Limited history (1 settled invoices)",
+        "No credit limit on file"
+      ]
+    },
+    {
+      "customer_id": "C0035",
+      "customer_name": "Yardley Partners",
+      "grade": "E",
+      "score": 11.9,
+      "sub_scores": {
+        "payment": 0.0,
+        "ageing": 9.6,
+        "concentration": 42.5
+      },
+      "outstanding": 40611.23,
+      "overdue": 34998.56,
+      "oldest_days_overdue": 406,
+      "credit_limit": 10000.0,
+      "recommended_limit": 0.0,
+      "limit_action": "Suspend credit",
+      "over_limit": true,
+      "credit_hold": true,
+      "collection": {
+        "tier": "P1",
+        "rank": 4,
+        "action": "Escalate: stop supply, final demand, consider agency/legal referral; resolve dispute (40,611)"
+      },
+      "risk_drivers": [
+        "Pays on average 48 days late",
+        "Only 2% of invoice value paid on time",
+        "Deteriorating: paying 73 days later than prior period",
+        "86% of balance is 60+ days overdue (57% is 90+)",
+        "40,611 in dispute",
+        "Over credit limit (406% utilised)"
+      ]
+    },
+    {
+      "customer_id": "C0036",
+      "customer_name": "Falcon Ltd",
+      "grade": "E",
+      "score": 22.9,
+      "sub_scores": {
+        "payment": 2.2,
+        "ageing": 38.4,
+        "concentration": 42.3
+      },
+      "outstanding": 41841.67,
+      "overdue": 31254.77,
+      "oldest_days_overdue": 387,
+      "credit_limit": 17000.0,
+      "recommended_limit": 0.0,
+      "limit_action": "Suspend credit",
+      "over_limit": true,
+      "credit_hold": true,
+      "collection": {
+        "tier": "P1",
+        "rank": 5,
+        "action": "Escalate: stop supply, final demand, consider agency/legal referral; resolve dispute (25,241)"
+      },
+      "risk_drivers": [
+        "Pays on average 33 days late",
+        "Only 3% of invoice value paid on time",
+        "Deteriorating: paying 48 days later than prior period",
+        "45% of balance is 60+ days overdue (45% is 90+)",
+        "25,241 in dispute",
+        "Over credit limit (246% utilised)"
+      ]
+    }
+  ]
+}
