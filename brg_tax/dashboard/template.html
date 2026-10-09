@@ -406,6 +406,8 @@ table.comp tr.detail td { background: var(--surface-2); font-size: 12.5px; }
         <button class="btn" id="rv-clear" type="button">Clear browser decisions</button>
       </div>
       <p class="note" id="rv-note" style="margin:0 0 14px"></p>
+      <div class="block" id="rv-exported" hidden style="margin-bottom:14px"><div class="block-head"><h2>Decisions JSON</h2><span class="hint">Save as decisions.json, then run brg-tax run --decisions decisions.json</span></div>
+        <div style="display:flex;gap:8px;align-items:center"><button class="btn primary" type="button" id="rv-copy">Copy decisions JSON</button><span class="dim" id="rv-copied" style="font-size:12.5px"></span></div><pre class="json" id="rv-json"></pre></div>
       <div class="cards" id="rv-cards"></div>
     </section>
 
@@ -754,10 +756,25 @@ $("rv-export").addEventListener("click", () => {
   const merged = {};
   allReview().forEach(r => { if (r.decision) merged[r.id] = r.decision; });
   Object.assign(merged, local);
-  const blob = new Blob([JSON.stringify({ schema: "brg_tax/decisions@1", exported: new Date().toISOString(), run_fingerprint: DATA.fingerprint, decisions: merged }, null, 2)], { type: "application/json" });
-  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "decisions.json"; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  const text = JSON.stringify({ schema: "brg_tax/decisions@1", exported: new Date().toISOString(), run_fingerprint: DATA.fingerprint, decisions: merged }, null, 2);
+  // Show the JSON with a copy button as well: some viewers (sandboxed frames) block file downloads.
+  $("rv-json").textContent = text; $("rv-exported").hidden = false; $("rv-copied").textContent = "";
+  try {
+    const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([text], { type: "application/json" })); a.download = "decisions.json";
+    a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  } catch (e) { /* download blocked: the copy button still works */ }
 });
-$("rv-clear").addEventListener("click", () => { if (confirm("Remove all decisions recorded in this browser?")) { local = {}; saveLocal(); header(); RENDER.review(); } });
+$("rv-copy").addEventListener("click", () => {
+  const msg = $("rv-copied"), text = $("rv-json").textContent;
+  const fallback = () => { const r = document.createRange(); r.selectNodeContents($("rv-json")); const s = getSelection(); s.removeAllRanges(); s.addRange(r); msg.textContent = "Selected. Press Ctrl/⌘+C to copy."; };
+  try { navigator.clipboard.writeText(text).then(() => { msg.textContent = "Copied."; }, fallback); } catch (e) { fallback(); }
+});
+let clearArmed = false;
+$("rv-clear").addEventListener("click", (e) => {
+  if (!clearArmed) { clearArmed = true; e.target.textContent = "Click again to remove all browser decisions"; setTimeout(() => { clearArmed = false; e.target.textContent = "Clear browser decisions"; }, 4000); return; }
+  clearArmed = false; e.target.textContent = "Clear browser decisions";
+  local = {}; saveLocal(); header(); RENDER.review();
+});
 
 /* ---------- optimiser ---------- */
 const opState = {};
