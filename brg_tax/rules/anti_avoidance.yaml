@@ -1,0 +1,101 @@
+# Anti-avoidance. These rules DETECT patterns and route them to the review queue. The optimiser never
+# selects a scenario that relies on them, and nothing here is ever offered as a recommendation.
+domain: anti_avoidance
+citations_checked: false
+rules:
+
+  - id: AA-464C-01
+    title: Loan repayments followed by new advances (bed and breakfasting)
+    question: Was a repayment of at least the s464C amount followed within 30 days by new advances of at least that amount?
+    applies: computation
+    certainty: rule
+    authority: ["CTA 2010 s464C(1)"]
+    guidance: ["CTM61620", "CTM61625"]
+    entity_types: [company]
+    effective: {from: "2013-03-20", to: null}
+    params: ["ct.s464c.amount", "ct.s464c.days"]
+    notes: >-
+      The repayment is matched against the new advance and does not reduce the s455 charge to that extent.
+      Repayments by dividend or bonus chargeable to income tax are excluded (s464C(4)).
+
+  - id: AA-464C-02
+    title: Repayments with arrangements to redraw
+    question: Where the balance was at least the arrangement threshold, were there arrangements to redraw at the time of repayment?
+    applies: computation
+    certainty: judgment
+    authority: ["CTA 2010 s464C(3)"]
+    guidance: ["CTM61630"]
+    entity_types: [company]
+    effective: {from: "2013-03-20", to: null}
+    params: ["ct.s464c.arrangement_threshold", "ct.s464c.amount"]
+    factors:
+      - Balance before repayment at or above the arrangement threshold
+      - New advances of at least the s464C amount after the repayment, at any interval
+      - Evidence of intention or arrangements at the time of repayment
+    authorities:
+      - "CTA 2010 s464C(3) (intention or arrangements test)"
+    default: {treat_as_matched: true}
+    reasoning: The pattern is consistent with arrangements to redraw. Prudently, the repayment is treated as matched until the reviewer records otherwise.
+
+  - id: AA-SETTLE-01
+    title: Settlements legislation - income shifting through shares
+    question: Is dividend income arising to a spouse, civil partner or minor child from shares that are not an outright gift of ordinary share capital carrying full rights?
+    applies: computation
+    certainty: judgment
+    authority: ["ITTOIA 2005 s619", "ITTOIA 2005 s624", "ITTOIA 2005 s626", "ITTOIA 2005 s629"]
+    guidance: ["TSEM4000", "TSEM4200"]
+    entity_types: [company]
+    effective: {from: "2005-04-06", to: null}
+    params: []
+    factors:
+      - Is there an arrangement with an element of bounty (an uncommercial transfer of value)?
+      - Are the shares a separate class (alphabet shares), carry restricted rights, or are dividends waived/varied?
+      - Is the income mainly derived from one person's work in the company?
+      - The s626 exemption for outright gifts between spouses of shares that are not wholly or substantially a right to income
+    authorities:
+      - "Jones v Garnett [2007] UKHL 35"
+      - "Buck v HMRC [2009] STC (SCD) 6"
+      - "Bird v HMRC [2008] STC (SCD) 1145"
+    default: {flag: true, tax_effect: none_computed}
+    reasoning: The share structure shows features HMRC associates with settlements. No adjustment is computed; the reviewer must assess.
+
+  - id: AA-WAIVER-01
+    title: Dividend waivers
+    question: Has a shareholder waived dividends so that others receive more?
+    applies: computation
+    certainty: judgment
+    authority: ["ITTOIA 2005 s620", "ITTOIA 2005 s624"]
+    guidance: ["TSEM4225"]
+    entity_types: [company]
+    effective: {from: "2005-04-06", to: null}
+    params: []
+    factors:
+      - Were sufficient reserves available to pay the same rate on all shares without the waiver?
+      - Is the waiver part of a regular pattern?
+      - Does the waiving shareholder's spouse or child benefit?
+    authorities:
+      - "Donovan and McLaren v HMRC [2014] UKFTT 048 (TC)"
+    default: {flag: true}
+    reasoning: A dividend waiver is recorded in the profile.
+
+  - id: AA-GAAR-01
+    title: General anti-abuse rule screen
+    question: Could a planning step be regarded as abusive tax arrangements?
+    applies: computation
+    certainty: judgment
+    authority: ["FA 2013 s206", "FA 2013 s207"]
+    guidance: ["HMRC GAAR Guidance Part C"]
+    entity_types: [company, sole_trader]
+    effective: {from: "2013-07-17", to: null}
+    params: []
+    factors:
+      - Is obtaining a tax advantage the main purpose, or one of the main purposes?
+      - Is the arrangement a reasonable course of action given the policy of the provisions (double reasonableness)?
+      - Contrived or abnormal steps, or results that Parliament did not anticipate
+    authorities:
+      - "FA 2013 s207(2) (double reasonableness test)"
+    default: {flag: true}
+    reasoning: >-
+      The optimiser only chooses between statutory elections and ordinary remuneration choices. Any scenario
+      that combines a repayment and redraw, circular funds, or dividend waivers is screened here and never
+      recommended.

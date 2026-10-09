@@ -1,0 +1,215 @@
+{
+  "package": "xero",
+  "notes": "Modelled on the Xero UK 'Account Transactions' export and the default UK chart of accounts. Codes 421-465, 499 and 711-714 are BRG additions to the default chart; edit this file to match each client's chart.",
+  "date_formats": [
+    "%d %b %Y",
+    "%d/%m/%Y"
+  ],
+  "amount_mode": "debit_credit",
+  "columns": {
+    "date": "Date",
+    "code": "Account Code",
+    "account": "Account",
+    "description": "Description",
+    "contact": "Contact",
+    "reference": "Reference",
+    "debit": "Debit",
+    "credit": "Credit",
+    "vat": "VAT",
+    "facts": "BRG Facts"
+  },
+  "codes": {
+    "200": {
+      "category": "sales"
+    },
+    "260": {
+      "category": "other_income"
+    },
+    "270": {
+      "category": "interest_received"
+    },
+    "310": {
+      "category": "cost_of_sales"
+    },
+    "320": {
+      "category": "subcontractors"
+    },
+    "400": {
+      "category": "advertising"
+    },
+    "404": {
+      "category": "bank_charges"
+    },
+    "412": {
+      "category": "accountancy"
+    },
+    "416": {
+      "category": "depreciation"
+    },
+    "420": {
+      "category": "entertainment"
+    },
+    "421": {
+      "category": "staff_entertainment",
+      "facts": {
+        "attendees": "staff_only"
+      }
+    },
+    "422": {
+      "category": "client_gifts"
+    },
+    "423": {
+      "category": "staff_gifts"
+    },
+    "429": {
+      "category": "sundry"
+    },
+    "433": {
+      "category": "insurance"
+    },
+    "437": {
+      "category": "loan_interest"
+    },
+    "441": {
+      "category": "legal_professional"
+    },
+    "445": {
+      "category": "light_heat"
+    },
+    "449": {
+      "category": "motor_expenses"
+    },
+    "450": {
+      "category": "car_lease"
+    },
+    "451": {
+      "category": "mileage"
+    },
+    "455": {
+      "category": "use_of_home"
+    },
+    "456": {
+      "category": "fines_penalties"
+    },
+    "461": {
+      "category": "software"
+    },
+    "465": {
+      "category": "research_development"
+    },
+    "469": {
+      "category": "rent"
+    },
+    "470": {
+      "category": "rates"
+    },
+    "473": {
+      "category": "repairs"
+    },
+    "477": {
+      "category": "wages"
+    },
+    "478": {
+      "category": "directors_salary"
+    },
+    "479": {
+      "category": "employer_nic"
+    },
+    "480": {
+      "category": "training"
+    },
+    "481": {
+      "category": "staff_pension"
+    },
+    "482": {
+      "category": "director_pension"
+    },
+    "485": {
+      "category": "subscriptions"
+    },
+    "489": {
+      "category": "telephone"
+    },
+    "493": {
+      "category": "travel"
+    },
+    "494": {
+      "category": "subsistence"
+    },
+    "499": {
+      "category": "donations"
+    },
+    "500": {
+      "category": "corporation_tax"
+    },
+    "710": {
+      "category": "fixed_assets",
+      "facts": {
+        "asset_class": "plant"
+      }
+    },
+    "711": {
+      "category": "fixed_assets",
+      "facts": {
+        "asset_class": "plant"
+      }
+    },
+    "712": {
+      "category": "fixed_assets",
+      "facts": {
+        "asset_class": "car"
+      }
+    },
+    "713": {
+      "category": "fixed_assets",
+      "facts": {
+        "asset_class": "building"
+      }
+    },
+    "714": {
+      "category": "fixed_assets",
+      "facts": {
+        "asset_class": "van"
+      }
+    },
+    "720": {
+      "category": "fixed_assets",
+      "facts": {
+        "asset_class": "computer"
+      }
+    },
+    "090": {
+      "category": "bank"
+    },
+    "610": {
+      "category": "debtors"
+    },
+    "800": {
+      "category": "creditors"
+    },
+    "820": {
+      "category": "vat_control"
+    },
+    "825": {
+      "category": "paye_control"
+    },
+    "830": {
+      "category": "ct_liability"
+    },
+    "835": {
+      "category": "dla"
+    },
+    "950": {
+      "category": "share_capital"
+    },
+    "960": {
+      "category": "reserves"
+    },
+    "970": {
+      "category": "dividends"
+    },
+    "719": {
+      "category": "accumulated_depreciation"
+    }
+  }
+}

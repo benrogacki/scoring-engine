@@ -1,0 +1,161 @@
+{
+  "package": "freeagent",
+  "notes": "Modelled on the FreeAgent accounting transactions export (nominal code + category name, Debit/Credit). Codes follow FreeAgent's numbering style but should be checked against each client's chart.",
+  "date_formats": [
+    "%Y-%m-%d",
+    "%d/%m/%Y"
+  ],
+  "amount_mode": "debit_credit",
+  "columns": {
+    "date": "Dated On",
+    "code": "Nominal Code",
+    "account": "Category",
+    "description": "Description",
+    "contact": "Contact",
+    "reference": "Reference",
+    "debit": "Debit",
+    "credit": "Credit",
+    "vat": "VAT",
+    "facts": "BRG Facts"
+  },
+  "codes": {
+    "001": {
+      "category": "sales"
+    },
+    "055": {
+      "category": "other_income"
+    },
+    "096": {
+      "category": "cost_of_sales"
+    },
+    "201": {
+      "category": "accountancy"
+    },
+    "202": {
+      "category": "legal_professional"
+    },
+    "250": {
+      "category": "advertising"
+    },
+    "251": {
+      "category": "bank_charges"
+    },
+    "252": {
+      "category": "client_gifts"
+    },
+    "253": {
+      "category": "entertainment"
+    },
+    "254": {
+      "category": "staff_entertainment",
+      "facts": {
+        "attendees": "staff_only"
+      }
+    },
+    "260": {
+      "category": "insurance"
+    },
+    "265": {
+      "category": "sundry"
+    },
+    "270": {
+      "category": "use_of_home"
+    },
+    "280": {
+      "category": "motor_expenses"
+    },
+    "281": {
+      "category": "mileage"
+    },
+    "282": {
+      "category": "car_lease"
+    },
+    "285": {
+      "category": "subsistence"
+    },
+    "286": {
+      "category": "travel"
+    },
+    "290": {
+      "category": "rent"
+    },
+    "291": {
+      "category": "light_heat"
+    },
+    "300": {
+      "category": "repairs"
+    },
+    "310": {
+      "category": "fines_penalties"
+    },
+    "350": {
+      "category": "training"
+    },
+    "355": {
+      "category": "subscriptions"
+    },
+    "363": {
+      "category": "telephone"
+    },
+    "365": {
+      "category": "software"
+    },
+    "401": {
+      "category": "wages"
+    },
+    "402": {
+      "category": "directors_salary"
+    },
+    "403": {
+      "category": "employer_nic"
+    },
+    "404": {
+      "category": "director_pension"
+    },
+    "450": {
+      "category": "depreciation"
+    },
+    "480": {
+      "category": "donations"
+    },
+    "490": {
+      "category": "corporation_tax"
+    },
+    "602": {
+      "category": "fixed_assets",
+      "facts": {
+        "asset_class": "computer"
+      }
+    },
+    "603": {
+      "category": "fixed_assets",
+      "facts": {
+        "asset_class": "plant"
+      }
+    },
+    "604": {
+      "category": "fixed_assets",
+      "facts": {
+        "asset_class": "van"
+      }
+    },
+    "750": {
+      "category": "bank"
+    },
+    "801": {
+      "category": "dla"
+    },
+    "817": {
+      "category": "vat_control"
+    },
+    "901": {
+      "category": "drawings"
+    },
+    "902": {
+      "category": "capital_account"
+    },
+    "905": {
+      "category": "dividends"
+    }
+  }
+}

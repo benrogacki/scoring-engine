@@ -13,14 +13,22 @@ dependencies = []
 [project.optional-dependencies]
 databricks = ["databricks-sql-connector>=3.0"]
 ais = ["websockets>=12"]
+tax = ["pydantic>=2.5", "PyYAML>=6"]
+test = ["pytest>=7"]
 
 [project.scripts]
 credit-score = "scoring_engine.cli:main"
 freight-nowcast = "freight_nowcast.cli:main"
+brg-tax = "brg_tax.cli:main"
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
 
 [tool.setuptools.packages.find]
-include = ["scoring_engine*", "freight_nowcast*"]
+include = ["scoring_engine*", "freight_nowcast*", "brg_tax*"]
 
 [tool.setuptools.package-data]
 scoring_engine = ["templates/*.html", "sources/queries/*.sql"]
 freight_nowcast = ["templates/*.html"]
+brg_tax = ["rules/*.yaml", "params/*.json", "ingest/mappings/*.json", "dashboard/*.html", "dashboard/*.js"]

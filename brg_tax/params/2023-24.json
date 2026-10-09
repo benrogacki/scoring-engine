@@ -1,0 +1,1291 @@
+{
+  "schema": "brg_tax/params@1",
+  "label": "2023-24",
+  "tax_year": {
+    "label": "2023-24",
+    "start": "2023-04-06",
+    "end": "2024-04-05"
+  },
+  "financial_year": {
+    "label": "FY2023",
+    "start": "2023-04-01",
+    "end": "2024-03-31"
+  },
+  "seeded": "2026-10-09",
+  "seed_note": "Seeded without network access. Every value is unverified until `brg-tax params-update` confirms it on the cited GOV.UK page.",
+  "params": {
+    "ca.car_lease_co2_threshold": {
+      "value": 50,
+      "unit": "gkm",
+      "period": "financial_year",
+      "authority": "CTA 2009 s57(2); ITTOIA 2005 s49(2)",
+      "source_url": "https://www.gov.uk/hmrc-internal-manuals/business-income-manual/bim47714",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "50g/km",
+        "near": "emissions"
+      }
+    },
+    "ca.car_lease_disallow_pct": {
+      "value": 15,
+      "unit": "percent",
+      "period": "financial_year",
+      "authority": "CTA 2009 s56-58; ITTOIA 2005 s48-50",
+      "source_url": "https://www.gov.uk/hmrc-internal-manuals/business-income-manual/bim47714",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "15%",
+        "near": "15%"
+      }
+    },
+    "ca.ct.aia_limit": {
+      "value": 1000000,
+      "unit": "GBP",
+      "period": "financial_year",
+      "authority": "CAA 2001 s51A",
+      "source_url": "https://www.gov.uk/capital-allowances/annual-investment-allowance",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "£1,000,000",
+        "near": "Annual Investment Allowance"
+      }
+    },
+    "ca.ct.car_main_pool_co2_max": {
+      "value": 50,
+      "unit": "gkm",
+      "period": "financial_year",
+      "authority": "CAA 2001 s104AA",
+      "source_url": "https://www.gov.uk/capital-allowances/business-cars",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "50g/km",
+        "near": "CO2"
+      }
+    },
+    "ca.ct.full_expensing_rate": {
+      "value": 100,
+      "unit": "percent",
+      "period": "financial_year",
+      "authority": "CAA 2001 s45S",
+      "source_url": "https://www.gov.uk/guidance/check-if-you-can-claim-full-expensing-or-the-50-first-year-allowance",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "100%",
+        "near": "100%"
+      }
+    },
+    "ca.ct.fya_zero_emission_car_rate": {
+      "value": 100,
+      "unit": "percent",
+      "period": "financial_year",
+      "authority": "CAA 2001 s45D",
+      "source_url": "https://www.gov.uk/capital-allowances/business-cars",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "100%",
+        "near": "zero emission"
+      }
+    },
+    "ca.ct.sba_rate": {
+      "value": 3,
+      "unit": "percent",
+      "period": "financial_year",
+      "authority": "CAA 2001 s270AA(2)",
+      "source_url": "https://www.gov.uk/guidance/claiming-capital-allowances-for-structures-and-buildings",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "3%",
+        "near": "3%"
+      }
+    },
+    "ca.ct.small_pool_limit": {
+      "value": 1000,
+      "unit": "GBP",
+      "period": "financial_year",
+      "authority": "CAA 2001 s56A",
+      "source_url": "https://www.gov.uk/work-out-capital-allowances/rates-and-pools",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "£1,000",
+        "near": "small pools"
+      }
+    },
+    "ca.ct.special_rate_fya": {
+      "value": 50,
+      "unit": "percent",
+      "period": "financial_year",
+      "authority": "CAA 2001 s45S",
+      "source_url": "https://www.gov.uk/guidance/check-if-you-can-claim-full-expensing-or-the-50-first-year-allowance",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "50%",
+        "near": "50%"
+      }
+    },
+    "ca.ct.wda_main_rate": {
+      "value": 18,
+      "unit": "percent",
+      "period": "financial_year",
+      "authority": "CAA 2001 s56(1)",
+      "source_url": "https://www.gov.uk/work-out-capital-allowances/rates-and-pools",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "18%",
+        "near": "main rate"
+      }
+    },
+    "ca.ct.wda_special_rate": {
+      "value": 6,
+      "unit": "percent",
+      "period": "financial_year",
+      "authority": "CAA 2001 s104D",
+      "source_url": "https://www.gov.uk/work-out-capital-allowances/rates-and-pools",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "6%",
+        "near": "special rate"
+      }
+    },
+    "ca.it.aia_limit": {
+      "value": 1000000,
+      "unit": "GBP",
+      "period": "tax_year",
+      "authority": "CAA 2001 s51A",
+      "source_url": "https://www.gov.uk/capital-allowances/annual-investment-allowance",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "£1,000,000",
+        "near": "Annual Investment Allowance"
+      }
+    },
+    "ca.it.car_main_pool_co2_max": {
+      "value": 50,
+      "unit": "gkm",
+      "period": "tax_year",
+      "authority": "CAA 2001 s104AA",
+      "source_url": "https://www.gov.uk/capital-allowances/business-cars",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "50g/km",
+        "near": "CO2"
+      }
+    },
+    "ca.it.fya_zero_emission_car_rate": {
+      "value": 100,
+      "unit": "percent",
+      "period": "tax_year",
+      "authority": "CAA 2001 s45D",
+      "source_url": "https://www.gov.uk/capital-allowances/business-cars",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "100%",
+        "near": "zero emission"
+      }
+    },
+    "ca.it.sba_rate": {
+      "value": 3,
+      "unit": "percent",
+      "period": "tax_year",
+      "authority": "CAA 2001 s270AA(2)",
+      "source_url": "https://www.gov.uk/guidance/claiming-capital-allowances-for-structures-and-buildings",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "3%",
+        "near": "3%"
+      }
+    },
+    "ca.it.small_pool_limit": {
+      "value": 1000,
+      "unit": "GBP",
+      "period": "tax_year",
+      "authority": "CAA 2001 s56A",
+      "source_url": "https://www.gov.uk/work-out-capital-allowances/rates-and-pools",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "£1,000",
+        "near": "small pools"
+      }
+    },
+    "ca.it.wda_main_rate": {
+      "value": 18,
+      "unit": "percent",
+      "period": "tax_year",
+      "authority": "CAA 2001 s56(1)",
+      "source_url": "https://www.gov.uk/work-out-capital-allowances/rates-and-pools",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "18%",
+        "near": "main rate"
+      }
+    },
+    "ca.it.wda_special_rate": {
+      "value": 6,
+      "unit": "percent",
+      "period": "tax_year",
+      "authority": "CAA 2001 s104D",
+      "source_url": "https://www.gov.uk/work-out-capital-allowances/rates-and-pools",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "6%",
+        "near": "special rate"
+      }
+    },
+    "ct.lower_limit": {
+      "value": 50000,
+      "unit": "GBP",
+      "period": "financial_year",
+      "authority": "CTA 2010 s18B(5)",
+      "source_url": "https://www.gov.uk/guidance/corporation-tax-marginal-relief",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "£50,000",
+        "near": "lower limit"
+      }
+    },
+    "ct.main_rate": {
+      "value": 25,
+      "unit": "percent",
+      "period": "financial_year",
+      "authority": "CTA 2010 s3; Finance Act 2021 s6-7 (FY charge)",
+      "source_url": "https://www.gov.uk/government/publications/rates-and-allowances-corporation-tax/rates-and-allowances-corporation-tax",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "25%",
+        "near": "Main rate"
+      }
+    },
+    "ct.mr_fraction": {
+      "value": {
+        "num": 3,
+        "den": 200
+      },
+      "unit": "fraction",
+      "period": "financial_year",
+      "authority": "CTA 2010 s18B(4)",
+      "source_url": "https://www.gov.uk/guidance/corporation-tax-marginal-relief",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "3/200",
+        "near": "standard fraction"
+      }
+    },
+    "ct.s455_rate": {
+      "value": 33.75,
+      "unit": "percent",
+      "period": "tax_year",
+      "authority": "CTA 2010 s455(3)",
+      "source_url": "https://www.gov.uk/directors-loans",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "33.75%",
+        "near": "loan"
+      }
+    },
+    "ct.s464c.amount": {
+      "value": 5000,
+      "unit": "GBP",
+      "period": "tax_year",
+      "authority": "CTA 2010 s464C(1)(b), (3)(b)",
+      "source_url": "https://www.gov.uk/directors-loans",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "£5,000",
+        "near": "£5,000"
+      }
+    },
+    "ct.s464c.arrangement_threshold": {
+      "value": 15000,
+      "unit": "GBP",
+      "period": "tax_year",
+      "authority": "CTA 2010 s464C(3)(a)",
+      "source_url": "https://www.gov.uk/directors-loans",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "£15,000",
+        "near": "£15,000"
+      }
+    },
+    "ct.s464c.days": {
+      "value": 30,
+      "unit": "days",
+      "period": "tax_year",
+      "authority": "CTA 2010 s464C(1)(c)",
+      "source_url": "https://www.gov.uk/directors-loans",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "30 days",
+        "near": "30 days"
+      }
+    },
+    "ct.small_profits_rate": {
+      "value": 19,
+      "unit": "percent",
+      "period": "financial_year",
+      "authority": "CTA 2010 s18A",
+      "source_url": "https://www.gov.uk/government/publications/rates-and-allowances-corporation-tax/rates-and-allowances-corporation-tax",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "19%",
+        "near": "Small profits rate"
+      }
+    },
+    "ct.upper_limit": {
+      "value": 250000,
+      "unit": "GBP",
+      "period": "financial_year",
+      "authority": "CTA 2010 s18B(5)",
+      "source_url": "https://www.gov.uk/guidance/corporation-tax-marginal-relief",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "£250,000",
+        "near": "upper limit"
+      }
+    },
+    "exp.amap_bicycle_rate": {
+      "value": 20,
+      "unit": "pence",
+      "period": "tax_year",
+      "authority": "ITEPA 2003 s230(2)",
+      "source_url": "https://www.gov.uk/expenses-and-benefits-business-travel-mileage/rules-for-tax",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "20p",
+        "near": "Bikes"
+      }
+    },
+    "exp.amap_car_first_rate": {
+      "value": 45,
+      "unit": "pence",
+      "period": "tax_year",
+      "authority": "ITEPA 2003 s230(2); ITTOIA 2005 s94D",
+      "source_url": "https://www.gov.uk/expenses-and-benefits-business-travel-mileage/rules-for-tax",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "45p",
+        "near": "Cars and vans"
+      }
+    },
+    "exp.amap_car_later_rate": {
+      "value": 25,
+      "unit": "pence",
+      "period": "tax_year",
+      "authority": "ITEPA 2003 s230(2); ITTOIA 2005 s94D",
+      "source_url": "https://www.gov.uk/expenses-and-benefits-business-travel-mileage/rules-for-tax",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "25p",
+        "near": "Cars and vans"
+      }
+    },
+    "exp.amap_car_threshold_miles": {
+      "value": 10000,
+      "unit": "miles",
+      "period": "tax_year",
+      "authority": "ITEPA 2003 s230(2)",
+      "source_url": "https://www.gov.uk/expenses-and-benefits-business-travel-mileage/rules-for-tax",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "10,000",
+        "near": "10,000"
+      }
+    },
+    "exp.amap_motorcycle_rate": {
+      "value": 24,
+      "unit": "pence",
+      "period": "tax_year",
+      "authority": "ITEPA 2003 s230(2)",
+      "source_url": "https://www.gov.uk/expenses-and-benefits-business-travel-mileage/rules-for-tax",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "24p",
+        "near": "Motorcycles"
+      }
+    },
+    "exp.client_gift_limit": {
+      "value": 50,
+      "unit": "GBP",
+      "period": "tax_year",
+      "authority": "CTA 2009 s1300(5); ITTOIA 2005 s47(5)",
+      "source_url": "https://www.gov.uk/guidance/vat-on-business-gifts-and-promotional-items-notice-7007",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "£50",
+        "near": "£50"
+      }
+    },
+    "exp.home_employee_weekly": {
+      "value": 6,
+      "unit": "GBP",
+      "period": "tax_year",
+      "authority": "ITEPA 2003 s316A; SI 2003/1361 (as amended)",
+      "source_url": "https://www.gov.uk/expenses-and-benefits-homeworking/whats-exempt",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "£6",
+        "near": "£6 a week"
+      }
+    },
+    "exp.home_flat_rates": {
+      "value": [
+        {
+          "min_hours": 25,
+          "max_hours": 50,
+          "monthly": 10
+        },
+        {
+          "min_hours": 51,
+          "max_hours": 100,
+          "monthly": 18
+        },
+        {
+          "min_hours": 101,
+          "max_hours": null,
+          "monthly": 26
+        }
+      ],
+      "unit": "table",
+      "period": "tax_year",
+      "authority": "ITTOIA 2005 s94H",
+      "source_url": "https://www.gov.uk/simpler-income-tax-simplified-expenses/working-from-home",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "£26",
+        "near": "101 or more"
+      }
+    },
+    "exp.pre_trading_years": {
+      "value": 7,
+      "unit": "years",
+      "period": "tax_year",
+      "authority": "CTA 2009 s61; ITTOIA 2005 s57",
+      "source_url": "https://www.gov.uk/hmrc-internal-manuals/business-income-manual/bim46351",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "7 years",
+        "near": "7 years"
+      }
+    },
+    "exp.staff_function_limit": {
+      "value": 150,
+      "unit": "GBP",
+      "period": "tax_year",
+      "authority": "ITEPA 2003 s264",
+      "source_url": "https://www.gov.uk/expenses-and-benefits-social-functions/whats-exempt",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "£150",
+        "near": "£150"
+      }
+    },
+    "exp.trivial_benefit_director_cap": {
+      "value": 300,
+      "unit": "GBP",
+      "period": "tax_year",
+      "authority": "ITEPA 2003 s323B",
+      "source_url": "https://www.gov.uk/expenses-and-benefits-trivial-benefits/whats-exempt",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "£300",
+        "near": "£300"
+      }
+    },
+    "exp.trivial_benefit_limit": {
+      "value": 50,
+      "unit": "GBP",
+      "period": "tax_year",
+      "authority": "ITEPA 2003 s323A(3)",
+      "source_url": "https://www.gov.uk/expenses-and-benefits-trivial-benefits/whats-exempt",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "£50",
+        "near": "£50"
+      }
+    },
+    "it.dividend_additional_rate": {
+      "value": 39.35,
+      "unit": "percent",
+      "period": "tax_year",
+      "authority": "ITA 2007 s8(3)",
+      "source_url": "https://www.gov.uk/tax-on-dividends",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "39.35%",
+        "near": "additional rate"
+      }
+    },
+    "it.dividend_allowance": {
+      "value": 1000,
+      "unit": "GBP",
+      "period": "tax_year",
+      "authority": "ITA 2007 s13A",
+      "source_url": "https://www.gov.uk/tax-on-dividends",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "£1,000",
+        "near": "dividend allowance"
+      }
+    },
+    "it.dividend_ordinary_rate": {
+      "value": 8.75,
+      "unit": "percent",
+      "period": "tax_year",
+      "authority": "ITA 2007 s8(1)",
+      "source_url": "https://www.gov.uk/tax-on-dividends",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "8.75%",
+        "near": "basic rate"
+      }
+    },
+    "it.dividend_upper_rate": {
+      "value": 33.75,
+      "unit": "percent",
+      "period": "tax_year",
+      "authority": "ITA 2007 s8(2)",
+      "source_url": "https://www.gov.uk/tax-on-dividends",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "33.75%",
+        "near": "higher rate"
+      }
+    },
+    "it.pa_taper_threshold": {
+      "value": 100000,
+      "unit": "GBP",
+      "period": "tax_year",
+      "authority": "ITA 2007 s35(2)",
+      "source_url": "https://www.gov.uk/government/publications/rates-and-allowances-income-tax/income-tax-rates-and-allowances-current-and-past",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "£100,000",
+        "near": "income limit for Personal Allowance"
+      }
+    },
+    "it.personal_allowance": {
+      "value": 12570,
+      "unit": "GBP",
+      "period": "tax_year",
+      "authority": "ITA 2007 s35",
+      "source_url": "https://www.gov.uk/government/publications/rates-and-allowances-income-tax/income-tax-rates-and-allowances-current-and-past",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "£12,570",
+        "near": "Personal Allowance"
+      }
+    },
+    "it.ruk.bands": {
+      "value": [
+        {
+          "upto": 37700,
+          "rate": 20,
+          "name": "basic"
+        },
+        {
+          "upto": 125140,
+          "rate": 40,
+          "name": "higher"
+        },
+        {
+          "upto": null,
+          "rate": 45,
+          "name": "additional"
+        }
+      ],
+      "unit": "bands",
+      "period": "tax_year",
+      "authority": "ITA 2007 s6, s10; Finance Act (annual) income tax charge",
+      "source_url": "https://www.gov.uk/government/publications/rates-and-allowances-income-tax/income-tax-rates-and-allowances-current-and-past",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "£37,700",
+        "near": "Basic rate"
+      },
+      "note": "Bands are on taxable income (after the personal allowance). Additional rate threshold £125,140 from 2023-24."
+    },
+    "it.sco.bands": {
+      "value": [
+        {
+          "upto": 2162,
+          "rate": 19,
+          "name": "starter"
+        },
+        {
+          "upto": 13118,
+          "rate": 20,
+          "name": "basic"
+        },
+        {
+          "upto": 31092,
+          "rate": 21,
+          "name": "intermediate"
+        },
+        {
+          "upto": 125140,
+          "rate": 42,
+          "name": "higher"
+        },
+        {
+          "upto": null,
+          "rate": 47,
+          "name": "top"
+        }
+      ],
+      "unit": "bands",
+      "period": "tax_year",
+      "authority": "ITA 2007 s6A, s11A-11D (Scottish rate resolution)",
+      "source_url": "https://www.gov.uk/scottish-income-tax",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "19%",
+        "near": "Starter rate"
+      },
+      "note": "Expressed on taxable income: GOV.UK publishes gross thresholds assuming the standard £12,570 allowance; subtract £12,570 to compare. Scottish rates apply to non-savings, non-dividend income only."
+    },
+    "it.trading_allowance": {
+      "value": 1000,
+      "unit": "GBP",
+      "period": "tax_year",
+      "authority": "ITTOIA 2005 s783A",
+      "source_url": "https://www.gov.uk/guidance/tax-free-allowances-on-property-and-trading-income",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "£1,000",
+        "near": "trading allowance"
+      }
+    },
+    "it.wal.bands": {
+      "value": [
+        {
+          "upto": 37700,
+          "rate": 20,
+          "name": "basic"
+        },
+        {
+          "upto": 125140,
+          "rate": 40,
+          "name": "higher"
+        },
+        {
+          "upto": null,
+          "rate": 45,
+          "name": "additional"
+        }
+      ],
+      "unit": "bands",
+      "period": "tax_year",
+      "authority": "ITA 2007 s6B-6C (Welsh rates of income tax)",
+      "source_url": "https://www.gov.uk/welsh-income-tax",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "20%",
+        "near": "Basic rate"
+      },
+      "note": "Welsh rates (10p per band) plus the reduced UK rates give the same totals as rest-of-UK; held separately so a Senedd change is a parameter edit."
+    },
+    "loans.bik_threshold": {
+      "value": 10000,
+      "unit": "GBP",
+      "period": "tax_year",
+      "authority": "ITEPA 2003 s180",
+      "source_url": "https://www.gov.uk/expenses-and-benefits-loans-provided-to-employees",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "£10,000",
+        "near": "£10,000"
+      }
+    },
+    "loans.official_rate": {
+      "value": 2.25,
+      "unit": "percent",
+      "period": "tax_year",
+      "authority": "ITEPA 2003 s181; FA 1989 s178",
+      "source_url": "https://www.gov.uk/government/publications/rates-and-allowances-beneficial-loan-arrangements-hmrc-official-rates",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "2.25%",
+        "near": "official rate"
+      },
+      "note": "2.25% applied from 6 April 2023 (the rate was revised during 2023-24 to 2.25%); confirm the in-year history."
+    },
+    "mtd_itsa.schedule": {
+      "value": [
+        {
+          "from_tax_year": "2026-27",
+          "reference_year": "2024-25",
+          "threshold": 50000
+        },
+        {
+          "from_tax_year": "2027-28",
+          "reference_year": "2025-26",
+          "threshold": 30000
+        },
+        {
+          "from_tax_year": "2028-29",
+          "reference_year": "2026-27",
+          "threshold": 20000
+        }
+      ],
+      "unit": "table",
+      "period": "tax_year",
+      "authority": "TMA 1970 Sch A1; SI 2021/1076",
+      "source_url": "https://www.gov.uk/guidance/check-if-youre-eligible-for-making-tax-digital-for-income-tax",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "£30,000",
+        "near": "2027"
+      }
+    },
+    "mtd_itsa.threshold": {
+      "value": null,
+      "unit": "GBP",
+      "period": "tax_year",
+      "authority": "TMA 1970 Sch A1; SI 2021/1076",
+      "source_url": "https://www.gov.uk/guidance/check-if-youre-eligible-for-making-tax-digital-for-income-tax",
+      "retrieved": null,
+      "verified": false
+    },
+    "nic.class1.lel": {
+      "value": 6396,
+      "unit": "GBP",
+      "period": "tax_year",
+      "authority": "SSCBA 1992 s5; SI 2001/1004 reg 10",
+      "source_url": "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2023-to-2024",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "£6,396",
+        "near": "Lower Earnings Limit"
+      }
+    },
+    "nic.class1.primary_additional_rate": {
+      "value": 2,
+      "unit": "percent",
+      "period": "tax_year",
+      "authority": "SSCBA 1992 s8(1)(b)",
+      "source_url": "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2023-to-2024",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "2%",
+        "near": "above the Upper Earnings Limit"
+      }
+    },
+    "nic.class1.primary_main_rate_director": {
+      "value": 11.5,
+      "unit": "percent",
+      "period": "tax_year",
+      "authority": "SSCBA 1992 s8; SI 2001/1004 reg 8 (directors' annual earnings period)",
+      "source_url": "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2023-to-2024",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "11.5%",
+        "near": "director"
+      },
+      "note": "Main rate fell from 12% to 10% on 6 January 2024; directors on the annual earnings period use the blended 11.5% for 2023-24."
+    },
+    "nic.class1.pt": {
+      "value": 12570,
+      "unit": "GBP",
+      "period": "tax_year",
+      "authority": "SSCBA 1992 s5; SI 2001/1004 reg 10",
+      "source_url": "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2023-to-2024",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "£12,570",
+        "near": "Primary Threshold"
+      }
+    },
+    "nic.class1.secondary_rate": {
+      "value": 13.8,
+      "unit": "percent",
+      "period": "tax_year",
+      "authority": "SSCBA 1992 s9(2)",
+      "source_url": "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2023-to-2024",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "13.8%",
+        "near": "Employer"
+      }
+    },
+    "nic.class1.st": {
+      "value": 9100,
+      "unit": "GBP",
+      "period": "tax_year",
+      "authority": "SSCBA 1992 s9; SI 2001/1004 reg 10",
+      "source_url": "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2023-to-2024",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "£9,100",
+        "near": "Secondary Threshold"
+      }
+    },
+    "nic.class1.uel": {
+      "value": 50270,
+      "unit": "GBP",
+      "period": "tax_year",
+      "authority": "SSCBA 1992 s5; SI 2001/1004 reg 10",
+      "source_url": "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2023-to-2024",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "£50,270",
+        "near": "Upper Earnings Limit"
+      }
+    },
+    "nic.class2.compulsory": {
+      "value": true,
+      "unit": "bool",
+      "period": "tax_year",
+      "authority": "SSCBA 1992 s11 as amended by NICs (Reduction in Rates) (No. 2) Act 2024",
+      "source_url": "https://www.gov.uk/self-employed-national-insurance-rates",
+      "retrieved": null,
+      "verified": false,
+      "note": "From 2024-25 no Class 2 is payable: profits at or above the small profits threshold get a credited year; below it, voluntary payment protects the record. 2023-24: payable only on profits at or above the lower profits limit; between SPT and LPL a credit is given."
+    },
+    "nic.class2.small_profits_threshold": {
+      "value": 6725,
+      "unit": "GBP",
+      "period": "tax_year",
+      "authority": "SSCBA 1992 s11(4)",
+      "source_url": "https://www.gov.uk/self-employed-national-insurance-rates",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "£6,725",
+        "near": "Small Profits Threshold"
+      }
+    },
+    "nic.class2.weekly_rate": {
+      "value": 3.45,
+      "unit": "GBP",
+      "period": "tax_year",
+      "authority": "SSCBA 1992 s11(1)",
+      "source_url": "https://www.gov.uk/self-employed-national-insurance-rates",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "£3.45",
+        "near": "Class 2"
+      }
+    },
+    "nic.class4.additional_rate": {
+      "value": 2,
+      "unit": "percent",
+      "period": "tax_year",
+      "authority": "SSCBA 1992 s15(3ZA)(b)",
+      "source_url": "https://www.gov.uk/self-employed-national-insurance-rates",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "2%",
+        "near": "Class 4"
+      }
+    },
+    "nic.class4.lower_profits_limit": {
+      "value": 12570,
+      "unit": "GBP",
+      "period": "tax_year",
+      "authority": "SSCBA 1992 s15(3)",
+      "source_url": "https://www.gov.uk/self-employed-national-insurance-rates",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "£12,570",
+        "near": "Class 4"
+      }
+    },
+    "nic.class4.main_rate": {
+      "value": 9,
+      "unit": "percent",
+      "period": "tax_year",
+      "authority": "SSCBA 1992 s15(3ZA)",
+      "source_url": "https://www.gov.uk/self-employed-national-insurance-rates",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "9%",
+        "near": "Class 4"
+      }
+    },
+    "nic.class4.upper_profits_limit": {
+      "value": 50270,
+      "unit": "GBP",
+      "period": "tax_year",
+      "authority": "SSCBA 1992 s15(3)",
+      "source_url": "https://www.gov.uk/self-employed-national-insurance-rates",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "£50,270",
+        "near": "Class 4"
+      }
+    },
+    "nic.employment_allowance": {
+      "value": 5000,
+      "unit": "GBP",
+      "period": "tax_year",
+      "authority": "NICA 2014 s1",
+      "source_url": "https://www.gov.uk/claim-employment-allowance",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "£5,000",
+        "near": "Employment Allowance"
+      }
+    },
+    "nic.employment_allowance_prior_year_limit": {
+      "value": 100000,
+      "unit": "GBP",
+      "period": "tax_year",
+      "authority": "NICA 2014 s1(3A) (de minimis state aid / £100,000 test)",
+      "source_url": "https://www.gov.uk/claim-employment-allowance",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "£100,000",
+        "near": "£100,000"
+      }
+    },
+    "pension.annual_allowance": {
+      "value": 60000,
+      "unit": "GBP",
+      "period": "tax_year",
+      "authority": "FA 2004 s228",
+      "source_url": "https://www.gov.uk/tax-on-your-private-pension/annual-allowance",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "£60,000",
+        "near": "annual allowance"
+      }
+    },
+    "pension.taper_adjusted_income": {
+      "value": 260000,
+      "unit": "GBP",
+      "period": "tax_year",
+      "authority": "FA 2004 s228ZA",
+      "source_url": "https://www.gov.uk/tax-on-your-private-pension/annual-allowance",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "£260,000",
+        "near": "adjusted income"
+      }
+    },
+    "pension.taper_minimum": {
+      "value": 10000,
+      "unit": "GBP",
+      "period": "tax_year",
+      "authority": "FA 2004 s228ZA",
+      "source_url": "https://www.gov.uk/tax-on-your-private-pension/annual-allowance",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "£10,000",
+        "near": "£10,000"
+      }
+    },
+    "pension.taper_threshold_income": {
+      "value": 200000,
+      "unit": "GBP",
+      "period": "tax_year",
+      "authority": "FA 2004 s228ZA",
+      "source_url": "https://www.gov.uk/tax-on-your-private-pension/annual-allowance",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "£200,000",
+        "near": "threshold income"
+      }
+    },
+    "sa.poa_at_source_pct": {
+      "value": 80,
+      "unit": "percent",
+      "period": "tax_year",
+      "authority": "SI 1996/1654 reg 3",
+      "source_url": "https://www.gov.uk/understand-self-assessment-bill/payments-on-account",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "80%",
+        "near": "80%"
+      }
+    },
+    "sa.poa_threshold": {
+      "value": 1000,
+      "unit": "GBP",
+      "period": "tax_year",
+      "authority": "SI 1996/1654 reg 3",
+      "source_url": "https://www.gov.uk/understand-self-assessment-bill/payments-on-account",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "£1,000",
+        "near": "£1,000"
+      }
+    },
+    "vat.annual_join_limit": {
+      "value": 1350000,
+      "unit": "GBP",
+      "period": "financial_year",
+      "authority": "SI 1995/2518 reg 52",
+      "source_url": "https://www.gov.uk/vat-annual-accounting-scheme/eligibility",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "£1.35 million",
+        "near": "£1.35"
+      }
+    },
+    "vat.annual_leave_limit": {
+      "value": 1600000,
+      "unit": "GBP",
+      "period": "financial_year",
+      "authority": "SI 1995/2518 reg 53",
+      "source_url": "https://www.gov.uk/vat-annual-accounting-scheme/eligibility",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "£1.6 million",
+        "near": "£1.6"
+      }
+    },
+    "vat.business_gift_limit": {
+      "value": 50,
+      "unit": "GBP",
+      "period": "financial_year",
+      "authority": "VATA 1994 Sch 4 para 5(2)(a)",
+      "source_url": "https://www.gov.uk/guidance/vat-on-business-gifts-and-promotional-items-notice-7007",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "£50",
+        "near": "£50"
+      }
+    },
+    "vat.cash_join_limit": {
+      "value": 1350000,
+      "unit": "GBP",
+      "period": "financial_year",
+      "authority": "SI 1995/2518 reg 58(1)",
+      "source_url": "https://www.gov.uk/vat-cash-accounting-scheme/eligibility",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "£1.35 million",
+        "near": "£1.35"
+      }
+    },
+    "vat.cash_leave_limit": {
+      "value": 1600000,
+      "unit": "GBP",
+      "period": "financial_year",
+      "authority": "SI 1995/2518 reg 60(1)",
+      "source_url": "https://www.gov.uk/vat-cash-accounting-scheme/eligibility",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "£1.6 million",
+        "near": "£1.6"
+      }
+    },
+    "vat.deregistration_threshold": {
+      "value": 83000,
+      "unit": "GBP",
+      "period": "financial_year",
+      "authority": "VATA 1994 Sch 1 para 4",
+      "source_url": "https://www.gov.uk/vat-registration/cancel-registration",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "£83,000",
+        "near": "deregistration"
+      }
+    },
+    "vat.frs_first_year_discount": {
+      "value": 1,
+      "unit": "percent",
+      "period": "financial_year",
+      "authority": "SI 1995/2518 reg 55JB",
+      "source_url": "https://www.gov.uk/vat-flat-rate-scheme/how-much-you-pay",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "1%",
+        "near": "1%"
+      }
+    },
+    "vat.frs_join_limit": {
+      "value": 150000,
+      "unit": "GBP",
+      "period": "financial_year",
+      "authority": "SI 1995/2518 reg 55L(1)(a)",
+      "source_url": "https://www.gov.uk/vat-flat-rate-scheme/eligibility",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "£150,000",
+        "near": "£150,000"
+      }
+    },
+    "vat.frs_lct_goods_min": {
+      "value": 1000,
+      "unit": "GBP",
+      "period": "financial_year",
+      "authority": "SI 1995/2518 reg 55A(1)",
+      "source_url": "https://www.gov.uk/vat-flat-rate-scheme/how-much-you-pay",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "£1,000",
+        "near": "£1,000"
+      }
+    },
+    "vat.frs_lct_goods_pct": {
+      "value": 2,
+      "unit": "percent",
+      "period": "financial_year",
+      "authority": "SI 1995/2518 reg 55A(1)",
+      "source_url": "https://www.gov.uk/vat-flat-rate-scheme/how-much-you-pay",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "2%",
+        "near": "2%"
+      }
+    },
+    "vat.frs_lct_rate": {
+      "value": 16.5,
+      "unit": "percent",
+      "period": "financial_year",
+      "authority": "SI 1995/2518 reg 55K (table) and reg 55A (limited cost business)",
+      "source_url": "https://www.gov.uk/vat-flat-rate-scheme/how-much-you-pay",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "16.5%",
+        "near": "limited cost"
+      }
+    },
+    "vat.frs_leave_limit": {
+      "value": 230000,
+      "unit": "GBP",
+      "period": "financial_year",
+      "authority": "SI 1995/2518 reg 55M(1)(b)",
+      "source_url": "https://www.gov.uk/vat-flat-rate-scheme/eligibility",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "£230,000",
+        "near": "£230,000"
+      }
+    },
+    "vat.frs_sector_rates": {
+      "value": {
+        "Accountancy or book-keeping": 14.5,
+        "Advertising": 11,
+        "Architect, civil and structural engineer or surveyor": 14.5,
+        "Business services not listed elsewhere": 12,
+        "Computer and IT consultancy or data processing": 14.5,
+        "Computer repair services": 10.5,
+        "General building or construction services": 9.5,
+        "Labour-only building or construction services": 14.5,
+        "Management consultancy": 14,
+        "Photography": 11,
+        "Any other activity not listed elsewhere": 12
+      },
+      "unit": "table",
+      "period": "financial_year",
+      "authority": "SI 1995/2518 reg 55K (table of categories)",
+      "source_url": "https://www.gov.uk/vat-flat-rate-scheme/how-much-you-pay",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "14.5%",
+        "near": "Computer and IT consultancy"
+      }
+    },
+    "vat.registration_threshold": {
+      "value": 85000,
+      "unit": "GBP",
+      "period": "financial_year",
+      "authority": "VATA 1994 Sch 1 para 1",
+      "source_url": "https://www.gov.uk/vat-registration/when-to-register",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "£85,000",
+        "near": "threshold"
+      }
+    },
+    "vat.standard_rate": {
+      "value": 20,
+      "unit": "percent",
+      "period": "financial_year",
+      "authority": "VATA 1994 s2(1)",
+      "source_url": "https://www.gov.uk/vat-rates",
+      "retrieved": null,
+      "verified": false,
+      "verify": {
+        "text": "20%",
+        "near": "Standard rate"
+      }
+    }
+  }
+}

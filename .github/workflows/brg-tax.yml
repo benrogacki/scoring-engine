@@ -1,0 +1,50 @@
+# BRG Tax Engine: rules validation, unit/golden/parity tests and a sample run on every push.
+#
+# The sample clients are synthetic. Parameter values stay `verified: false` until
+# `brg-tax params-update` is run somewhere with access to GOV.UK; `brg-tax check` warns (but does not
+# fail) on unverified values, and fails on any rules-library problem.
+name: BRG tax engine
+
+on:
+  push:
+    paths: ["brg_tax/**", "tests/brg_tax/**", "clients/**", "policy.json", "pyproject.toml", ".github/workflows/brg-tax.yml"]
+  pull_request:
+    paths: ["brg_tax/**", "tests/brg_tax/**", "clients/**", "policy.json", "pyproject.toml", ".github/workflows/brg-tax.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install
+        run: pip install -e ".[tax,test]"
+
+      - name: Validate rules and parameters
+        run: brg-tax check
+
+      - name: Tests (unit, golden, JS parity, CLI)
+        run: pytest tests/brg_tax -v
+
+      - name: Sample run (October, then December compared with October)
+        run: |
+          brg-tax run --clients clients --policy policy.json --as-of 2026-10-09 --out out/oct --strict
+          brg-tax run --clients clients --policy policy.json --as-of 2026-12-01 --previous out/oct --out out/dec --strict
+          brg-tax diff out/oct out/dec
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: brg-tax-sample-dashboard
+          path: out/dec
+          retention-days: 14

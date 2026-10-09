@@ -1,0 +1,28 @@
+{
+  "id": "c01-asha-patel",
+  "name": "Asha Patel Consulting",
+  "entity_type": "sole_trader",
+  "package": "freeagent",
+  "region": "england",
+  "periods": [
+    {
+      "start": "2025-04-01",
+      "end": "2026-03-31"
+    }
+  ],
+  "vat": {
+    "registered": false,
+    "expected_next_30_days": 7800
+  },
+  "sole_trader": {
+    "trading_start": "2019-05-01",
+    "other_income": 0,
+    "prior_year_liability": 15000,
+    "poas_paid_for_year": 15000,
+    "turnover_by_tax_year": {
+      "2024-25": 48000
+    },
+    "mtd_software": false
+  },
+  "notes": "Synthetic. Exercises the VAT historic and forward-look tests, simplified expenses, mixed-use phone, entertaining and MTD forward look."
+}

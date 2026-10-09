@@ -1,0 +1,51 @@
+Dated On,Nominal Code,Category,Description,Debit,Credit,VAT,Contact,Reference,BRG Facts
+2025-04-05,365,Computer Software,Cloud software subscriptions,100.00,,0.00,,FA0001,
+2025-04-12,363,Telephone,Mobile and broadband,40.00,,0.00,,FA0002,private_use_pct=20
+2025-04-28,001,Sales,Consultancy fees,,6500.00,0.00,Northwind Analytics Ltd,FA0003,
+2025-05-05,365,Computer Software,Cloud software subscriptions,100.00,,0.00,,FA0004,
+2025-05-12,363,Telephone,Mobile and broadband,40.00,,0.00,,FA0005,private_use_pct=20
+2025-05-28,001,Sales,Consultancy fees,,6500.00,0.00,Northwind Analytics Ltd,FA0006,
+2025-06-05,365,Computer Software,Cloud software subscriptions,100.00,,0.00,,FA0007,
+2025-06-10,260,Insurance,Professional indemnity insurance,600.00,,0.00,,FA0008,
+2025-06-12,363,Telephone,Mobile and broadband,40.00,,0.00,,FA0009,private_use_pct=20
+2025-06-28,001,Sales,Consultancy fees,,6500.00,0.00,Northwind Analytics Ltd,FA0010,
+2025-07-05,365,Computer Software,Cloud software subscriptions,100.00,,0.00,,FA0011,
+2025-07-08,602,Computer Equipment,Laptop,1500.00,,0.00,,FA0012,
+2025-07-12,363,Telephone,Mobile and broadband,40.00,,0.00,,FA0013,private_use_pct=20
+2025-07-28,001,Sales,Consultancy fees,,6500.00,0.00,Northwind Analytics Ltd,FA0014,
+2025-08-05,365,Computer Software,Cloud software subscriptions,100.00,,0.00,,FA0015,
+2025-08-12,363,Telephone,Mobile and broadband,40.00,,0.00,,FA0016,private_use_pct=20
+2025-08-28,001,Sales,Consultancy fees,,6500.00,0.00,Northwind Analytics Ltd,FA0017,
+2025-09-05,365,Computer Software,Cloud software subscriptions,100.00,,0.00,,FA0018,
+2025-09-12,363,Telephone,Mobile and broadband,40.00,,0.00,,FA0019,private_use_pct=20
+2025-09-18,350,Training,Data visualisation refresher course,500.00,,0.00,,FA0020,new_skill=no
+2025-09-28,001,Sales,Consultancy fees,,6500.00,0.00,Northwind Analytics Ltd,FA0021,
+2025-10-05,365,Computer Software,Cloud software subscriptions,100.00,,0.00,,FA0022,
+2025-10-12,363,Telephone,Mobile and broadband,40.00,,0.00,,FA0023,private_use_pct=20
+2025-10-28,001,Sales,Consultancy fees,,6500.00,0.00,Northwind Analytics Ltd,FA0024,
+2025-11-05,365,Computer Software,Cloud software subscriptions,100.00,,0.00,,FA0025,
+2025-11-12,363,Telephone,Mobile and broadband,40.00,,0.00,,FA0026,private_use_pct=20
+2025-11-14,253,Entertaining,Client lunch - project kick-off,350.00,,0.00,,FA0027,attendees=includes_non_employees
+2025-11-28,001,Sales,Consultancy fees,,6500.00,0.00,Northwind Analytics Ltd,FA0028,
+2025-12-05,365,Computer Software,Cloud software subscriptions,100.00,,0.00,,FA0029,
+2025-12-12,363,Telephone,Mobile and broadband,40.00,,0.00,,FA0030,private_use_pct=20
+2025-12-28,001,Sales,Consultancy fees,,6500.00,0.00,Northwind Analytics Ltd,FA0031,
+2026-01-05,365,Computer Software,Cloud software subscriptions,100.00,,0.00,,FA0032,
+2026-01-12,363,Telephone,Mobile and broadband,40.00,,0.00,,FA0033,private_use_pct=20
+2026-01-28,001,Sales,Consultancy fees,,6500.00,0.00,Northwind Analytics Ltd,FA0034,
+2026-02-05,365,Computer Software,Cloud software subscriptions,100.00,,0.00,,FA0035,
+2026-02-12,363,Telephone,Mobile and broadband,40.00,,0.00,,FA0036,private_use_pct=20
+2026-02-20,201,Accountancy Fees,Accounts and tax return fee,900.00,,0.00,,FA0037,
+2026-02-28,001,Sales,Consultancy fees,,6500.00,0.00,Northwind Analytics Ltd,FA0038,
+2026-03-05,365,Computer Software,Cloud software subscriptions,100.00,,0.00,,FA0039,
+2026-03-12,363,Telephone,Mobile and broadband,40.00,,0.00,,FA0040,private_use_pct=20
+2026-03-28,001,Sales,Consultancy fees,,6500.00,0.00,Northwind Analytics Ltd,FA0041,
+2026-03-31,450,Depreciation,Depreciation - computer equipment,500.00,,0.00,,FA0042,
+2026-03-31,281,Mileage Allowance,Business mileage 2025-26 (own car),900.00,,0.00,,FA0043,business_miles=2000
+2026-03-31,270,Use of Home,Use of home - simplified flat rate,312.00,,0.00,,FA0044,method=flat_rate; hours_per_month=101
+2026-04-28,001,Sales,Consultancy fees,,7500.00,0.00,Northwind Analytics Ltd,FA0045,
+2026-05-28,001,Sales,Consultancy fees,,7500.00,0.00,Northwind Analytics Ltd,FA0046,
+2026-06-28,001,Sales,Consultancy fees,,7500.00,0.00,Northwind Analytics Ltd,FA0047,
+2026-07-28,001,Sales,Consultancy fees,,7500.00,0.00,Northwind Analytics Ltd,FA0048,
+2026-08-28,001,Sales,Consultancy fees,,7500.00,0.00,Northwind Analytics Ltd,FA0049,
+2026-09-28,001,Sales,Consultancy fees,,7500.00,0.00,Northwind Analytics Ltd,FA0050,

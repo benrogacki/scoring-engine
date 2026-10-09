@@ -1,0 +1,20 @@
+code,name,debit,credit
+090,Business Bank Account,31034.50,
+200,Sales,,72000.00
+404,Bank Fees,120.00,
+412,Consulting & Accounting,1800.00,
+416,Depreciation,800.00,
+420,Entertainment,600.00,
+421,Staff Entertainment,140.00,
+422,Client Gifts,240.00,
+456,Fines and Penalties,60.00,
+461,Software,2400.00,
+469,Rent,6000.00,
+478,Directors' Remuneration,12570.00,
+479,Employers National Insurance,1135.50,
+719,Accumulated Depreciation,,800.00
+720,Computer Equipment,2000.00,
+835,Directors' Loan Account,9000.00,
+950,Capital - Ordinary Shares,,100.00
+960,Retained Earnings,,15000.00
+970,Dividends,20000.00,

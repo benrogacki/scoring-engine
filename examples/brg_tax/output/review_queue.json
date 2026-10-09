@@ -1,0 +1,226 @@
+{
+  "schema": "brg_tax/review_queue@1",
+  "as_of": "2026-10-09",
+  "fingerprint": "49fe6bac1ac1a80c",
+  "items": [
+    {
+      "id": "c02-brightside:AA-464C-01:d1:2026-04-20",
+      "client_id": "c02-brightside",
+      "kind": "anti_avoidance",
+      "rule_id": "AA-464C-01",
+      "title": "s464C: repayment redrawn within 30 days (Jordan Hale)",
+      "question": "Was a repayment of at least the s464C amount followed within 30 days by new advances of at least that amount?",
+      "factors": [],
+      "authorities": [],
+      "authority": [
+        "CTA 2010 s464C(1)"
+      ],
+      "guidance": [
+        "CTM61620",
+        "CTM61625"
+      ],
+      "proposed": {
+        "matched": 600000
+      },
+      "reasoning": "\u00a36,000.00 repaid on 2026-04-20 and \u00a36,000.00 redrawn by 2026-05-10. The repayment is matched to the new advance and does not reduce the s455 charge (s464C(1)).",
+      "amount": 600000,
+      "txn_ids": [],
+      "status": "open",
+      "decision": null,
+      "impact": "s455 on the matched amount: \u00a32,025.00"
+    },
+    {
+      "id": "c03-northgate:CA-AIA-02:aia",
+      "client_id": "c03-northgate",
+      "kind": "judgment",
+      "rule_id": "CA-AIA-02",
+      "title": "AIA shared with an associated company?",
+      "question": "Is this company related to another (common control and shared premises or similar activities), so one AIA is shared?",
+      "factors": [
+        "Are the businesses controlled by the same person(s)?",
+        "The shared premises condition - do they carry on qualifying activities from the same premises?",
+        "The similar activities condition - is more than 50% of turnover from the same NACE classification?",
+        "Groups of companies share one AIA (s51C) regardless of these conditions"
+      ],
+      "authorities": [
+        "CAA 2001 s51G (shared premises condition)",
+        "CAA 2001 s51H (similar activities condition)"
+      ],
+      "authority": [
+        "CAA 2001 s51B-51N"
+      ],
+      "guidance": [
+        "CA23090",
+        "CA23092"
+      ],
+      "proposed": {
+        "aia_allocation": "full"
+      },
+      "reasoning": "An associated company is recorded. The full AIA is provisionally allocated to this company on the assumption that the related business claims none; the reviewer must confirm the allocation.",
+      "amount": 0,
+      "txn_ids": [],
+      "status": "open",
+      "decision": null,
+      "impact": "Changes the AIA available and so the capital allowances claimed."
+    },
+    {
+      "id": "c04-ridgeway:CT-RD-01:rd",
+      "client_id": "c04-ridgeway",
+      "kind": "judgment",
+      "rule_id": "CT-RD-01",
+      "title": "Possible R&D relief claim",
+      "question": "Is a claim to R&D expenditure credit or enhanced R&D intensive support available?",
+      "factors": [
+        "Detected from transactions coded research_development or descriptions mentioning prototypes or development",
+        "Claim notification within six months of period end for first-time claimants (FA 2022 Sch 1)",
+        "Additional information form required before the CT600 claim"
+      ],
+      "authorities": [
+        "Get Onbord Ltd v HMRC [2023] UKFTT 00189 (TC)"
+      ],
+      "authority": [
+        "CTA 2009 Part 13",
+        "CTA 2009 s1042"
+      ],
+      "guidance": [
+        "CIRD80000"
+      ],
+      "proposed": {
+        "claim": "none"
+      },
+      "reasoning": "No relief is computed. A reviewer must decide whether to scope a claim.",
+      "amount": 350000,
+      "txn_ids": [
+        "transactions:107"
+      ],
+      "status": "open",
+      "decision": null,
+      "impact": "No relief computed. A claim could reduce the CT liability or produce a credit."
+    },
+    {
+      "id": "c04-ridgeway:AA-SETTLE-01:p2",
+      "client_id": "c04-ridgeway",
+      "kind": "anti_avoidance",
+      "rule_id": "AA-SETTLE-01",
+      "title": "Settlements legislation: Alex Okafor",
+      "question": "Is dividend income arising to a spouse, civil partner or minor child from shares that are not an outright gift of ordinary share capital carrying full rights?",
+      "factors": [
+        "Is there an arrangement with an element of bounty (an uncommercial transfer of value)?",
+        "Are the shares a separate class (alphabet shares), carry restricted rights, or are dividends waived/varied?",
+        "Is the income mainly derived from one person's work in the company?",
+        "The s626 exemption for outright gifts between spouses of shares that are not wholly or substantially a right to income"
+      ],
+      "authorities": [
+        "Jones v Garnett [2007] UKHL 35",
+        "Buck v HMRC [2009] STC (SCD) 6",
+        "Bird v HMRC [2008] STC (SCD) 1145"
+      ],
+      "authority": [
+        "ITTOIA 2005 s619",
+        "ITTOIA 2005 s624",
+        "ITTOIA 2005 s626",
+        "ITTOIA 2005 s629"
+      ],
+      "guidance": [
+        "TSEM4000",
+        "TSEM4200"
+      ],
+      "proposed": {
+        "flag": true,
+        "tax_effect": "none_computed"
+      },
+      "reasoning": "Alex Okafor holds B shares (a separate class) and connected to d1, who works in the business and does not work in the business. Dividends to them may be taxed on the settlor (ITTOIA s624).",
+      "amount": 0,
+      "txn_ids": [],
+      "status": "open",
+      "decision": null,
+      "impact": ""
+    },
+    {
+      "id": "c05-kestrel:EXP-HOME-02:transactions:58",
+      "client_id": "c05-kestrel",
+      "kind": "judgment",
+      "rule_id": "EXP-HOME-02",
+      "title": "Use of home - actual cost apportionment: Use of home office - payment to director",
+      "question": "What part of the household costs relates to business use, and is that apportionment reasonable?",
+      "factors": [
+        "Number of rooms used and whether any room is used exclusively for business (CGT private residence relief risk)",
+        "Hours of business use against total use",
+        "Which costs are fixed (council tax, mortgage interest, rent) and which vary with use (heat, light)",
+        "For a company paying a director - is there a written arrangement and evidence of the additional household costs?",
+        "Payments up to the employee flat rate per week are exempt without evidence (ITEPA s316A)"
+      ],
+      "authorities": [
+        "Mallalieu v Drummond [1983] 2 AC 861",
+        "Baird v Williams [1999] STC 635"
+      ],
+      "authority": [
+        "ITTOIA 2005 s34(2)",
+        "CTA 2009 s54",
+        "ITEPA 2003 s316A"
+      ],
+      "guidance": [
+        "BIM47820",
+        "BIM47825",
+        "EIM32760"
+      ],
+      "proposed": {
+        "ct": "allow"
+      },
+      "reasoning": "The claim is provisionally allowed for the business. For a company, only the employee flat rate per week is exempt for the director without evidence; any excess is at risk of being taxable earnings.",
+      "amount": 120000,
+      "txn_ids": [
+        "transactions:58"
+      ],
+      "status": "open",
+      "decision": null,
+      "impact": ""
+    },
+    {
+      "id": "c05-kestrel:EXT-IR35-01:contract0",
+      "client_id": "c05-kestrel",
+      "kind": "judgment",
+      "rule_id": "EXT-IR35-01",
+      "title": "Employment status: Halden Bank plc (via Stackline Recruitment)",
+      "question": "Would the director be an employee of the end client if engaged directly (hypothetical contract)?",
+      "factors": [
+        "Mutuality of obligation - an obligation to provide and accept work",
+        "Control - over what, how, when and where the work is done",
+        "Personal service and genuine right of substitution",
+        "Part and parcel of the client's organisation",
+        "Financial risk, own equipment, opportunity to profit, multiple clients",
+        "Who decides status - client size (small client: the company decides under Chapter 8; medium/large client: the client issues an SDS under Chapter 10)",
+        "Client size recorded as unknown; SDS: none; via agency: yes"
+      ],
+      "authorities": [
+        "Ready Mixed Concrete (South East) Ltd v Minister of Pensions [1968] 2 QB 497",
+        "Hall v Lorimer [1994] 1 WLR 209",
+        "HMRC v Atholl House Productions Ltd [2022] EWCA Civ 501",
+        "HMRC v Professional Game Match Officials Ltd [2024] UKSC 29",
+        "Christa Ackroyd Media Ltd v HMRC [2019] UKUT 326 (TCC)",
+        "Kickabout Productions Ltd v HMRC [2022] EWCA Civ 502"
+      ],
+      "authority": [
+        "ITEPA 2003 s49",
+        "ITEPA 2003 s50",
+        "ITEPA 2003 s61K-61X",
+        "SSCBA 1992 s4A"
+      ],
+      "guidance": [
+        "ESM3000",
+        "ESM10000",
+        "ESM0500"
+      ],
+      "proposed": {
+        "status": "outside",
+        "deemed_payment": 0
+      },
+      "reasoning": "No status determination is on file. No deemed employment payment is included in the computation; the review item shows the estimated Chapter 8 deemed payment and tax if the engagement is inside.",
+      "amount": 11000000,
+      "txn_ids": [],
+      "status": "open",
+      "decision": null,
+      "impact": "If inside IR35 (Chapter 8): deemed payment about \u00a376,864.78, employer NIC \u00a311,529.72, extra income tax and NIC for the director about \u00a329,777.00. The deemed payment and its NIC are deductible for CT."
+    }
+  ]
+}

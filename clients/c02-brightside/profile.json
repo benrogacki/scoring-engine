@@ -1,0 +1,44 @@
+{
+  "id": "c02-brightside",
+  "name": "Brightside Design Ltd",
+  "entity_type": "company",
+  "package": "xero",
+  "region": "england",
+  "periods": [
+    {
+      "start": "2024-04-01",
+      "end": "2025-03-31"
+    },
+    {
+      "start": "2025-04-01",
+      "end": "2026-03-31"
+    }
+  ],
+  "incorporated": "2019-06-03",
+  "company_number": "SC000002",
+  "confirmation_statement_date": "2026-06-03",
+  "associated_companies": 0,
+  "people": [
+    {
+      "id": "d1",
+      "name": "Jordan Hale",
+      "shares": 100,
+      "region": "england",
+      "salary": 12570
+    }
+  ],
+  "vat": {
+    "registered": true,
+    "registration_date": "2021-01-01",
+    "scheme": "standard",
+    "stagger": "1",
+    "frs_sector": "Advertising",
+    "expected_next_12_months": 74000
+  },
+  "payroll": {
+    "operates": true
+  },
+  "opening_reserves": 15000,
+  "dla_account_code": "835",
+  "notes": "Synthetic. Single-director company: no Employment Allowance; overdrawn DLA with a repayment redrawn inside 30 days (s464C)."
+}

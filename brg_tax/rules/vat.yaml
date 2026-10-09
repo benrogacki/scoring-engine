@@ -1,0 +1,209 @@
+# VAT rules: input tax recovery on each purchase (applies: transaction) and the registration, scheme
+# and deregistration tests run on the whole business (applies: computation).
+# See expenses.yaml for how to read conditions and outcomes.
+#   outcome.vat  recover | blocked | none | not_registered | output_tax_check | {recover_pct: 50}
+#                | {recover_pct_fact: business_use_pct}
+domain: vat
+citations_checked: false
+rules:
+
+  - id: VAT-NOTREG-01
+    title: Business not registered for VAT
+    question: Is the business registered for VAT on the transaction date?
+    conditions: {vat_registered: false}
+    outcome: {vat: not_registered}
+    certainty: rule
+    priority: 100
+    authority: ["VATA 1994 s3", "VATA 1994 s24", "VATA 1994 s26"]
+    guidance: ["VATREG02000"]
+    entity_types: [company, sole_trader]
+    effective: {from: "1994-09-01", to: null}
+    params: []
+    notes: VAT paid is part of the cost (and allowable or capital with it). Pre-registration input tax (SI 1995/2518 reg 111) is not modelled.
+
+  - id: VAT-REC-01
+    title: Input tax on taxable business purchases
+    question: Is VAT charged on a purchase used for making taxable supplies?
+    conditions: {vat_registered: true, has_vat: true}
+    outcome: {vat: recover}
+    certainty: rule
+    authority: ["VATA 1994 s24", "VATA 1994 s25", "VATA 1994 s26"]
+    guidance: ["VIT10000"]
+    entity_types: [company, sole_trader]
+    effective: {from: "1994-09-01", to: null}
+    params: []
+    notes: Assumes wholly taxable supplies. Businesses with exempt supplies are flagged for partial exemption (VAT-PE-01).
+
+  - id: VAT-NONE-01
+    title: No VAT on the purchase
+    question: Is the purchase zero-rated, exempt or outside the scope of VAT?
+    conditions: {vat_registered: true, has_vat: false}
+    outcome: {vat: none}
+    certainty: rule
+    authority: ["VATA 1994 s24"]
+    guidance: ["VIT10000"]
+    entity_types: [company, sole_trader]
+    effective: {from: "1994-09-01", to: null}
+    params: []
+
+  - id: VAT-ENT-01
+    title: Business entertainment - input tax blocked
+    question: Is this business entertainment of non-employees?
+    conditions: {vat_registered: true, category: entertainment, attendees: includes_non_employees}
+    outcome: {vat: blocked}
+    certainty: rule
+    authority: ["SI 1992/3222 art 5", "VATA 1994 s25(7)"]
+    guidance: ["VIT43000"]
+    entity_types: [company, sole_trader]
+    effective: {from: "1994-09-01", to: null}
+    params: []
+
+  - id: VAT-CAR-01
+    title: Purchase of a car - input tax blocked
+    question: Is this the purchase of a motor car (as defined) that is available for private use?
+    conditions: {vat_registered: true, category: fixed_assets, asset_class: car, exclusive_business_use: [ "no", {missing: true}]}
+    outcome: {vat: blocked}
+    certainty: rule
+    authority: ["SI 1992/3222 art 7", "VATA 1994 s25(7)"]
+    guidance: ["VIT23000", "VAT Notice 700/64"]
+    entity_types: [company, sole_trader]
+    effective: {from: "1994-09-01", to: null}
+    params: []
+    notes: Recoverable only where the car is used exclusively for business with no availability for private use (e.g. a pool car), or for a taxi/driving school/leasing trade.
+
+  - id: VAT-CAR-02
+    title: Purchase of a car used exclusively for business
+    question: Is the car used exclusively for business, with no private availability?
+    conditions: {vat_registered: true, category: fixed_assets, asset_class: car, exclusive_business_use: "yes"}
+    outcome: {vat: recover}
+    certainty: rule
+    authority: ["SI 1992/3222 art 7(2G)"]
+    guidance: ["VIT23000"]
+    entity_types: [company, sole_trader]
+    effective: {from: "1994-09-01", to: null}
+    params: []
+
+  - id: VAT-FUEL-01
+    title: Road fuel with private use
+    question: Is fuel bought for a vehicle that is also used privately?
+    conditions: {vat_registered: true, category: motor_expenses, fuel: "yes", private_use_pct: {gt: 0}}
+    outcome: {vat: review_fact}
+    fact_needed: fuel_scale_charge_applied
+    certainty: rule
+    authority: ["VATA 1994 s56", "VATA 1994 s57"]
+    guidance: ["VAT Notice 700/64"]
+    entity_types: [company, sole_trader]
+    effective: {from: "1994-09-01", to: null}
+    params: []
+    default: {vat: {recover_pct_fact: business_use_pct}}
+    reasoning: >-
+      The business must either account for the fuel scale charge, reclaim only business fuel from mileage
+      records, or reclaim none. Provisionally only the business proportion is reclaimed.
+
+  # ------------------------------------------------------------------ whole-business tests
+  - id: VAT-REG-01
+    title: Compulsory registration - historic turnover test
+    question: Did taxable turnover in the last 12 months exceed the registration threshold at the end of any month?
+    applies: computation
+    certainty: rule
+    authority: ["VATA 1994 Sch 1 para 1(1)(a)", "VATA 1994 Sch 1 para 5"]
+    guidance: ["VATREG02000", "VAT Notice 700/1"]
+    entity_types: [company, sole_trader]
+    effective: {from: "1994-09-01", to: null}
+    params: ["vat.registration_threshold"]
+    notes: >-
+      Notify HMRC within 30 days of the end of the month in which the threshold was exceeded; registration
+      takes effect from the first day of the second month. The exception where turnover in the next 12
+      months is not expected to exceed the deregistration threshold (para 1(3)) is shown but not auto-applied.
+
+  - id: VAT-REG-02
+    title: Compulsory registration - forward-look test
+    question: Is taxable turnover in the next 30 days alone expected to exceed the registration threshold?
+    applies: computation
+    certainty: rule
+    authority: ["VATA 1994 Sch 1 para 1(1)(b)", "VATA 1994 Sch 1 para 6"]
+    guidance: ["VATREG02000"]
+    entity_types: [company, sole_trader]
+    effective: {from: "1994-09-01", to: null}
+    params: ["vat.registration_threshold"]
+    notes: Registration is from the start of the 30-day period; notify by the end of it.
+
+  - id: VAT-DEREG-01
+    title: Voluntary deregistration
+    question: Is taxable turnover in the next 12 months expected to be at or below the deregistration threshold?
+    applies: computation
+    certainty: election
+    authority: ["VATA 1994 Sch 1 para 4"]
+    guidance: ["VATREG32000"]
+    entity_types: [company, sole_trader]
+    effective: {from: "1994-09-01", to: null}
+    params: ["vat.deregistration_threshold"]
+    notes: Output tax is due on stock and assets held at deregistration (VATA Sch 4 para 8) if it exceeds £1,000.
+
+  - id: VAT-FRS-01
+    title: Flat rate scheme - eligibility and comparison
+    question: Is the business eligible for the flat rate scheme, and would it pay less VAT?
+    applies: computation
+    certainty: election
+    authority: ["VATA 1994 s26B", "SI 1995/2518 regs 55A-55V"]
+    guidance: ["VAT Notice 733"]
+    entity_types: [company, sole_trader]
+    effective: {from: "2002-04-25", to: null}
+    params: ["vat.frs_join_limit", "vat.frs_leave_limit", "vat.frs_sector_rates", "vat.frs_first_year_discount", "vat.standard_rate"]
+    notes: Sector selection is the business's main activity by turnover; a disputed sector should be resolved before joining.
+
+  - id: VAT-FRS-02
+    title: Flat rate scheme - limited cost trader test
+    question: Is the business's spend on relevant goods less than 2% of VAT-inclusive turnover or below the annual minimum?
+    applies: computation
+    certainty: rule
+    authority: ["SI 1995/2518 reg 55A(1)"]
+    guidance: ["VAT Notice 733 section 4"]
+    entity_types: [company, sole_trader]
+    effective: {from: "2017-04-01", to: null}
+    params: ["vat.frs_lct_rate", "vat.frs_lct_goods_pct", "vat.frs_lct_goods_min"]
+    notes: >-
+      Relevant goods exclude capital items, food and drink for staff, vehicle costs including fuel (unless
+      a transport business) and goods for resale or hire unless that is the main business. The engine
+      counts transactions with relevant_goods=yes, or categories cost_of_sales/materials by default.
+
+  - id: VAT-CASH-01
+    title: Cash accounting scheme eligibility
+    question: Is estimated taxable turnover in the next 12 months within the cash accounting limit?
+    applies: computation
+    certainty: election
+    authority: ["SI 1995/2518 regs 56-65"]
+    guidance: ["VAT Notice 731"]
+    entity_types: [company, sole_trader]
+    effective: {from: "1987-10-01", to: null}
+    params: ["vat.cash_join_limit", "vat.cash_leave_limit"]
+
+  - id: VAT-ANN-01
+    title: Annual accounting scheme eligibility
+    question: Is estimated taxable turnover in the next 12 months within the annual accounting limit?
+    applies: computation
+    certainty: election
+    authority: ["SI 1995/2518 regs 49-55"]
+    guidance: ["VAT Notice 732"]
+    entity_types: [company, sole_trader]
+    effective: {from: "1996-04-01", to: null}
+    params: ["vat.annual_join_limit", "vat.annual_leave_limit"]
+
+  - id: VAT-PE-01
+    title: Partial exemption (out of scope for v1)
+    question: Does the business make exempt supplies, so input tax must be apportioned?
+    applies: computation
+    certainty: judgment
+    authority: ["VATA 1994 s26", "SI 1995/2518 regs 99-111"]
+    guidance: ["VAT Notice 706", "PE11000"]
+    entity_types: [company, sole_trader]
+    effective: {from: "1994-09-01", to: null}
+    params: []
+    factors:
+      - Value of exempt supplies and directly attributable exempt input tax
+      - De minimis tests (simplified tests 1 and 2, standard test)
+      - Whether a special method is in place
+    authorities:
+      - "Commissioners of Customs and Excise v Midland Bank plc (C-98/98) [2000] STC 501"
+    default: {vat: recover}
+    reasoning: Input tax has been treated as fully recoverable. Partial exemption is not computed in v1; this must be worked by hand.

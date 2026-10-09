@@ -1,0 +1,73 @@
+Date,Transaction Type,No.,Name,Memo/Description,Account,Amount,Tax Amount,BRG Facts
+09/04/2025,Expense,1,,Plumbing materials,Cost of Sales,3750.00,750.00,
+14/04/2025,Expense,2,,Mobile phone,Telephone and Internet,50.00,0.00,private_use_pct=25
+15/04/2025,Expense,3,,"Van fuel, insurance and servicing",Vehicle Expenses,1000.00,0.00,private_use_pct=10
+22/04/2025,Expense,4,,Subcontract labour,Subcontractors,1000.00,0.00,
+26/04/2025,Invoice,5,Domestic customers,Plumbing and heating jobs,Sales,12500.00,2500.00,
+28/04/2025,Expense,6,,Drawings,Owner Drawings,3000.00,0.00,
+02/05/2025,Expense,7,,Public liability insurance,Insurance,1800.00,0.00,
+09/05/2025,Expense,8,,Plumbing materials,Cost of Sales,3750.00,750.00,
+14/05/2025,Expense,9,,Mobile phone,Telephone and Internet,50.00,0.00,private_use_pct=25
+22/05/2025,Expense,10,,Subcontract labour,Subcontractors,1000.00,0.00,
+26/05/2025,Invoice,11,Domestic customers,Plumbing and heating jobs,Sales,12500.00,2500.00,
+28/05/2025,Expense,12,,Drawings,Owner Drawings,3000.00,0.00,
+09/06/2025,Expense,13,,Plumbing materials,Cost of Sales,3750.00,750.00,
+14/06/2025,Expense,14,,Mobile phone,Telephone and Internet,50.00,0.00,private_use_pct=25
+18/06/2025,Expense,15,,Used van,Motor Vehicles,14000.00,2800.00,
+22/06/2025,Expense,16,,Subcontract labour,Subcontractors,1000.00,0.00,
+26/06/2025,Invoice,17,Domestic customers,Plumbing and heating jobs,Sales,12500.00,2500.00,
+28/06/2025,Expense,18,,Drawings,Owner Drawings,3000.00,0.00,
+09/07/2025,Expense,19,,Plumbing materials,Cost of Sales,3750.00,750.00,
+14/07/2025,Expense,20,,Mobile phone,Telephone and Internet,50.00,0.00,private_use_pct=25
+15/07/2025,Expense,21,,"Van fuel, insurance and servicing",Vehicle Expenses,1000.00,0.00,private_use_pct=10
+22/07/2025,Expense,22,,Subcontract labour,Subcontractors,1000.00,0.00,
+26/07/2025,Invoice,23,Domestic customers,Plumbing and heating jobs,Sales,12500.00,2500.00,
+28/07/2025,Expense,24,,Drawings,Owner Drawings,3000.00,0.00,
+09/08/2025,Expense,25,,Plumbing materials,Cost of Sales,3750.00,750.00,
+14/08/2025,Expense,26,,Mobile phone,Telephone and Internet,50.00,0.00,private_use_pct=25
+21/08/2025,Expense,27,,Speeding fine,Fines and Penalties,100.00,0.00,fine_liability=business
+22/08/2025,Expense,28,,Subcontract labour,Subcontractors,1000.00,0.00,
+26/08/2025,Invoice,29,Domestic customers,Plumbing and heating jobs,Sales,12500.00,2500.00,
+28/08/2025,Expense,30,,Drawings,Owner Drawings,3000.00,0.00,
+05/09/2025,Expense,31,,Van livery and flyers,Advertising/Promotional,1000.00,200.00,
+09/09/2025,Expense,32,,Plumbing materials,Cost of Sales,3750.00,750.00,
+14/09/2025,Expense,33,,Mobile phone,Telephone and Internet,50.00,0.00,private_use_pct=25
+22/09/2025,Expense,34,,Subcontract labour,Subcontractors,1000.00,0.00,
+26/09/2025,Invoice,35,Domestic customers,Plumbing and heating jobs,Sales,12500.00,2500.00,
+28/09/2025,Expense,36,,Drawings,Owner Drawings,3000.00,0.00,
+09/10/2025,Expense,37,,Plumbing materials,Cost of Sales,3750.00,750.00,
+14/10/2025,Expense,38,,Mobile phone,Telephone and Internet,50.00,0.00,private_use_pct=25
+15/10/2025,Expense,39,,"Van fuel, insurance and servicing",Vehicle Expenses,1000.00,0.00,private_use_pct=10
+22/10/2025,Expense,40,,Subcontract labour,Subcontractors,1000.00,0.00,
+26/10/2025,Invoice,41,Domestic customers,Plumbing and heating jobs,Sales,12500.00,2500.00,
+28/10/2025,Expense,42,,Drawings,Owner Drawings,3000.00,0.00,
+09/11/2025,Expense,43,,Plumbing materials,Cost of Sales,3750.00,750.00,
+14/11/2025,Expense,44,,Mobile phone,Telephone and Internet,50.00,0.00,private_use_pct=25
+22/11/2025,Expense,45,,Subcontract labour,Subcontractors,1000.00,0.00,
+26/11/2025,Invoice,46,Domestic customers,Plumbing and heating jobs,Sales,12500.00,2500.00,
+28/11/2025,Expense,47,,Drawings,Owner Drawings,3000.00,0.00,
+05/12/2025,Expense,48,,Supplier Christmas drinks,Meals and Entertainment,200.00,0.00,attendees=includes_non_employees
+09/12/2025,Expense,49,,Plumbing materials,Cost of Sales,3750.00,750.00,
+14/12/2025,Expense,50,,Mobile phone,Telephone and Internet,50.00,0.00,private_use_pct=25
+22/12/2025,Expense,51,,Subcontract labour,Subcontractors,1000.00,0.00,
+26/12/2025,Invoice,52,Domestic customers,Plumbing and heating jobs,Sales,12500.00,2500.00,
+28/12/2025,Expense,53,,Drawings,Owner Drawings,3000.00,0.00,
+09/01/2026,Expense,54,,Plumbing materials,Cost of Sales,3750.00,750.00,
+14/01/2026,Expense,55,,Mobile phone,Telephone and Internet,50.00,0.00,private_use_pct=25
+15/01/2026,Expense,56,,"Van fuel, insurance and servicing",Vehicle Expenses,1000.00,0.00,private_use_pct=10
+22/01/2026,Expense,57,,Subcontract labour,Subcontractors,1000.00,0.00,
+26/01/2026,Invoice,58,Domestic customers,Plumbing and heating jobs,Sales,12500.00,2500.00,
+28/01/2026,Expense,59,,Drawings,Owner Drawings,3000.00,0.00,
+09/02/2026,Expense,60,,Plumbing materials,Cost of Sales,3750.00,750.00,
+14/02/2026,Expense,61,,Mobile phone,Telephone and Internet,50.00,0.00,private_use_pct=25
+22/02/2026,Expense,62,,Subcontract labour,Subcontractors,1000.00,0.00,
+26/02/2026,Invoice,63,Domestic customers,Plumbing and heating jobs,Sales,12500.00,2500.00,
+28/02/2026,Expense,64,,Drawings,Owner Drawings,3000.00,0.00,
+09/03/2026,Expense,65,,Plumbing materials,Cost of Sales,3750.00,750.00,
+10/03/2026,Expense,66,,Accounts and tax return,Accountancy Fees,1200.00,240.00,
+14/03/2026,Expense,67,,Mobile phone,Telephone and Internet,50.00,0.00,private_use_pct=25
+22/03/2026,Expense,68,,Subcontract labour,Subcontractors,1000.00,0.00,
+26/03/2026,Invoice,69,Domestic customers,Plumbing and heating jobs,Sales,12500.00,2500.00,
+28/03/2026,Expense,70,,Drawings,Owner Drawings,3000.00,0.00,
+31/03/2026,Expense,71,,Depreciation - van,Depreciation,2800.00,0.00,
+31/03/2026,Expense,72,,Use of home - simplified flat rate,Use of Home,120.00,0.00,method=flat_rate; hours_per_month=30

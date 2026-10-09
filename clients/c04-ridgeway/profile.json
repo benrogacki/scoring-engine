@@ -1,0 +1,55 @@
+{
+  "id": "c04-ridgeway",
+  "name": "Ridgeway Joinery Ltd",
+  "entity_type": "company",
+  "package": "xero",
+  "region": "england",
+  "periods": [
+    {
+      "start": "2024-04-01",
+      "end": "2025-03-31"
+    },
+    {
+      "start": "2025-04-01",
+      "end": "2026-03-31"
+    }
+  ],
+  "incorporated": "2012-02-14",
+  "company_number": "00000004",
+  "confirmation_statement_date": "2026-02-14",
+  "associated_companies": 0,
+  "people": [
+    {
+      "id": "d1",
+      "name": "Sam Okafor",
+      "shares": 100,
+      "salary": 12570
+    },
+    {
+      "id": "p2",
+      "name": "Alex Okafor",
+      "is_director": false,
+      "shares": 50,
+      "share_class": "B",
+      "works_in_business": false,
+      "connected_to": "d1"
+    }
+  ],
+  "vat": {
+    "registered": true,
+    "registration_date": "2012-04-01",
+    "scheme": "standard",
+    "stagger": "1"
+  },
+  "payroll": {
+    "operates": true,
+    "other_employees_above_st": 3,
+    "other_employer_nic": 15750
+  },
+  "opening_reserves": 400000,
+  "pools_bf": {
+    "main": 40000,
+    "special": 0
+  },
+  "notes": "Synthetic. Capital expenditure across every allowance type; car lease VAT over-claimed in the books; spouse holds B shares (settlements screen)."
+}
