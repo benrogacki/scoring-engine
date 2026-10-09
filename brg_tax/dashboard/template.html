@@ -417,7 +417,7 @@ table.comp tr.detail td { background: var(--surface-2); font-size: 12.5px; }
     </section>
 
     <section class="panel" id="panel-deadlines" role="tabpanel" hidden>
-      <div class="toolbar"><select class="sel" id="dl-client" aria-label="Client"></select><div class="chips" id="dl-filter"></div><span class="spacer"></span><a class="btn" href="deadlines.ics" download>Download calendar (.ics)</a></div>
+      <div class="toolbar"><select class="sel" id="dl-client" aria-label="Client"></select><div class="chips" id="dl-filter"></div><span class="spacer"></span><a class="btn" id="dl-ics" href="deadlines.ics" download hidden>Download calendar (.ics)</a></div>
       <div class="block" id="dl-list"></div>
     </section>
 
@@ -436,7 +436,7 @@ table.comp tr.detail td { background: var(--surface-2); font-size: 12.5px; }
         <div class="block"><div class="block-head"><h2>Rules library</h2><span class="hint" id="rl-hint"></span></div>
           <div class="toolbar"><input class="search" id="rl-search" type="search" placeholder="Search id, title, authority" aria-label="Search rules"><div class="chips" id="rl-filter"></div></div>
           <div class="table-wrap"><table id="rl-table" class="rules-table"></table></div></div>
-        <div class="block"><div class="block-head"><h2>Files from this run</h2></div><ul class="downloads" id="downloads"></ul></div>
+        <div class="block" id="downloads-block" hidden><div class="block-head"><h2>Files from this run</h2></div><ul class="downloads" id="downloads"></ul></div>
       </div>
     </section>
   </main>
@@ -977,5 +977,25 @@ $("rl-filter").addEventListener("click", (e) => { const b = e.target.closest("[d
 /* ---------- boot ---------- */
 header();
 showTab(ui.tab && document.querySelector(`[data-tab="${ui.tab}"]`) ? ui.tab : "overview");
+
+// Same behaviour as the Debtor Risk Desk: hosted next to its run files (an internal web server or a
+// private share), the page lists the run's files and reloads itself when a newer run is published
+// (run_fingerprint.txt changes). Opened as a plain file or in a sandboxed viewer it stays a snapshot.
+(async () => {
+  if (!/^https?:$/.test(location.protocol)) return;
+  try {
+    const res = await fetch("run_fingerprint.txt", { cache: "no-store" });
+    if (!res.ok) return;
+    $("downloads-block").hidden = false;
+    $("dl-ics").hidden = false;
+    $("foot").textContent += " This page checks for a newer run every 10 minutes and reloads when one is published.";
+    setInterval(async () => {
+      try {
+        const r = await fetch("run_fingerprint.txt", { cache: "no-store" });
+        if (r.ok && (await r.text()).trim() !== DATA.fingerprint) location.reload();
+      } catch (e) { /* offline: try again next time */ }
+    }, 600000);
+  } catch (e) { /* not hosted with its run files */ }
+})();
 })();
 </script>

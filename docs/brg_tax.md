@@ -29,7 +29,10 @@ brg-tax params-update --year 2026-27   # needs access to www.gov.uk
 pytest tests/brg_tax
 ```
 
-Open `out/<run>/dashboard.html` in a browser. Worked outputs for the sample clients are in
+Open `out/<run>/dashboard.html` in a browser. It works like the Debtor Risk Desk dashboard. Opened as a
+plain file, it is a snapshot of the run. Served from a web server next to its run files (an internal
+server or a private share, never a public site, because client data is confidential), it lists the
+run's files and checks `run_fingerprint.txt` every 10 minutes, reloading when a newer run is published. Worked outputs for the sample clients are in
 [`examples/brg_tax/output/`](../examples/brg_tax/output/); start with `summary.md`.
 
 ## Before you rely on any figure
