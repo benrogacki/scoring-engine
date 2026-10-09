@@ -1,0 +1,180 @@
+{
+  "package": "quickbooks",
+  "notes": "Modelled on the QuickBooks Online UK 'Transaction Detail by Account' export (account names, signed Amount). Map by full account name; edit to match each client's chart.",
+  "date_formats": [
+    "%d/%m/%Y"
+  ],
+  "amount_mode": "signed",
+  "columns": {
+    "date": "Date",
+    "code": "Account",
+    "account": "Account",
+    "description": "Memo/Description",
+    "contact": "Name",
+    "reference": "No.",
+    "amount": "Amount",
+    "vat": "Tax Amount",
+    "facts": "BRG Facts"
+  },
+  "codes": {
+    "Sales": {
+      "category": "sales"
+    },
+    "Other Income": {
+      "category": "other_income"
+    },
+    "Interest Earned": {
+      "category": "interest_received"
+    },
+    "Cost of Sales": {
+      "category": "cost_of_sales"
+    },
+    "Subcontractors": {
+      "category": "subcontractors"
+    },
+    "Advertising/Promotional": {
+      "category": "advertising"
+    },
+    "Bank Charges": {
+      "category": "bank_charges"
+    },
+    "Accountancy Fees": {
+      "category": "accountancy"
+    },
+    "Legal and Professional Fees": {
+      "category": "legal_professional"
+    },
+    "Depreciation": {
+      "category": "depreciation"
+    },
+    "Meals and Entertainment": {
+      "category": "entertainment"
+    },
+    "Staff Entertainment": {
+      "category": "staff_entertainment",
+      "facts": {
+        "attendees": "staff_only"
+      }
+    },
+    "Client Gifts": {
+      "category": "client_gifts"
+    },
+    "Staff Gifts": {
+      "category": "staff_gifts"
+    },
+    "Other General and Admin Expenses": {
+      "category": "sundry"
+    },
+    "Insurance": {
+      "category": "insurance"
+    },
+    "Interest Paid": {
+      "category": "loan_interest"
+    },
+    "Utilities": {
+      "category": "light_heat"
+    },
+    "Vehicle Expenses": {
+      "category": "motor_expenses"
+    },
+    "Vehicle Lease": {
+      "category": "car_lease"
+    },
+    "Mileage": {
+      "category": "mileage"
+    },
+    "Use of Home": {
+      "category": "use_of_home"
+    },
+    "Fines and Penalties": {
+      "category": "fines_penalties"
+    },
+    "Software": {
+      "category": "software"
+    },
+    "Rent or Lease Payments": {
+      "category": "rent"
+    },
+    "Business Rates": {
+      "category": "rates"
+    },
+    "Repairs and Maintenance": {
+      "category": "repairs"
+    },
+    "Wages": {
+      "category": "wages"
+    },
+    "Directors Remuneration": {
+      "category": "directors_salary"
+    },
+    "Employers NI": {
+      "category": "employer_nic"
+    },
+    "Training": {
+      "category": "training"
+    },
+    "Pension Costs": {
+      "category": "staff_pension"
+    },
+    "Directors Pension": {
+      "category": "director_pension"
+    },
+    "Dues and Subscriptions": {
+      "category": "subscriptions"
+    },
+    "Telephone and Internet": {
+      "category": "telephone"
+    },
+    "Travel": {
+      "category": "travel"
+    },
+    "Travel Meals": {
+      "category": "subsistence"
+    },
+    "Charitable Contributions": {
+      "category": "donations"
+    },
+    "Corporation Tax": {
+      "category": "corporation_tax"
+    },
+    "Research and Development": {
+      "category": "research_development"
+    },
+    "Plant and Machinery": {
+      "category": "fixed_assets",
+      "facts": {
+        "asset_class": "plant"
+      }
+    },
+    "Motor Vehicles": {
+      "category": "fixed_assets",
+      "facts": {
+        "asset_class": "van"
+      }
+    },
+    "Computer Equipment": {
+      "category": "fixed_assets",
+      "facts": {
+        "asset_class": "computer"
+      }
+    },
+    "Current Account": {
+      "category": "bank"
+    },
+    "Directors Loan Account": {
+      "category": "dla"
+    },
+    "VAT Control": {
+      "category": "vat_control"
+    },
+    "Owner Drawings": {
+      "category": "drawings"
+    },
+    "Retained Earnings": {
+      "category": "reserves"
+    },
+    "Dividends": {
+      "category": "dividends"
+    }
+  }
+}

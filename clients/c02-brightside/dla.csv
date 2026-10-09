@@ -1,0 +1,7 @@
+date,person_id,description,amount,method
+2025-06-30,d1,Personal card spend,4000.00,bank
+2025-09-30,d1,Personal transfer,4000.00,bank
+2026-01-15,d1,Personal transfer,4000.00,bank
+2026-02-28,d1,Repayment,-3000.00,bank
+2026-04-20,d1,Repayment from personal account,-6000.00,bank
+2026-05-10,d1,Personal transfer,6000.00,bank

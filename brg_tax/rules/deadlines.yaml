@@ -1,0 +1,224 @@
+# Filing and payment deadlines. engine/deadlines.py generates a calendar per client from these rules.
+#   anchor   period_end | tax_year_end | tax_year_start | vat_period_end | review_date | dla_due
+#   offset   {months: n, days: n}  months use the month-end rule (30 June + 9 months = 31 March)
+#   fixed    {month: m, day: d, year_offset: n} - a fixed date relative to the anchor's year
+#   when     condition on the client: company | sole_trader | vat_registered | payroll | mtd_itsa | s455
+domain: deadlines
+citations_checked: false
+rules:
+
+  - id: DL-CT600-01
+    title: CT600 company tax return
+    question: When must the company tax return be filed?
+    applies: deadline
+    anchor: period_end
+    offset: {months: 12}
+    when: company
+    kind: filing
+    certainty: rule
+    authority: ["FA 1998 Sch 18 para 14"]
+    guidance: ["CTM93030"]
+    entity_types: [company]
+    effective: {from: "1999-07-01", to: null}
+    params: []
+
+  - id: DL-CTPAY-01
+    title: Corporation tax payment
+    question: When is corporation tax payable?
+    applies: deadline
+    anchor: period_end
+    offset: {months: 9, days: 1}
+    when: company
+    kind: payment
+    certainty: rule
+    authority: ["TMA 1970 s59D"]
+    guidance: ["CTM92010"]
+    entity_types: [company]
+    effective: {from: "1999-07-01", to: null}
+    params: []
+
+  - id: DL-S455-01
+    title: s455 tax on overdrawn loan account (with CT payment)
+    question: When is s455 tax payable if the loan is not cleared?
+    applies: deadline
+    anchor: period_end
+    offset: {months: 9, days: 1}
+    when: s455
+    kind: payment
+    certainty: rule
+    authority: ["CTA 2010 s455(3)", "TMA 1970 s59D"]
+    guidance: ["CTM61505"]
+    entity_types: [company]
+    effective: {from: "2010-04-01", to: null}
+    params: []
+
+  - id: DL-CHACC-01
+    title: Companies House accounts (private company)
+    question: When must the annual accounts be delivered to Companies House?
+    applies: deadline
+    anchor: period_end
+    offset: {months: 9}
+    when: company
+    kind: filing
+    certainty: rule
+    authority: ["CA 2006 s442(2)(a)", "CA 2006 s443"]
+    guidance: ["Companies House: Accounts guidance"]
+    entity_types: [company]
+    effective: {from: "2008-04-06", to: null}
+    params: []
+    notes: First accounts covering more than 12 months are due 21 months after incorporation (s442(3)) - flagged where first_accounts is set.
+
+  - id: DL-CS-01
+    title: Confirmation statement
+    question: When is the confirmation statement due?
+    applies: deadline
+    anchor: review_date
+    offset: {days: 14}
+    when: company
+    kind: filing
+    certainty: rule
+    authority: ["CA 2006 s853A"]
+    guidance: ["Companies House: Confirmation statement guidance"]
+    entity_types: [company]
+    effective: {from: "2016-06-30", to: null}
+    params: []
+
+  - id: DL-VAT-01
+    title: VAT return and payment
+    question: When is each VAT return and payment due?
+    applies: deadline
+    anchor: vat_period_end
+    offset: {months: 1, days: 7}
+    when: vat_registered
+    kind: filing_and_payment
+    certainty: rule
+    authority: ["SI 1995/2518 reg 25(1)", "SI 1995/2518 reg 40(2)"]
+    guidance: ["VAT Notice 700/12"]
+    entity_types: [company, sole_trader]
+    effective: {from: "1995-09-01", to: null}
+    params: []
+    notes: The 7-day extension applies to electronic returns and payments. Annual accounting has different dates (not generated).
+
+  - id: DL-SA-01
+    title: Self assessment return (online)
+    question: When must the online return for the tax year be filed?
+    applies: deadline
+    anchor: tax_year_end
+    fixed: {month: 1, day: 31, year_offset: 1}
+    when: sole_trader
+    kind: filing
+    certainty: rule
+    authority: ["TMA 1970 s8(1D)"]
+    guidance: ["SAM100000"]
+    entity_types: [sole_trader]
+    effective: {from: "2008-04-06", to: null}
+    params: []
+
+  - id: DL-SA-02
+    title: Self assessment balancing payment and first payment on account
+    question: When are the balancing payment and the first payment on account due?
+    applies: deadline
+    anchor: tax_year_end
+    fixed: {month: 1, day: 31, year_offset: 1}
+    when: sole_trader
+    kind: payment
+    certainty: rule
+    authority: ["TMA 1970 s59A(2)", "TMA 1970 s59B(4)"]
+    guidance: ["SAM80000"]
+    entity_types: [sole_trader]
+    effective: {from: "1996-04-06", to: null}
+    params: []
+
+  - id: DL-SA-03
+    title: Second payment on account
+    question: When is the second payment on account due?
+    applies: deadline
+    anchor: tax_year_end
+    fixed: {month: 7, day: 31, year_offset: 1}
+    when: sole_trader
+    kind: payment
+    certainty: rule
+    authority: ["TMA 1970 s59A(2)(b)"]
+    guidance: ["SAM80000"]
+    entity_types: [sole_trader]
+    effective: {from: "1996-04-06", to: null}
+    params: []
+
+  - id: DL-MTD-01
+    title: MTD for Income Tax quarterly update
+    question: When are quarterly updates due?
+    applies: deadline
+    anchor: mtd_quarter_end
+    offset: {months: 1, days: 2}
+    when: mtd_itsa
+    kind: filing
+    certainty: rule
+    authority: ["TMA 1970 Sch A1 para 7", "SI 2021/1076 reg 7"]
+    guidance: ["GOV.UK MTD for Income Tax: quarterly updates"]
+    entity_types: [sole_trader]
+    effective: {from: "2026-04-06", to: null}
+    params: []
+    notes: Standard update periods end 5 July, 5 October, 5 January and 5 April; updates are due by the 7th of the following month. Regulation number to be confirmed.
+
+  - id: DL-P11D-01
+    title: P11D and P11D(b)
+    question: When must expenses and benefits returns be filed?
+    applies: deadline
+    anchor: tax_year_end
+    fixed: {month: 7, day: 6, year_offset: 0}
+    when: payroll
+    kind: filing
+    certainty: rule
+    authority: ["SI 2003/2682 reg 85", "SI 2001/1004 reg 80"]
+    guidance: ["EIM16000"]
+    entity_types: [company]
+    effective: {from: "2003-04-06", to: null}
+    params: []
+    notes: Payrolled benefits remove the P11D for those benefits; mandatory payrolling of benefits was announced for a later year.
+
+  - id: DL-C1A-01
+    title: Class 1A NIC payment (electronic)
+    question: When is Class 1A NIC on benefits payable?
+    applies: deadline
+    anchor: tax_year_end
+    fixed: {month: 7, day: 22, year_offset: 0}
+    when: payroll
+    kind: payment
+    certainty: rule
+    authority: ["SI 2001/1004 Sch 4 para 11"]
+    guidance: ["NIM16000"]
+    entity_types: [company]
+    effective: {from: "2004-04-06", to: null}
+    params: []
+    notes: 19 July if paid by cheque. Paragraph reference to be confirmed.
+
+  - id: DL-P60-01
+    title: P60 to employees
+    question: When must P60s be given to employees and directors?
+    applies: deadline
+    anchor: tax_year_end
+    fixed: {month: 5, day: 31, year_offset: 0}
+    when: payroll
+    kind: filing
+    certainty: rule
+    authority: ["SI 2003/2682 reg 67"]
+    guidance: ["PAYE91000"]
+    entity_types: [company]
+    effective: {from: "2003-04-06", to: null}
+    params: []
+
+  - id: DL-RTI-01
+    title: Final payroll submission for the tax year
+    question: When is the final FPS or EPS for the tax year due?
+    applies: deadline
+    anchor: tax_year_end
+    fixed: {month: 4, day: 19, year_offset: 0}
+    when: payroll
+    kind: filing
+    certainty: rule
+    authority: ["SI 2003/2682 reg 67B", "SI 2003/2682 reg 67F"]
+    guidance: ["PAYE21000"]
+    entity_types: [company]
+    effective: {from: "2013-04-06", to: null}
+    params: []
+    notes: The final FPS is due on or before the last payday of the year; 19 April is the latest date for an EPS marking the final submission.

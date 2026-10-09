@@ -1,0 +1,249 @@
+# Profit extraction by director-shareholders, director's loan accounts and employment status.
+# Used by engine/extraction.py (optimiser and DLA monitor). Only rules marked election feed the optimiser.
+domain: extraction
+citations_checked: false
+rules:
+
+  - id: EXT-IT-01
+    title: Income tax on employment and other non-savings income
+    question: How much income tax is due on salary and other non-savings income?
+    applies: computation
+    certainty: rule
+    authority: ["ITA 2007 s6", "ITA 2007 s10", "ITA 2007 s23", "ITEPA 2003 s62"]
+    guidance: ["PAYE11000"]
+    entity_types: [company, sole_trader]
+    effective: {from: "2007-04-06", to: null}
+    params: ["it.personal_allowance", "it.ruk.bands"]
+
+  - id: EXT-IT-SCO-01
+    title: Scottish rates on non-savings, non-dividend income
+    question: Is the individual a Scottish taxpayer (main place of residence in Scotland)?
+    applies: computation
+    certainty: rule
+    authority: ["ITA 2007 s6A", "ITA 2007 s11A", "Scotland Act 1998 s80D"]
+    guidance: ["SRIT10000"]
+    entity_types: [company, sole_trader]
+    effective: {from: "2017-04-06", to: null}
+    params: ["it.sco.bands"]
+    notes: Savings and dividend income are taxed at UK rates using the UK basic rate band.
+
+  - id: EXT-IT-WAL-01
+    title: Welsh rates of income tax
+    question: Is the individual a Welsh taxpayer?
+    applies: computation
+    certainty: rule
+    authority: ["ITA 2007 s6B", "ITA 2007 s11B", "Wales Act 2014 s8"]
+    guidance: ["WRIT1000"]
+    entity_types: [company, sole_trader]
+    effective: {from: "2019-04-06", to: null}
+    params: ["it.wal.bands"]
+
+  - id: EXT-PA-01
+    title: Personal allowance taper
+    question: Does adjusted net income exceed the taper threshold?
+    applies: computation
+    certainty: rule
+    authority: ["ITA 2007 s35", "ITA 2007 s58"]
+    guidance: ["SAIM3000"]
+    entity_types: [company, sole_trader]
+    effective: {from: "2010-04-06", to: null}
+    params: ["it.personal_allowance", "it.pa_taper_threshold"]
+    notes: The allowance falls by £1 for every £2 of adjusted net income above the threshold. Personal pension contributions and Gift Aid (which reduce adjusted net income) are not modelled.
+
+  - id: EXT-DIV-01
+    title: Dividend income tax
+    question: How much tax is due on dividends after the dividend allowance?
+    applies: computation
+    certainty: rule
+    authority: ["ITA 2007 s8", "ITA 2007 s13A", "ITTOIA 2005 s383"]
+    guidance: ["SAIM5000"]
+    entity_types: [company]
+    effective: {from: "2016-04-06", to: null}
+    params: ["it.dividend_allowance", "it.dividend_ordinary_rate", "it.dividend_upper_rate", "it.dividend_additional_rate"]
+    notes: Dividends are the top slice of income. The allowance uses up band - it is a nil rate, not an exemption.
+
+  - id: EXT-DIV-02
+    title: Distributable reserves - hard stop
+    question: Does the dividend exceed profits available for distribution?
+    applies: computation
+    certainty: rule
+    authority: ["CA 2006 s830", "CA 2006 s836", "CA 2006 s847"]
+    guidance: ["CTM15210"]
+    entity_types: [company]
+    effective: {from: "2008-04-06", to: null}
+    params: []
+    notes: >-
+      A dividend beyond distributable reserves is unlawful; a shareholder who knew or had reasonable
+      grounds to believe it was unlawful must repay it (s847), and HMRC may treat it as a loan (s455) or
+      earnings. The optimiser never proposes it; any scenario that does is marked as a hard stop.
+
+  - id: EXT-NIC-01
+    title: Class 1 NIC for directors (annual earnings period)
+    question: What employee and employer NIC is due on the director's salary?
+    applies: computation
+    certainty: rule
+    authority: ["SSCBA 1992 s6", "SSCBA 1992 s8", "SSCBA 1992 s9", "SI 2001/1004 reg 8"]
+    guidance: ["NIM12000", "CWG2"]
+    entity_types: [company]
+    effective: {from: "2001-04-06", to: null}
+    params: ["nic.class1.pt", "nic.class1.uel", "nic.class1.st", "nic.class1.primary_main_rate_director", "nic.class1.primary_additional_rate", "nic.class1.secondary_rate"]
+    notes: Directors use an annual earnings period, so the thresholds are applied to the year's total salary.
+
+  - id: EXT-NIC-02
+    title: Qualifying year without paying NIC
+    question: Is salary at or above the lower earnings limit (a qualifying year for state pension)?
+    applies: computation
+    certainty: rule
+    authority: ["SSCBA 1992 s6(1)"]
+    guidance: ["NIM01000"]
+    entity_types: [company]
+    effective: {from: "2001-04-06", to: null}
+    params: ["nic.class1.lel"]
+
+  - id: EXT-EA-01
+    title: Employment Allowance
+    question: Can the company claim the Employment Allowance against employer NIC?
+    applies: computation
+    certainty: rule
+    authority: ["NICA 2014 s1", "NICA 2014 s2", "SI 2016/344"]
+    guidance: ["GOV.UK Employment Allowance"]
+    entity_types: [company]
+    effective: {from: "2014-04-06", to: null}
+    params: ["nic.employment_allowance", "nic.employment_allowance_prior_year_limit"]
+    notes: >-
+      Excluded where the director is the only employee paid above the secondary threshold (SI 2016/344),
+      so a single-director company with no other staff cannot claim. Two directors both paid above the
+      threshold, or another employee above it, restores eligibility. Connected companies share one
+      allowance. The £100,000 prior-year employer NIC limit applied up to 2024-25.
+
+  - id: EXT-SAL-01
+    title: Salary level
+    question: What salary should each director take?
+    applies: computation
+    certainty: election
+    authority: ["CTA 2009 s54", "ITEPA 2003 s62"]
+    guidance: ["BIM47105"]
+    entity_types: [company]
+    effective: {from: "2009-04-01", to: null}
+    params: ["nic.class1.lel", "nic.class1.pt", "nic.class1.st"]
+    notes: A commercial salary for work done is deductible. The optimiser tests standard points (nil, LEL, ST, PT) and a grid.
+
+  - id: EXT-PEN-01
+    title: Employer pension contributions
+    question: Should the company contribute to the director's pension?
+    applies: computation
+    certainty: election
+    authority: ["CTA 2009 s1290", "FA 2004 s196", "FA 2004 s228", "FA 2004 s228ZA"]
+    guidance: ["PTM043000", "BIM46035"]
+    entity_types: [company]
+    effective: {from: "2006-04-06", to: null}
+    params: ["pension.annual_allowance", "pension.taper_threshold_income", "pension.taper_adjusted_income", "pension.taper_minimum"]
+    notes: >-
+      Deductible for CT when paid, no NIC, not taxable on the director within the annual allowance. Carry
+      forward of unused allowance from the three previous years is not modelled - contributions above the
+      current-year allowance are flagged, not blocked.
+
+  - id: EXT-DLA-01
+    title: s455 charge on loans to participators
+    question: Is a loan to a participator in a close company outstanding at the end of the accounting period?
+    applies: computation
+    certainty: rule
+    authority: ["CTA 2010 s455", "CTA 2010 s439"]
+    guidance: ["CTM61505", "CTM61525"]
+    entity_types: [company]
+    effective: {from: "2010-04-01", to: null}
+    params: ["ct.s455_rate"]
+    notes: >-
+      Charged on the amount outstanding at the period end that has not been repaid, released or written
+      off within nine months and one day; due with the corporation tax. The rate is the one in force when
+      the loan was made.
+
+  - id: EXT-DLA-02
+    title: s458 relief on repayment
+    question: Has a loan on which s455 was charged since been repaid?
+    applies: computation
+    certainty: rule
+    authority: ["CTA 2010 s458"]
+    guidance: ["CTM61600"]
+    entity_types: [company]
+    effective: {from: "2010-04-01", to: null}
+    params: []
+    notes: Relief is due nine months and one day after the end of the accounting period in which the repayment is made; claim within four years.
+
+  - id: EXT-DLA-03
+    title: Beneficial loan benefit
+    question: Did the director's loans exceed the threshold at any time in the tax year at below the official rate of interest?
+    applies: computation
+    certainty: rule
+    authority: ["ITEPA 2003 s175", "ITEPA 2003 s180", "ITEPA 2003 s182"]
+    guidance: ["EIM26100", "EIM26250"]
+    entity_types: [company]
+    effective: {from: "2014-04-06", to: null}
+    params: ["loans.official_rate", "loans.bik_threshold"]
+    notes: Normal averaging method by default; Class 1A NIC on the benefit at the secondary rate.
+
+  - id: EXT-DLA-04
+    title: Alternative (precise) method for beneficial loans
+    question: Should the precise (daily balance) method be used instead of normal averaging?
+    applies: computation
+    certainty: election
+    authority: ["ITEPA 2003 s183"]
+    guidance: ["EIM26250"]
+    entity_types: [company]
+    effective: {from: "2003-04-06", to: null}
+    params: ["loans.official_rate"]
+    notes: The employee may elect (by the SA filing date) and HMRC may require it. Both figures are shown.
+
+  - id: EXT-DLA-05
+    title: Clearing an overdrawn loan account before the s455 date
+    question: Should the overdrawn balance be cleared (dividend, bonus or cash) before the s455 due date?
+    applies: computation
+    certainty: election
+    authority: ["CTA 2010 s455", "CTA 2010 s458"]
+    guidance: ["CTM61540"]
+    entity_types: [company]
+    effective: {from: "2010-04-01", to: null}
+    params: ["ct.s455_rate"]
+    notes: >-
+      Clearing by a declared dividend or bonus is a genuine repayment and is excluded from the
+      bed-and-breakfasting rules (s464C(4)). Clearing by cash that is then redrawn is not - see AA-464C-01.
+
+  - id: EXT-IR35-01
+    title: Employment status (IR35 / off-payroll working)
+    question: Would the director be an employee of the end client if engaged directly (hypothetical contract)?
+    applies: computation
+    certainty: judgment
+    authority: ["ITEPA 2003 s49", "ITEPA 2003 s50", "ITEPA 2003 s61K-61X", "SSCBA 1992 s4A"]
+    guidance: ["ESM3000", "ESM10000", "ESM0500"]
+    entity_types: [company]
+    effective: {from: "2000-04-06", to: null}
+    params: []
+    factors:
+      - Mutuality of obligation - an obligation to provide and accept work
+      - Control - over what, how, when and where the work is done
+      - Personal service and genuine right of substitution
+      - Part and parcel of the client's organisation
+      - Financial risk, own equipment, opportunity to profit, multiple clients
+      - "Who decides status - client size (small client: the company decides under Chapter 8; medium/large client: the client issues an SDS under Chapter 10)"
+    authorities:
+      - "Ready Mixed Concrete (South East) Ltd v Minister of Pensions [1968] 2 QB 497"
+      - "Hall v Lorimer [1994] 1 WLR 209"
+      - "HMRC v Atholl House Productions Ltd [2022] EWCA Civ 501"
+      - "HMRC v Professional Game Match Officials Ltd [2024] UKSC 29"
+      - "Christa Ackroyd Media Ltd v HMRC [2019] UKUT 326 (TCC)"
+      - "Kickabout Productions Ltd v HMRC [2022] EWCA Civ 502"
+    default: {status: outside, deemed_payment: 0}
+    reasoning: >-
+      No status determination is on file. No deemed employment payment is included in the computation;
+      the review item shows the estimated Chapter 8 deemed payment and tax if the engagement is inside.
+
+  - id: EXT-TRIV-DIR-01
+    title: Trivial benefits cap for directors of close companies
+    question: Do trivial benefits to a director (and household) exceed the annual cap?
+    applies: computation
+    certainty: rule
+    authority: ["ITEPA 2003 s323B"]
+    guidance: ["EIM21864"]
+    entity_types: [company]
+    effective: {from: "2016-04-06", to: null}
+    params: ["exp.trivial_benefit_director_cap"]

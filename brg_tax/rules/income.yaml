@@ -1,0 +1,43 @@
+# Income: which receipts are trading income and which are taxed under other rules.
+domain: income
+citations_checked: false
+rules:
+
+  - id: INC-TRADE-01
+    title: Trading income
+    question: Is this a receipt of the trade?
+    conditions: {category: [sales, other_income]}
+    outcome: {ct: taxable, vat: none}
+    certainty: rule
+    authority: ["CTA 2009 s35", "ITTOIA 2005 s5"]
+    guidance: ["BIM40000"]
+    entity_types: [company, sole_trader]
+    effective: {from: "2005-04-06", to: null}
+    params: []
+    notes: Output tax on sales is tested in the VAT module, not here.
+
+  - id: INC-INT-01
+    title: Interest received by a company
+    question: Is this interest from a loan relationship (e.g. a bank deposit)?
+    conditions: {category: interest_received, entity_type: company}
+    outcome: {ct: non_trading, vat: none}
+    certainty: rule
+    authority: ["CTA 2009 s299", "CTA 2009 s301"]
+    guidance: ["CFM31000"]
+    entity_types: [company]
+    effective: {from: "2009-04-01", to: null}
+    params: []
+    notes: A non-trading loan relationship credit - part of total profits but not trading profits.
+
+  - id: INC-INT-02
+    title: Interest received by a sole trader
+    question: Is this savings interest rather than trading income?
+    conditions: {category: interest_received, entity_type: sole_trader}
+    outcome: {ct: non_trading, vat: none}
+    certainty: rule
+    authority: ["ITTOIA 2005 s369"]
+    guidance: ["SAIM2000"]
+    entity_types: [sole_trader]
+    effective: {from: "2005-04-06", to: null}
+    params: []
+    notes: Excluded from trading profits; savings income is outside the v1 income tax computation and is flagged.

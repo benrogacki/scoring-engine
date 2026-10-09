@@ -1,0 +1,26 @@
+{
+  "firm": "BRG Accounts",
+  "extraction": {
+    "retain_pct": 0,
+    "clear_dla_by_dividend": true
+  },
+  "capital_allowances": {
+    "default_strategy": "max",
+    "strategy_overrides": {}
+  },
+  "comparator": {
+    "extra_admin_cost": 1500
+  },
+  "vat": {
+    "approaching_threshold_pct": 90,
+    "default_frs_sector": "Any other activity not listed elsewhere"
+  },
+  "deadlines": {
+    "look_back_days": 60,
+    "look_ahead_days": 400,
+    "due_soon_days": 30
+  },
+  "risk_appetite": {
+    "liability_change_alert": 100
+  }
+}

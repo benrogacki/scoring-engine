@@ -1,0 +1,58 @@
+Dated On,Nominal Code,Category,Description,Debit,Credit,VAT,Contact,Reference,BRG Facts
+2025-07-02,260,Insurance,Professional indemnity insurance,500.00,,0.00,,FA0001,
+2025-07-04,365,Computer Software,Developer tools,50.00,,10.00,,FA0002,
+2025-07-10,602,Computer Equipment,Laptop (new),1800.00,,360.00,,FA0003,
+2025-07-20,286,Travel,Rail fares to client site,200.00,,0.00,,FA0004,temporary_workplace=yes
+2025-07-27,001,Sales,Contract day rates,,9000.00,1800.00,Stackline Recruitment Ltd,FA0005,
+2025-07-28,402,Directors Salaries,Director's salary,1047.50,,0.00,,FA0006,
+2025-08-04,365,Computer Software,Developer tools,50.00,,10.00,,FA0007,
+2025-08-20,286,Travel,Rail fares to client site,200.00,,0.00,,FA0008,temporary_workplace=yes
+2025-08-27,001,Sales,Contract day rates,,9000.00,1800.00,Stackline Recruitment Ltd,FA0009,
+2025-08-28,402,Directors Salaries,Director's salary,1047.50,,0.00,,FA0010,
+2025-09-04,365,Computer Software,Developer tools,50.00,,10.00,,FA0011,
+2025-09-20,286,Travel,Rail fares to client site,200.00,,0.00,,FA0012,temporary_workplace=yes
+2025-09-27,001,Sales,Contract day rates,,9000.00,1800.00,Stackline Recruitment Ltd,FA0013,
+2025-09-28,402,Directors Salaries,Director's salary,1047.50,,0.00,,FA0014,
+2025-10-04,365,Computer Software,Developer tools,50.00,,10.00,,FA0015,
+2025-10-20,286,Travel,Rail fares to client site,200.00,,0.00,,FA0016,temporary_workplace=yes
+2025-10-27,001,Sales,Contract day rates,,9000.00,1800.00,Stackline Recruitment Ltd,FA0017,
+2025-10-28,402,Directors Salaries,Director's salary,1047.50,,0.00,,FA0018,
+2025-11-04,365,Computer Software,Developer tools,50.00,,10.00,,FA0019,
+2025-11-20,286,Travel,Rail fares to client site,200.00,,0.00,,FA0020,temporary_workplace=yes
+2025-11-27,001,Sales,Contract day rates,,9000.00,1800.00,Stackline Recruitment Ltd,FA0021,
+2025-11-28,402,Directors Salaries,Director's salary,1047.50,,0.00,,FA0022,
+2025-12-04,365,Computer Software,Developer tools,50.00,,10.00,,FA0023,
+2025-12-19,905,Dividends,Interim dividend,30000.00,,0.00,,FA0024,
+2025-12-20,286,Travel,Rail fares to client site,200.00,,0.00,,FA0025,temporary_workplace=yes
+2025-12-27,001,Sales,Contract day rates,,9000.00,1800.00,Stackline Recruitment Ltd,FA0026,
+2025-12-28,402,Directors Salaries,Director's salary,1047.50,,0.00,,FA0027,
+2026-01-04,365,Computer Software,Developer tools,50.00,,10.00,,FA0028,
+2026-01-20,286,Travel,Rail fares to client site,200.00,,0.00,,FA0029,temporary_workplace=yes
+2026-01-27,001,Sales,Contract day rates,,9000.00,1800.00,Stackline Recruitment Ltd,FA0030,
+2026-01-28,402,Directors Salaries,Director's salary,1047.50,,0.00,,FA0031,
+2026-02-04,365,Computer Software,Developer tools,50.00,,10.00,,FA0032,
+2026-02-20,286,Travel,Rail fares to client site,200.00,,0.00,,FA0033,temporary_workplace=yes
+2026-02-27,001,Sales,Contract day rates,,9000.00,1800.00,Stackline Recruitment Ltd,FA0034,
+2026-02-28,402,Directors Salaries,Director's salary,1047.50,,0.00,,FA0035,
+2026-03-04,365,Computer Software,Developer tools,50.00,,10.00,,FA0036,
+2026-03-20,286,Travel,Rail fares to client site,200.00,,0.00,,FA0037,temporary_workplace=yes
+2026-03-27,001,Sales,Contract day rates,,9000.00,1800.00,Stackline Recruitment Ltd,FA0038,
+2026-03-28,402,Directors Salaries,Director's salary,1047.50,,0.00,,FA0039,
+2026-04-04,365,Computer Software,Developer tools,50.00,,10.00,,FA0040,
+2026-04-20,286,Travel,Rail fares to client site,200.00,,0.00,,FA0041,temporary_workplace=yes
+2026-04-27,001,Sales,Contract day rates,,9000.00,1800.00,Stackline Recruitment Ltd,FA0042,
+2026-04-28,402,Directors Salaries,Director's salary,1047.50,,0.00,,FA0043,
+2026-05-04,365,Computer Software,Developer tools,50.00,,10.00,,FA0044,
+2026-05-20,286,Travel,Rail fares to client site,200.00,,0.00,,FA0045,temporary_workplace=yes
+2026-05-27,001,Sales,Contract day rates,,9000.00,1800.00,Stackline Recruitment Ltd,FA0046,
+2026-05-28,402,Directors Salaries,Director's salary,1047.50,,0.00,,FA0047,
+2026-06-04,365,Computer Software,Developer tools,50.00,,10.00,,FA0048,
+2026-06-15,001,Sales,Overtime days,,2000.00,400.00,Stackline Recruitment Ltd,FA0049,
+2026-06-20,201,Accountancy Fees,Accounts and CT600,1500.00,,300.00,,FA0050,
+2026-06-20,286,Travel,Rail fares to client site,200.00,,0.00,,FA0051,temporary_workplace=yes
+2026-06-26,905,Dividends,Interim dividend,30000.00,,0.00,,FA0052,
+2026-06-27,001,Sales,Contract day rates,,9000.00,1800.00,Stackline Recruitment Ltd,FA0053,
+2026-06-28,402,Directors Salaries,Director's salary,1047.50,,0.00,,FA0054,
+2026-06-30,450,Depreciation,Depreciation,600.00,,0.00,,FA0055,
+2026-06-30,403,Employers NI,Employer's NIC 2025-26,1135.50,,0.00,,FA0056,
+2026-06-30,270,Use of Home,Use of home office - payment to director,1200.00,,0.00,,FA0057,

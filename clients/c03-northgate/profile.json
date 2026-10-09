@@ -1,0 +1,47 @@
+{
+  "id": "c03-northgate",
+  "name": "Northgate Engineering Ltd",
+  "entity_type": "company",
+  "package": "quickbooks",
+  "region": "england",
+  "periods": [
+    {
+      "start": "2024-10-01",
+      "end": "2025-09-30"
+    },
+    {
+      "start": "2025-10-01",
+      "end": "2026-06-30"
+    }
+  ],
+  "incorporated": "2016-09-12",
+  "company_number": "00000003",
+  "confirmation_statement_date": "2026-09-12",
+  "associated_companies": 1,
+  "associated_basis": "control",
+  "people": [
+    {
+      "id": "d1",
+      "name": "Priya Shah",
+      "shares": 50,
+      "salary": 12570
+    },
+    {
+      "id": "d2",
+      "name": "Marcus Shah",
+      "shares": 50,
+      "salary": 12570
+    }
+  ],
+  "vat": {
+    "registered": true,
+    "registration_date": "2017-01-01",
+    "scheme": "standard",
+    "stagger": "1"
+  },
+  "payroll": {
+    "operates": true
+  },
+  "opening_reserves": 80000,
+  "notes": "Synthetic. Accounting date changed to 30 June: 9-month period, limits halved for one associated company and reduced by 273/365, split across FY2025 and FY2026."
+}

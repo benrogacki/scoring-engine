@@ -1,0 +1,50 @@
+{
+  "id": "c05-kestrel",
+  "name": "Kestrel Data Ltd",
+  "entity_type": "company",
+  "package": "freeagent",
+  "region": "scotland",
+  "periods": [
+    {
+      "start": "2024-07-01",
+      "end": "2025-06-30"
+    },
+    {
+      "start": "2025-07-01",
+      "end": "2026-06-30"
+    }
+  ],
+  "incorporated": "2020-06-22",
+  "company_number": "SC000005",
+  "confirmation_statement_date": "2026-06-22",
+  "associated_companies": 0,
+  "people": [
+    {
+      "id": "d1",
+      "name": "Morven Reid",
+      "shares": 100,
+      "region": "scotland",
+      "salary": 12570
+    }
+  ],
+  "contracts": [
+    {
+      "end_client": "Halden Bank plc (via Stackline Recruitment)",
+      "client_size": "unknown",
+      "sds": "none",
+      "via_agency": true
+    }
+  ],
+  "vat": {
+    "registered": true,
+    "registration_date": "2020-09-01",
+    "scheme": "standard",
+    "stagger": "3",
+    "frs_sector": "Computer and IT consultancy or data processing"
+  },
+  "payroll": {
+    "operates": true
+  },
+  "opening_reserves": 30000,
+  "notes": "Synthetic. Single IT contract via an agency with no status determination; actual-cost use of home payments; Scottish taxpayer."
+}

@@ -1,3 +1,13 @@
+# Scoring engine and BRG Tax Engine
+
+This repository holds the credit-risk scoring engine (the **Debtor Risk Desk**, below), the freight
+nowcaster, and the **BRG Tax Engine**, `brg_tax/`. The tax engine is a UK tax rules engine for SME
+clients. It routes every treatment through a cited rules library and produces CT and self-assessment
+computations, a director extraction optimiser, a DLA monitor, VAT tests, a deadline calendar and a
+review queue. Each figure keeps an audit trail. It needs Python 3.11+ (`pip install -e ".[tax]"`) and
+is documented in [`docs/brg_tax.md`](docs/brg_tax.md). Worked outputs for its six synthetic sample
+clients are in [`examples/brg_tax/output/`](examples/brg_tax/output/).
+
 # Credit-Risk Scoring Engine
 
 A scoring workflow for finance teams, built on the debtor ledger. It scores each customer on

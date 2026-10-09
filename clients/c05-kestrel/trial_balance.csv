@@ -1,0 +1,13 @@
+code,name,debit,credit
+001,Sales,,110000.00
+201,Accountancy Fees,1500.00,
+260,Insurance,500.00,
+270,Use of Home,1200.00,
+286,Travel,2400.00,
+365,Computer Software,600.00,
+402,Directors Salaries,12570.00,
+403,Employers NI,1135.50,
+450,Depreciation,600.00,
+602,Computer Equipment,1800.00,
+750,Business Account,27694.50,
+905,905,60000.00,

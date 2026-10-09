@@ -1,0 +1,249 @@
+# Capital allowances (applies: computation). The engine (engine/capital_allowances.py) reads the fixed
+# asset register, allocates each addition to an allowance and a pool, and cites these ids on each line.
+domain: capital_allowances
+citations_checked: false
+rules:
+
+  - id: CA-PLANT-01
+    title: Expenditure on plant and machinery
+    question: Is the asset plant or machinery used in the business?
+    applies: computation
+    certainty: rule
+    authority: ["CAA 2001 s11", "CAA 2001 s21-23"]
+    guidance: ["CA21000", "CA22000"]
+    entity_types: [company, sole_trader]
+    effective: {from: "2001-04-01", to: null}
+    params: []
+    notes: Buildings and structures are excluded (s21-22) except items in List C (s23); integral features are plant (s33A).
+
+  - id: CA-AIA-01
+    title: Annual investment allowance
+    question: How much qualifying expenditure (not cars) should be covered by the AIA?
+    applies: computation
+    certainty: election
+    authority: ["CAA 2001 s38A", "CAA 2001 s38B", "CAA 2001 s51A"]
+    guidance: ["CA23080", "CA23084"]
+    entity_types: [company, sole_trader]
+    effective: {from: "2008-04-01", to: null}
+    params: ["ca.ct.aia_limit", "ca.it.aia_limit"]
+    notes: >-
+      The limit is time-apportioned for periods other than 12 months (s51A(5)). Cars are excluded (s38B).
+      Claims can be for any amount up to the limit, so a smaller claim is an election.
+
+  - id: CA-AIA-02
+    title: AIA shared between related companies or businesses
+    question: Is this company related to another (common control and shared premises or similar activities), so one AIA is shared?
+    applies: computation
+    certainty: judgment
+    authority: ["CAA 2001 s51B-51N"]
+    guidance: ["CA23090", "CA23092"]
+    entity_types: [company, sole_trader]
+    effective: {from: "2008-04-01", to: null}
+    params: ["ca.ct.aia_limit"]
+    factors:
+      - Are the businesses controlled by the same person(s)?
+      - The shared premises condition - do they carry on qualifying activities from the same premises?
+      - The similar activities condition - is more than 50% of turnover from the same NACE classification?
+      - Groups of companies share one AIA (s51C) regardless of these conditions
+    authorities:
+      - "CAA 2001 s51G (shared premises condition)"
+      - "CAA 2001 s51H (similar activities condition)"
+    default: {aia_allocation: full}
+    reasoning: >-
+      An associated company is recorded. The full AIA is provisionally allocated to this company on the
+      assumption that the related business claims none; the reviewer must confirm the allocation.
+
+  - id: CA-FE-01
+    title: Full expensing (100% first-year allowance)
+    question: Is the expenditure on new and unused main-rate plant by a company (not a car, not for leasing)?
+    applies: computation
+    certainty: election
+    authority: ["CAA 2001 s45S", "CAA 2001 s46"]
+    guidance: ["CA23170"]
+    entity_types: [company]
+    effective: {from: "2023-04-01", to: null}
+    params: ["ca.ct.full_expensing_rate"]
+    notes: Companies only. On disposal the whole proceeds are a balancing charge (s45U). Not available for used assets or in the period trade ceases.
+
+  - id: CA-FYA-SR-01
+    title: 50% special rate first-year allowance
+    question: Is the expenditure on new and unused special rate plant by a company?
+    applies: computation
+    certainty: election
+    authority: ["CAA 2001 s45S"]
+    guidance: ["CA23170"]
+    entity_types: [company]
+    effective: {from: "2023-04-01", to: null}
+    params: ["ca.ct.special_rate_fya"]
+    notes: The remaining 50% goes into the special rate pool. The AIA (100%) is normally preferred while it is available.
+
+  - id: CA-FYA40-01
+    title: 40% first-year allowance for main rate expenditure
+    question: Is this main-rate expenditure on new and unused plant from 1 January 2026 that does not qualify for full expensing?
+    applies: computation
+    certainty: election
+    authority: ["CAA 2001 (FYA for main rate expenditure, Finance Act 2026)"]
+    guidance: ["CA23100"]
+    entity_types: [company, sole_trader]
+    effective: {from: "2026-01-01", to: null}
+    params: ["ca.ct.fya_main_40_rate", "ca.it.fya_main_40_rate"]
+    notes: >-
+      Announced at Autumn Budget 2025; extends to unincorporated businesses and assets for leasing. The
+      section number and exact conditions must be confirmed against the enacted Finance Act 2026 - the
+      engine only uses it after the AIA is exhausted, so it rarely binds for SME clients.
+
+  - id: CA-CAR-01
+    title: Cars - pool by CO2 emissions
+    question: Which pool does the car go into, based on CO2 emissions?
+    applies: computation
+    certainty: rule
+    authority: ["CAA 2001 s104AA", "CAA 2001 s38B"]
+    guidance: ["CA23535"]
+    entity_types: [company, sole_trader]
+    effective: {from: "2021-04-01", to: null}
+    params: ["ca.ct.car_main_pool_co2_max", "ca.it.car_main_pool_co2_max"]
+    notes: Cars with emissions at or below the threshold go to the main pool; above it to the special rate pool. Cars never get the AIA.
+
+  - id: CA-CAR-02
+    title: Zero-emission cars - 100% first-year allowance
+    question: Is the car new and unused with zero CO2 emissions (or electrically propelled)?
+    applies: computation
+    certainty: rule
+    authority: ["CAA 2001 s45D"]
+    guidance: ["CA23153"]
+    entity_types: [company, sole_trader]
+    effective: {from: "2021-04-01", to: "2027-03-31"}
+    params: ["ca.ct.fya_zero_emission_car_rate", "ca.it.fya_zero_emission_car_rate"]
+    notes: End date reflects the extension to 31 March 2027 (CT) / 5 April 2027 (IT); confirm.
+
+  - id: CA-CAR-03
+    title: Cars with private use (unincorporated businesses)
+    question: Is the car or asset used privately by the sole trader?
+    applies: computation
+    certainty: rule
+    authority: ["CAA 2001 s205", "CAA 2001 s206", "CAA 2001 s206A"]
+    guidance: ["CA27000"]
+    entity_types: [sole_trader]
+    effective: {from: "2001-04-01", to: null}
+    params: []
+    notes: The asset goes into a single-asset pool; allowances are reduced by the private use proportion. Company assets used privately by directors are taxed as benefits instead.
+
+  - id: CA-INTF-01
+    title: Integral features - special rate expenditure
+    question: Is the expenditure on an integral feature of a building (electrical, water, heating, lifts, solar shading)?
+    applies: computation
+    certainty: rule
+    authority: ["CAA 2001 s33A", "CAA 2001 s104A"]
+    guidance: ["CA22300"]
+    entity_types: [company, sole_trader]
+    effective: {from: "2008-04-01", to: null}
+    params: []
+
+  - id: CA-WDA-01
+    title: Writing-down allowance - main pool
+    question: What WDA is due on the main pool?
+    applies: computation
+    certainty: rule
+    authority: ["CAA 2001 s55", "CAA 2001 s56"]
+    guidance: ["CA23210"]
+    entity_types: [company, sole_trader]
+    effective: {from: "2008-04-01", to: null}
+    params: ["ca.ct.wda_main_rate", "ca.it.wda_main_rate"]
+    notes: >-
+      Reduced proportionately for periods shorter than 12 months (s56(3)). Where the rate changes during a
+      period (1 April 2026 CT / 6 April 2026 IT), a hybrid rate is time-apportioned by days.
+
+  - id: CA-WDA-02
+    title: Writing-down allowance - special rate pool
+    question: What WDA is due on the special rate pool?
+    applies: computation
+    certainty: rule
+    authority: ["CAA 2001 s104D"]
+    guidance: ["CA23220"]
+    entity_types: [company, sole_trader]
+    effective: {from: "2008-04-01", to: null}
+    params: ["ca.ct.wda_special_rate", "ca.it.wda_special_rate"]
+
+  - id: CA-SMALL-01
+    title: Small pools allowance
+    question: Is the unrelieved balance on the main or special rate pool at or below the small pools limit?
+    applies: computation
+    certainty: election
+    authority: ["CAA 2001 s56A"]
+    guidance: ["CA23240"]
+    entity_types: [company, sole_trader]
+    effective: {from: "2008-04-01", to: null}
+    params: ["ca.ct.small_pool_limit", "ca.it.small_pool_limit"]
+    notes: The limit is reduced proportionately for short periods. The engine claims it by default.
+
+  - id: CA-DISP-01
+    title: Disposal value
+    question: What disposal value is brought into account when an asset leaves a pool?
+    applies: computation
+    certainty: rule
+    authority: ["CAA 2001 s61", "CAA 2001 s62"]
+    guidance: ["CA23250"]
+    entity_types: [company, sole_trader]
+    effective: {from: "2001-04-01", to: null}
+    params: []
+    notes: The lower of proceeds and original cost. A negative pool balance is a balancing charge.
+
+  - id: CA-DISP-02
+    title: Disposal of full-expensed or 50% FYA assets
+    question: Was the asset disposed of one on which full expensing or the 50% FYA was claimed?
+    applies: computation
+    certainty: rule
+    authority: ["CAA 2001 s45U"]
+    guidance: ["CA23175"]
+    entity_types: [company]
+    effective: {from: "2023-04-01", to: null}
+    params: []
+    notes: Full expensing - the whole disposal value is an immediate balancing charge. 50% FYA - half is a balancing charge and half reduces the special rate pool.
+
+  - id: CA-NEW-01
+    title: New and unused status not recorded
+    question: Was the asset new and unused when acquired (needed for full expensing and the 50% FYA)?
+    applies: computation
+    certainty: rule
+    authority: ["CAA 2001 s45S(1)(b)"]
+    guidance: ["CA23171"]
+    entity_types: [company]
+    effective: {from: "2023-04-01", to: null}
+    params: []
+    fact_needed: new_unused
+    reasoning: Treated as used (AIA/WDA only) until confirmed - the prudent position for first-year allowances.
+
+  - id: CA-SBA-01
+    title: Structures and buildings allowance
+    question: Is this qualifying expenditure on constructing, renovating or converting a non-residential structure or building?
+    applies: computation
+    certainty: rule
+    authority: ["CAA 2001 s270AA", "CAA 2001 s270BA", "CAA 2001 s270CA"]
+    guidance: ["CA90000", "CA91000"]
+    entity_types: [company, sole_trader]
+    effective: {from: "2018-10-29", to: null}
+    params: ["ca.ct.sba_rate", "ca.it.sba_rate"]
+    notes: >-
+      Straight line from the later of the date the expenditure was incurred and the date the building was
+      first brought into non-residential use; time-apportioned by days. Land and its acquisition costs are
+      excluded. An allowance statement is required (s270IA).
+
+  - id: CA-ASSET-01
+    title: Asset class or pool not determinable
+    question: What kind of asset is this (plant, car, integral feature, building)?
+    applies: computation
+    certainty: judgment
+    authority: ["CAA 2001 s21", "CAA 2001 s22", "CAA 2001 s23"]
+    guidance: ["CA21100", "CA22000"]
+    entity_types: [company, sole_trader]
+    effective: {from: "2001-04-01", to: null}
+    params: []
+    factors:
+      - Function test - is it the apparatus with which the trade is carried on, or the setting in which it is carried on?
+      - List A/B exclusions and List C saving (s21-23)
+    authorities:
+      - "Yarmouth v France (1887) 19 QBD 647"
+      - "Wimpy International Ltd v Warland [1989] STC 273"
+      - "J Lyons & Co Ltd v A-G [1944] Ch 281"
+    default: {pool: main}
+    reasoning: Treated as main pool plant pending classification.

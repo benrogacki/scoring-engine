@@ -1,0 +1,27 @@
+code,name,debit,credit
+090,Business Bank Account,305094.50,
+200,Sales,,900000.00
+310,Cost of Goods Sold,264000.00,
+400,Advertising,3000.00,
+404,Bank Fees,600.00,
+412,Consulting & Accounting,4200.00,
+416,Depreciation,45000.00,
+433,Insurance,9600.00,
+441,Legal Expenses,5000.00,
+445,"Light, Power, Heating",18000.00,
+449,Motor Vehicle Expenses,6000.00,
+450,Car Lease,5400.00,
+465,Research & Development,3500.00,
+469,Rent,48000.00,
+473,Repairs and Maintenance,7000.00,
+477,Wages and Salaries,120000.00,
+478,Directors' Remuneration,12570.00,
+479,Employers National Insurance,6385.50,
+489,Telephone & Internet,1800.00,
+710,Office Equipment,148000.00,
+712,Motor Vehicles,32000.00,
+713,Buildings and Improvements,200000.00,
+719,Accumulated Depreciation,,45000.00
+950,Capital - Ordinary Shares,,150.00
+960,Retained Earnings,,400000.00
+970,Dividends,100000.00,

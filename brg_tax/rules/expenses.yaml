@@ -1,0 +1,727 @@
+# Expense treatment rules: which costs are deductible in computing trading profits.
+#
+# How to read a rule
+#   conditions  facts the transaction must have. A plain value means "equals"; a list means "any of";
+#               {missing: true} means the fact has not been recorded; {gt: 50} etc. compare numbers;
+#               {gt: "param:exp.client_gift_limit"} compares with a year's parameter.
+#               Facts come from the nominal-code mapping, the transaction's "BRG Facts" column and
+#               the client profile (entity_type, vat_registered, pre_trading).
+#   outcome.ct  allow | disallow | capital | review_fact, or a calculation:
+#               {disallow_pct_fact: private_use_pct}, {allow_pct_fact: business_use_pct},
+#               {disallow_pct_param: <param>}, {calc: mileage | home_flat_rate | pre_trading}
+#   certainty   rule = applied automatically; judgment = never auto-resolved, goes to the review queue
+#               with a proposed default; election = a choice the optimiser may make.
+#   When several rules match, the one with the most conditions wins, then the higher priority.
+#
+# Citations were written from the legislation as understood at 9 October 2026 and have not been
+# re-checked against legislation.gov.uk in this build (no network access); check before relying on them.
+domain: expenses
+citations_checked: false
+rules:
+
+  # ------------------------------------------------------------------ ordinary revenue costs
+  - id: EXP-ORD-01
+    title: Ordinary revenue expenses of the trade
+    question: Is this a routine revenue cost incurred wholly and exclusively for the trade?
+    conditions:
+      category: [cost_of_sales, subcontractors, wages, staff_pension, rent, rates, light_heat, software, insurance,
+                 bank_charges, advertising, accountancy, subscriptions, loan_interest, directors_salary, employer_nic]
+    outcome: {ct: allow}
+    certainty: rule
+    authority: ["CTA 2009 s54", "ITTOIA 2005 s34"]
+    guidance: ["BIM37000", "BIM42000"]
+    entity_types: [company, sole_trader]
+    effective: {from: "2005-04-06", to: null}
+    params: []
+    notes: >-
+      Categories are listed only when their ordinary nature is not in doubt. Accountancy fees for
+      preparing accounts and returns are allowable (BIM46450); fees for tax disputes are not, and should
+      be coded to legal_professional with fee_nature=tax_dispute.
+
+  - id: EXP-ORD-02
+    title: Director's remuneration
+    question: Is the director's salary or bonus paid within nine months of the period end?
+    conditions: {category: directors_salary, entity_type: company, paid_within_9_months: "no"}
+    outcome: {ct: disallow}
+    certainty: rule
+    priority: 10
+    authority: ["CTA 2009 s1288", "CTA 2009 s1289"]
+    guidance: ["BIM46045"]
+    entity_types: [company]
+    effective: {from: "2009-04-01", to: null}
+    params: []
+    notes: Accrued remuneration not paid within 9 months of the period end is deductible in the period it is paid.
+
+  - id: EXP-DEP-01
+    title: Depreciation and amortisation
+    question: Is this an accounting charge for depreciation or amortisation of fixed assets?
+    conditions: {category: depreciation}
+    outcome: {ct: disallow, vat: none}
+    certainty: rule
+    authority: ["CTA 2009 s53", "ITTOIA 2005 s33"]
+    guidance: ["BIM35910"]
+    entity_types: [company, sole_trader]
+    effective: {from: "2005-04-06", to: null}
+    params: []
+    notes: Capital allowances are given instead. Intangibles under CTA 2009 Part 8 are out of scope for v1.
+
+  - id: EXP-TAX-01
+    title: Corporation tax and income tax charged in the accounts
+    question: Is this a charge for tax on profits?
+    conditions: {category: [corporation_tax, drawings]}
+    outcome: {ct: disallow, vat: none}
+    certainty: rule
+    authority: ["CTA 2009 s54", "ITTOIA 2005 s34"]
+    guidance: ["BIM31040"]
+    entity_types: [company, sole_trader]
+    effective: {from: "2005-04-06", to: null}
+    params: []
+    notes: Tax on profits is an appropriation of profit, as are a sole trader's drawings.
+
+  # ------------------------------------------------------------------ wholly and exclusively / duality
+  - id: EXP-WE-01
+    title: Wholly and exclusively (dual purpose)
+    question: Was the expense incurred wholly and exclusively for the purposes of the trade, or does it have a private purpose too?
+    conditions: {category: sundry}
+    outcome: {ct: review}
+    certainty: judgment
+    authority: ["CTA 2009 s54(1)(a)", "ITTOIA 2005 s34(1)(a)"]
+    guidance: ["BIM37000", "BIM37400", "BIM37600"]
+    entity_types: [company, sole_trader]
+    effective: {from: "2005-04-06", to: null}
+    params: []
+    factors:
+      - The object (purpose) of the spender at the time, not the effect of the expense
+      - Whether any private benefit is merely incidental or is itself a purpose
+      - Whether an identifiable business part can be separated (ITTOIA s34(2) / CTA 2009 s54(2))
+      - "Evidence: who benefits, how often, link to income-earning activity"
+    authorities:
+      - "Mallalieu v Drummond [1983] 2 AC 861"
+      - "Bentleys, Stokes and Lowless v Beeson [1952] 2 All ER 82"
+      - "MacKinlay v Arthur Young McClelland Moores & Co [1990] 2 AC 239"
+      - "Vodafone Cellular Ltd v Shaw [1997] STC 734"
+    default: {ct: disallow}
+    reasoning: >-
+      Sundry costs are uncoded or mixed by nature. Until the purpose is confirmed the prudent default is
+      to disallow; the reviewer can allow in full or allow the separable business part.
+    notes: Recode the transaction to a specific category where possible.
+
+  - id: EXP-PRIV-01
+    title: Mixed-use costs with a recorded business-use percentage
+    question: What part of this mixed-use cost relates to the business?
+    conditions: {entity_type: sole_trader, private_use_pct: {gt: 0}}
+    outcome: {ct: {disallow_pct_fact: private_use_pct}, vat: {recover_pct_fact: business_use_pct}}
+    certainty: rule
+    priority: 5
+    authority: ["ITTOIA 2005 s34(2)"]
+    guidance: ["BIM37007", "BIM47820"]
+    entity_types: [sole_trader]
+    effective: {from: "2005-04-06", to: null}
+    params: []
+    notes: >-
+      Applies where the business-use proportion is recorded on the transaction (e.g. phone, van running
+      costs). Whether the percentage itself is reasonable is for the reviewer when it is first set.
+
+  # ------------------------------------------------------------------ capital vs revenue
+  - id: EXP-CAP-01
+    title: Fixed asset additions
+    question: Is this expenditure on an asset of enduring benefit to the trade?
+    conditions: {category: fixed_assets}
+    outcome: {ct: capital}
+    certainty: rule
+    authority: ["CTA 2009 s53", "ITTOIA 2005 s33", "CAA 2001 s11"]
+    guidance: ["BIM35000", "CA21000"]
+    entity_types: [company, sole_trader]
+    effective: {from: "2005-04-06", to: null}
+    params: []
+    notes: Excluded from the profit computation and passed to capital allowances via the fixed asset register.
+
+  - id: EXP-CAP-02
+    title: Repairs where the nature of the work is not recorded
+    question: Is this a repair (restoring an asset to its original condition) or an improvement (capital)?
+    conditions: {category: repairs, improvement: {missing: true}}
+    outcome: {ct: review}
+    certainty: judgment
+    authority: ["CTA 2009 s53", "ITTOIA 2005 s33"]
+    guidance: ["BIM35400", "BIM46900"]
+    entity_types: [company, sole_trader]
+    effective: {from: "2005-04-06", to: null}
+    params: []
+    factors:
+      - Is the "entirety" being worked on the whole asset or a subsidiary part of it?
+      - Does the work restore the asset or improve it beyond its original state (like-for-like with modern materials is still a repair)?
+      - Was the asset usable in the trade when acquired, or did the work make it so?
+      - Accounting treatment (capitalised or expensed) is relevant but not decisive
+    authorities:
+      - "Law Shipping Co Ltd v CIR (1923) 12 TC 621"
+      - "Odeon Associated Theatres Ltd v Jones (1971) 48 TC 257"
+      - "Samuel Jones & Co (Devonvale) Ltd v CIR (1951) 32 TC 513"
+      - "British Insulated and Helsby Cables Ltd v Atherton [1926] AC 205"
+    default: {ct: allow}
+    reasoning: Coded as repairs in the books; provisionally allowed as revenue pending confirmation that no improvement element exists.
+    notes: Record improvement=yes/no in the BRG Facts column to resolve automatically.
+
+  - id: EXP-CAP-03
+    title: Repairs confirmed as like-for-like
+    question: Is this a repair with no improvement element?
+    conditions: {category: repairs, improvement: "no"}
+    outcome: {ct: allow}
+    certainty: rule
+    authority: ["CTA 2009 s54", "ITTOIA 2005 s34"]
+    guidance: ["BIM46900"]
+    entity_types: [company, sole_trader]
+    effective: {from: "2005-04-06", to: null}
+    params: []
+
+  - id: EXP-CAP-04
+    title: Repairs that improve the asset
+    question: Does the work improve the asset beyond its original condition?
+    conditions: {category: repairs, improvement: "yes"}
+    outcome: {ct: disallow}
+    certainty: rule
+    authority: ["CTA 2009 s53", "ITTOIA 2005 s33"]
+    guidance: ["BIM35400"]
+    entity_types: [company, sole_trader]
+    effective: {from: "2005-04-06", to: null}
+    params: []
+    notes: Capital. Add to the fixed asset register if it qualifies for capital allowances or SBA.
+
+  # ------------------------------------------------------------------ entertaining
+  - id: EXP-ENT-00
+    title: Entertaining where attendees are not recorded
+    question: Who was entertained (staff only, or including clients/suppliers)?
+    conditions: {category: entertainment, attendees: {missing: true}}
+    outcome: {ct: review_fact, vat: review_fact}
+    fact_needed: attendees
+    certainty: rule
+    authority: ["CTA 2009 s1298", "ITTOIA 2005 s45", "SI 1992/3222 art 5"]
+    guidance: ["BIM45000", "VIT43000"]
+    entity_types: [company, sole_trader]
+    effective: {from: "2009-04-01", to: null}
+    params: []
+    default: {ct: disallow, vat: blocked}
+    reasoning: Treated as business entertainment (disallowed, input tax blocked) until the attendees are recorded.
+
+  - id: EXP-ENT-01
+    title: Business entertainment of non-employees
+    question: Is this business entertainment of non-employees?
+    conditions: {category: entertainment, attendees: includes_non_employees}
+    outcome: {ct: disallow, vat: blocked}
+    certainty: rule
+    authority: ["CTA 2009 s1298", "ITTOIA 2005 s45", "SI 1992/3222 art 5"]
+    guidance: ["BIM45000", "VIT43000"]
+    entity_types: [company, sole_trader]
+    effective: {from: "2009-04-01", to: null}
+    params: []
+    notes: >-
+      Staff attending to host clients are part of the business entertainment (BIM45034), so the whole
+      cost is disallowed. Overseas customers: input tax may be recoverable (VIT43000) - recode if so.
+
+  - id: EXP-ENT-02
+    title: Staff entertainment
+    question: Is this entertaining of employees only?
+    conditions: {category: [entertainment, staff_entertainment], attendees: staff_only}
+    outcome: {ct: allow, vat: recover}
+    certainty: rule
+    authority: ["CTA 2009 s1298(2)", "ITTOIA 2005 s45(2)", "ITEPA 2003 s264"]
+    guidance: ["BIM45000", "EIM21690"]
+    entity_types: [company, sole_trader]
+    effective: {from: "2009-04-01", to: null}
+    params: ["exp.staff_function_limit"]
+    notes: >-
+      Allowable for the employer. For the employees, an annual function costing no more than the
+      staff_function_limit per head is exempt (ITEPA s264); above it the whole cost is a benefit. A
+      sole trader entertaining only themselves is not staff entertaining - code it as drawings.
+
+  # ------------------------------------------------------------------ gifts
+  - id: EXP-GIFT-01
+    title: Client gifts carrying a conspicuous advertisement, within the limit
+    question: Is the gift branded, not food/drink/tobacco/vouchers, and within the per-recipient limit?
+    conditions:
+      category: client_gifts
+      carries_logo: "yes"
+      gift_type: other
+      cost_per_recipient: {lte: "param:exp.client_gift_limit"}
+    outcome: {ct: allow, vat: recover}
+    certainty: rule
+    authority: ["CTA 2009 s1300(3)", "ITTOIA 2005 s47(3)", "VATA 1994 Sch 4 para 5(2)(a)"]
+    guidance: ["BIM45065", "VAT Notice 700/7"]
+    entity_types: [company, sole_trader]
+    effective: {from: "2009-04-01", to: null}
+    params: ["exp.client_gift_limit", "vat.business_gift_limit"]
+
+  - id: EXP-GIFT-02
+    title: Other client gifts
+    question: Is this a gift that falls outside the conspicuous-advertisement exception?
+    conditions: {category: client_gifts}
+    outcome: {ct: disallow, vat: recover}
+    certainty: rule
+    authority: ["CTA 2009 s1298", "ITTOIA 2005 s45", "VATA 1994 Sch 4 para 5"]
+    guidance: ["BIM45065", "VAT Notice 700/7"]
+    entity_types: [company, sole_trader]
+    effective: {from: "2009-04-01", to: null}
+    params: ["vat.business_gift_limit"]
+    notes: >-
+      Gifts are business entertainment unless the s1300/s47 exception is met (all conditions recorded).
+      Input tax is recoverable on business gifts, but output tax is due where gifts to the same person
+      exceed the VAT gift limit in 12 months.
+
+  - id: EXP-TRIV-01
+    title: Trivial benefits to staff
+    question: Is this a staff gift of no more than the trivial-benefit limit, not cash or a cash voucher, and not a reward for services?
+    conditions: {category: staff_gifts, cost_per_recipient: {lte: "param:exp.trivial_benefit_limit"}, cash_or_voucher: "no"}
+    outcome: {ct: allow, vat: recover}
+    certainty: rule
+    authority: ["ITEPA 2003 s323A", "ITEPA 2003 s323B", "CTA 2009 s54"]
+    guidance: ["EIM21864"]
+    entity_types: [company]
+    effective: {from: "2016-04-06", to: null}
+    params: ["exp.trivial_benefit_limit", "exp.trivial_benefit_director_cap"]
+    notes: >-
+      Exempt for the employee. Directors of close companies (and their household) are capped at the
+      annual director cap - the director totals are checked in the extraction module.
+
+  - id: EXP-TRIV-02
+    title: Staff gifts outside the trivial-benefit exemption
+    question: Is this a staff gift that is cash, a cash voucher, a reward, or over the limit?
+    conditions: {category: staff_gifts}
+    outcome: {ct: allow, vat: recover}
+    certainty: rule
+    authority: ["CTA 2009 s54", "ITEPA 2003 s62", "ITEPA 2003 s201"]
+    guidance: ["EIM21864"]
+    entity_types: [company]
+    effective: {from: "2016-04-06", to: null}
+    params: []
+    notes: Allowable employment cost for the company, but a taxable benefit for the employee (P11D or PAYE Settlement Agreement).
+
+  # ------------------------------------------------------------------ cars and travel
+  - id: EXP-CAR-01
+    title: Car lease rentals - high emission cars
+    question: Is this a lease rental for a car with CO2 emissions above the threshold?
+    conditions: {category: car_lease, co2_gkm: {gt: "param:ca.car_lease_co2_threshold"}}
+    outcome: {ct: {disallow_pct_param: ca.car_lease_disallow_pct}, vat: {recover_pct: 50}}
+    certainty: rule
+    authority: ["CTA 2009 s56", "CTA 2009 s57", "ITTOIA 2005 s48", "ITTOIA 2005 s49", "SI 1992/3222 art 7(2E)"]
+    guidance: ["BIM47714", "VIT55100"]
+    entity_types: [company, sole_trader]
+    effective: {from: "2021-04-01", to: null}
+    params: ["ca.car_lease_disallow_pct", "ca.car_lease_co2_threshold"]
+    notes: >-
+      The 15% restriction applies to hire of cars first registered before 1 April 2009 under older
+      rules - not modelled. VAT: 50% of input tax on a car lease is blocked where the car is available
+      for private use; recode with exclusive_business_use=yes for a pool car.
+
+  - id: EXP-CAR-02
+    title: Car lease rentals - low emission cars
+    question: Is this a lease rental for a car at or below the CO2 threshold?
+    conditions: {category: car_lease, co2_gkm: {lte: "param:ca.car_lease_co2_threshold"}}
+    outcome: {ct: allow, vat: {recover_pct: 50}}
+    certainty: rule
+    authority: ["CTA 2009 s56", "ITTOIA 2005 s48", "SI 1992/3222 art 7(2E)"]
+    guidance: ["BIM47714"]
+    entity_types: [company, sole_trader]
+    effective: {from: "2021-04-01", to: null}
+    params: ["ca.car_lease_co2_threshold"]
+
+  - id: EXP-CAR-03
+    title: Car lease where CO2 is not recorded
+    question: What are the car's CO2 emissions (g/km)?
+    conditions: {category: car_lease, co2_gkm: {missing: true}}
+    outcome: {ct: review_fact, vat: {recover_pct: 50}}
+    fact_needed: co2_gkm
+    certainty: rule
+    authority: ["CTA 2009 s56", "ITTOIA 2005 s48"]
+    guidance: ["BIM47714"]
+    entity_types: [company, sole_trader]
+    effective: {from: "2021-04-01", to: null}
+    params: ["ca.car_lease_disallow_pct"]
+    default: {ct: {disallow_pct_param: ca.car_lease_disallow_pct}}
+    reasoning: Assumed above the threshold (15% disallowed) until the CO2 figure is recorded.
+
+  - id: EXP-MILE-01
+    title: Mileage claims at approved rates
+    question: Is the mileage claim within the approved mileage allowance for the business miles recorded?
+    conditions: {category: mileage, business_miles: {gt: 0}}
+    outcome: {ct: {calc: mileage}, vat: none}
+    certainty: rule
+    authority: ["ITEPA 2003 s229", "ITEPA 2003 s230", "ITTOIA 2005 s94D"]
+    guidance: ["EIM31200", "BIM75005"]
+    entity_types: [company, sole_trader]
+    effective: {from: "2011-04-06", to: null}
+    params: ["exp.amap_car_first_rate", "exp.amap_car_later_rate", "exp.amap_car_threshold_miles", "exp.amap_motorcycle_rate", "exp.amap_bicycle_rate"]
+    notes: >-
+      Company: payments to directors up to the approved amount are deductible and free of tax/NIC;
+      any excess is shown as disallowed here only for the sole-trader simplified-expenses election,
+      and as a taxable payment for a company (deductible, but reported via payroll). Sole trader: the
+      flat rate (s94D) replaces actual motoring costs and capital allowances for that vehicle.
+      VAT on fuel within a mileage allowance is not modelled (needs fuel receipts) - treated as no VAT.
+
+  - id: EXP-MILE-02
+    title: Mileage claims with no miles recorded
+    question: How many business miles does this claim cover?
+    conditions: {category: mileage, business_miles: {missing: true}}
+    outcome: {ct: review_fact, vat: none}
+    fact_needed: business_miles
+    certainty: rule
+    authority: ["ITEPA 2003 s229", "ITTOIA 2005 s94D"]
+    guidance: ["EIM31200"]
+    entity_types: [company, sole_trader]
+    effective: {from: "2011-04-06", to: null}
+    params: []
+    default: {ct: allow}
+    reasoning: Provisionally allowed as claimed; the claim must be supported by a mileage log.
+
+  - id: EXP-TRAV-01
+    title: Travel to a temporary workplace
+    question: Was the journey to a temporary workplace (not ordinary commuting)?
+    conditions: {category: [travel, subsistence], temporary_workplace: "yes"}
+    outcome: {ct: allow, vat: recover}
+    certainty: rule
+    authority: ["ITEPA 2003 s338", "ITEPA 2003 s339", "ITTOIA 2005 s34"]
+    guidance: ["EIM32000", "BIM47705"]
+    entity_types: [company, sole_trader]
+    effective: {from: "2005-04-06", to: null}
+    params: []
+
+  - id: EXP-TRAV-02
+    title: Ordinary commuting
+    question: Is this ordinary commuting between home and a permanent place of business?
+    conditions: {category: [travel, subsistence], temporary_workplace: "no"}
+    outcome: {ct: disallow, vat: blocked}
+    certainty: rule
+    authority: ["ITTOIA 2005 s34", "ITEPA 2003 s338(3)"]
+    guidance: ["BIM47705", "EIM32010"]
+    entity_types: [company, sole_trader]
+    effective: {from: "2005-04-06", to: null}
+    params: []
+    notes: >-
+      For a company the cost of an employee's commuting is deductible as an employment cost but taxable
+      on the employee; the disallowance here applies to sole traders. Recode company commuting costs to
+      wages with a benefit flag.
+
+  - id: EXP-TRAV-03
+    title: Travel and subsistence where the workplace status is unknown
+    question: Is the destination a temporary workplace or a permanent base?
+    conditions: {category: [travel, subsistence], temporary_workplace: {missing: true}}
+    outcome: {ct: review}
+    certainty: judgment
+    authority: ["ITTOIA 2005 s34", "ITEPA 2003 s339"]
+    guidance: ["BIM47705", "EIM32080"]
+    entity_types: [company, sole_trader]
+    effective: {from: "2005-04-06", to: null}
+    params: []
+    factors:
+      - Is there a base of operations from which the business is run?
+      - Is attendance at the destination for a limited duration or temporary purpose (24-month rule for employees)?
+      - Are journeys regular and predictable (indicating a permanent place)?
+      - For meals, was the trader away from their normal pattern of business travel?
+    authorities:
+      - "Samadian v HMRC [2014] UKUT 13 (TCC)"
+      - "Horton v Young (1971) 47 TC 60"
+      - "Caillebotte v Quinn [1975] STC 265"
+      - "Healy v HMRC [2015] UKUT 0303 (TCC)"
+    default: {ct: allow, vat: recover}
+    reasoning: Coded as business travel; provisionally allowed pending confirmation of the destination's status.
+
+  # ------------------------------------------------------------------ use of home
+  - id: EXP-HOME-01
+    title: Use of home - simplified flat rate (sole traders)
+    question: How many hours a month was the home used for business?
+    conditions: {category: use_of_home, entity_type: sole_trader, method: flat_rate, hours_per_month: {gte: 25}}
+    outcome: {ct: {calc: home_flat_rate}, vat: none}
+    certainty: rule
+    authority: ["ITTOIA 2005 s94H"]
+    guidance: ["BIM75010"]
+    entity_types: [sole_trader]
+    effective: {from: "2013-04-06", to: null}
+    params: ["exp.home_flat_rates"]
+    notes: The allowable amount is the flat monthly rate for the band of hours, for each month recorded (months fact, default 12).
+
+  - id: EXP-HOME-02
+    title: Use of home - actual cost apportionment
+    question: What part of the household costs relates to business use, and is that apportionment reasonable?
+    conditions: {category: use_of_home}
+    outcome: {ct: review}
+    certainty: judgment
+    authority: ["ITTOIA 2005 s34(2)", "CTA 2009 s54", "ITEPA 2003 s316A"]
+    guidance: ["BIM47820", "BIM47825", "EIM32760"]
+    entity_types: [company, sole_trader]
+    effective: {from: "2005-04-06", to: null}
+    params: ["exp.home_employee_weekly"]
+    factors:
+      - Number of rooms used and whether any room is used exclusively for business (CGT private residence relief risk)
+      - Hours of business use against total use
+      - Which costs are fixed (council tax, mortgage interest, rent) and which vary with use (heat, light)
+      - For a company paying a director - is there a written arrangement and evidence of the additional household costs?
+      - Payments up to the employee flat rate per week are exempt without evidence (ITEPA s316A)
+    authorities:
+      - "Mallalieu v Drummond [1983] 2 AC 861"
+      - "Baird v Williams [1999] STC 635"
+    default: {ct: allow}
+    reasoning: >-
+      The claim is provisionally allowed for the business. For a company, only the employee flat rate per
+      week is exempt for the director without evidence; any excess is at risk of being taxable earnings.
+    notes: Flat-rate claims by sole traders with recorded hours are resolved automatically by EXP-HOME-01.
+
+  # ------------------------------------------------------------------ pre-trading, fines, legal
+  - id: EXP-PRE-01
+    title: Pre-trading expenditure
+    question: Was this incurred before trading began, and within the pre-trading window?
+    conditions: {pre_trading: "yes"}
+    outcome: {ct: {calc: pre_trading}}
+    overlay: true
+    certainty: rule
+    authority: ["CTA 2009 s61", "ITTOIA 2005 s57"]
+    guidance: ["BIM46351"]
+    entity_types: [company, sole_trader]
+    effective: {from: "2005-04-06", to: null}
+    params: ["exp.pre_trading_years"]
+    notes: >-
+      Allowed as if incurred on the first day of trading if within the window and otherwise deductible;
+      older costs are disallowed. This is an overlay: the category's own rule still decides whether the
+      cost would have been deductible (e.g. entertaining stays disallowed); the window test is applied on top.
+
+  - id: EXP-FINE-01
+    title: Fines and penalties of the business
+    question: Is this a fine or penalty imposed on the business itself?
+    conditions: {category: fines_penalties, fine_liability: [business, {missing: true}]}
+    outcome: {ct: disallow, vat: none}
+    certainty: rule
+    authority: ["CTA 2009 s54", "ITTOIA 2005 s34"]
+    guidance: ["BIM42515"]
+    entity_types: [company, sole_trader]
+    effective: {from: "2005-04-06", to: null}
+    params: []
+    notes: >-
+      Penalties for breaking the law are not incurred for the purposes of the trade (McKnight v Sheppard
+      [1999] 1 WLR 1333). Late-payment interest and penalties to HMRC are likewise disallowed (CTA 2009 s1303).
+
+  - id: EXP-FINE-02
+    title: Employee's fine paid by the employer
+    question: Is this a fine incurred by an employee personally that the company has paid?
+    conditions: {category: fines_penalties, entity_type: company, fine_liability: employee}
+    outcome: {ct: allow, vat: none}
+    certainty: rule
+    authority: ["CTA 2009 s54", "ITEPA 2003 s62"]
+    guidance: ["BIM42515", "EIM21689"]
+    entity_types: [company]
+    effective: {from: "2005-04-06", to: null}
+    params: []
+    notes: Deductible as part of the employee's remuneration package, but taxable earnings for the employee (payroll/P11D).
+
+  - id: EXP-LEGAL-01
+    title: Legal and professional fees of a revenue nature
+    question: Do the fees relate to the day-to-day trade (debt collection, trade contracts, employment matters, short leases)?
+    conditions: {category: legal_professional, fee_nature: revenue}
+    outcome: {ct: allow, vat: recover}
+    certainty: rule
+    authority: ["CTA 2009 s54", "ITTOIA 2005 s34"]
+    guidance: ["BIM46405", "BIM46410"]
+    entity_types: [company, sole_trader]
+    effective: {from: "2005-04-06", to: null}
+    params: []
+
+  - id: EXP-LEGAL-02
+    title: Legal and professional fees of a capital nature
+    question: Do the fees relate to acquiring or disposing of a capital asset, a long lease, or share capital?
+    conditions: {category: legal_professional, fee_nature: [capital, tax_dispute]}
+    outcome: {ct: disallow, vat: recover}
+    certainty: rule
+    authority: ["CTA 2009 s53", "ITTOIA 2005 s33"]
+    guidance: ["BIM46415", "BIM46452"]
+    entity_types: [company, sole_trader]
+    effective: {from: "2005-04-06", to: null}
+    params: []
+    notes: Capital fees may form part of an asset's cost for capital allowances, SBA or chargeable gains - add to the register where they do.
+
+  - id: EXP-LEGAL-03
+    title: Legal and professional fees - nature not recorded
+    question: Are these fees revenue (trading) or capital in nature?
+    conditions: {category: legal_professional, fee_nature: {missing: true}}
+    outcome: {ct: review}
+    certainty: judgment
+    authority: ["CTA 2009 s53", "CTA 2009 s54", "ITTOIA 2005 s33"]
+    guidance: ["BIM46400"]
+    entity_types: [company, sole_trader]
+    effective: {from: "2005-04-06", to: null}
+    params: []
+    factors:
+      - What was the fee for - an asset, a lease of more than 50 years, share issue, or the trade's day-to-day operation?
+      - Does it preserve an existing asset or right (revenue) or acquire/enhance one (capital)?
+      - Is any part a tax dispute (disallowed) or a personal matter?
+    authorities:
+      - "ECC Quarries Ltd v Watkis [1975] STC 578"
+      - "Morgan v Tate & Lyle Ltd [1955] AC 21"
+    default: {ct: allow}
+    reasoning: Provisionally allowed as revenue; request the invoice narrative to confirm.
+
+  # ------------------------------------------------------------------ other specific items
+  - id: EXP-TRAIN-01
+    title: Training that updates existing skills
+    question: Does the training update or maintain skills already used in the trade?
+    conditions: {category: training, new_skill: "no"}
+    outcome: {ct: allow, vat: recover}
+    certainty: rule
+    authority: ["CTA 2009 s54", "ITTOIA 2005 s34"]
+    guidance: ["BIM35660", "BIM42526"]
+    entity_types: [company, sole_trader]
+    effective: {from: "2005-04-06", to: null}
+    params: []
+
+  - id: EXP-TRAIN-02
+    title: Training for a new skill or qualification
+    question: Does the training give the trader a new skill or qualification (capital / personal)?
+    conditions: {category: training}
+    outcome: {ct: review}
+    certainty: judgment
+    authority: ["ITTOIA 2005 s33", "ITTOIA 2005 s34"]
+    guidance: ["BIM35660", "BIM42526"]
+    entity_types: [sole_trader]
+    effective: {from: "2005-04-06", to: null}
+    params: []
+    factors:
+      - Is the course connected to the trade as currently carried on?
+      - Does it create an asset of enduring benefit (a new qualification, new trade)?
+      - Is there a personal benefit beyond the trade?
+    authorities:
+      - "Dass v Special Commissioner [2006] EWHC 2491 (Ch)"
+      - "Consultant Psychiatrist v HMRC [2006] SpC 557"
+    default: {ct: disallow}
+    reasoning: For a sole trader, training with no recorded link to existing skills is treated as capital/personal until confirmed.
+    notes: For a company, training of employees is generally allowable (and exempt for the employee under ITEPA s250).
+
+  - id: EXP-TRAIN-03
+    title: Training of employees and directors (company)
+    question: Is this work-related training for an employee or director?
+    conditions: {category: training, entity_type: company}
+    outcome: {ct: allow, vat: recover}
+    certainty: rule
+    authority: ["CTA 2009 s54", "ITEPA 2003 s250"]
+    guidance: ["BIM42526", "EIM01210"]
+    entity_types: [company]
+    effective: {from: "2005-04-06", to: null}
+    params: []
+
+  - id: EXP-TEL-01
+    title: Telephone and internet (company contract)
+    question: Is this a phone or broadband contract in the company's name?
+    conditions: {category: telephone, entity_type: company}
+    outcome: {ct: allow, vat: recover}
+    certainty: rule
+    authority: ["CTA 2009 s54", "ITEPA 2003 s319"]
+    guidance: ["BIM37000", "EIM21778"]
+    entity_types: [company]
+    effective: {from: "2005-04-06", to: null}
+    params: []
+    notes: One mobile phone per employee provided under a company contract is exempt (ITEPA s319).
+
+  - id: EXP-TEL-02
+    title: Telephone and internet (sole trader)
+    question: What is the business-use proportion of the phone and internet costs?
+    conditions: {category: telephone, entity_type: sole_trader}
+    outcome: {ct: allow, vat: recover}
+    certainty: rule
+    authority: ["ITTOIA 2005 s34"]
+    guidance: ["BIM37000"]
+    entity_types: [sole_trader]
+    effective: {from: "2005-04-06", to: null}
+    params: []
+    notes: A business-only line is fully allowable; for mixed use record private_use_pct and EXP-PRIV-01 applies.
+
+  - id: EXP-MOTOR-01
+    title: Motor running costs
+    question: Are these running costs of a business vehicle?
+    conditions: {category: motor_expenses}
+    outcome: {ct: allow, vat: recover}
+    certainty: rule
+    authority: ["CTA 2009 s54", "ITTOIA 2005 s34"]
+    guidance: ["BIM47700"]
+    entity_types: [company, sole_trader]
+    effective: {from: "2005-04-06", to: null}
+    params: []
+    notes: >-
+      Sole traders with private use: record private_use_pct (EXP-PRIV-01). Company cars with private use
+      create a car/fuel benefit for the director (P11D) and may need the VAT fuel scale charge.
+
+  - id: EXP-DON-01
+    title: Charitable donations
+    question: Is this a donation to a charity?
+    conditions: {category: donations}
+    outcome: {ct: disallow, vat: none}
+    certainty: rule
+    authority: ["CTA 2009 s54", "CTA 2010 s189", "ITA 2007 s414"]
+    guidance: ["BIM47405", "CTM10000"]
+    entity_types: [company, sole_trader]
+    effective: {from: "2005-04-06", to: null}
+    params: []
+    notes: >-
+      Not a trading expense. A company deducts qualifying charitable donations from total profits
+      (CTA 2010 s189 - applied in the CT computation); a sole trader claims Gift Aid through the return.
+
+  - id: EXP-PEN-01
+    title: Employer pension contributions
+    question: Is this an employer contribution to a registered pension scheme, paid in the period?
+    conditions: {category: director_pension}
+    outcome: {ct: allow, vat: none}
+    certainty: rule
+    authority: ["CTA 2009 s1290", "FA 2004 s196", "FA 2004 s197"]
+    guidance: ["BIM46001", "BIM46035"]
+    entity_types: [company]
+    effective: {from: "2006-04-06", to: null}
+    params: []
+    notes: >-
+      Deductible when paid. Large contributions may be spread (FA 2004 s197). Contributions for a
+      director-shareholder are tested for wholly and exclusively only where the overall package is
+      excessive for the work done (BIM46035) - escalate in the review queue if that is in doubt.
+
+  - id: EXP-RD-01
+    title: Research and development costs
+    question: Is this a revenue cost of research and development related to the trade?
+    conditions: {category: research_development}
+    outcome: {ct: allow, vat: recover}
+    certainty: rule
+    authority: ["CTA 2009 s87", "CTA 2009 s54"]
+    guidance: ["CIRD81000"]
+    entity_types: [company, sole_trader]
+    effective: {from: "2009-04-01", to: null}
+    params: []
+    notes: >-
+      Deductible as revenue expenditure. Whether R&D relief (RDEC / ERIS) is available is a separate
+      judgment raised once per period by CT-RD-01 and is not computed in v1.
+
+  # ------------------------------------------------------------------ gaps
+  - id: EXP-UNCAT-01
+    title: Uncategorised transaction
+    question: What is this transaction? (The nominal code is not in the mapping.)
+    conditions: {category: uncategorised}
+    outcome: {ct: review_fact, vat: review_fact}
+    fact_needed: category
+    certainty: rule
+    authority: ["CTA 2009 s54", "ITTOIA 2005 s34"]
+    guidance: ["BIM37000"]
+    entity_types: [company, sole_trader]
+    effective: {from: "2005-04-06", to: null}
+    params: []
+    default: {ct: disallow, vat: blocked}
+    reasoning: Disallowed, with input tax not recovered, until the transaction is categorised (add the code to the mapping or recode it with category= in BRG Facts).
+
+  - id: EXP-NORULE-01
+    title: No specific rule for this combination of facts
+    question: Is this cost deductible on general principles (revenue, wholly and exclusively, not prohibited)?
+    conditions: {}
+    outcome: {ct: review}
+    certainty: judgment
+    authority: ["CTA 2009 s53", "CTA 2009 s54", "ITTOIA 2005 s33", "ITTOIA 2005 s34"]
+    guidance: ["BIM37000", "BIM35000"]
+    entity_types: [company, sole_trader]
+    effective: {from: "2005-04-06", to: null}
+    params: []
+    factors:
+      - Revenue or capital in nature?
+      - Incurred wholly and exclusively for the trade?
+      - Any specific statutory prohibition (entertaining, crime-related payments, unpaid remuneration)?
+    authorities:
+      - "Mallalieu v Drummond [1983] 2 AC 861"
+      - "British Insulated and Helsby Cables Ltd v Atherton [1926] AC 205"
+    default: {ct: allow}
+    reasoning: The category has no specific rule for the facts recorded. Provisionally allowed as booked; the reviewer should confirm or add a rule.

@@ -1,0 +1,183 @@
+# Self-employment: income tax, Class 2 and Class 4 NIC, basis periods, payments on account, MTD for
+# Income Tax, and the sole trader vs limited company comparison. Used by engine/sole_trader.py.
+domain: income_tax_self_employed
+citations_checked: false
+rules:
+
+  - id: SA-PROFIT-01
+    title: Trading profits of an unincorporated business
+    question: Start from the accounting profit and adjust for tax.
+    applies: computation
+    certainty: rule
+    authority: ["ITTOIA 2005 s5", "ITTOIA 2005 s25"]
+    guidance: ["BIM30000"]
+    entity_types: [sole_trader]
+    effective: {from: "2005-04-06", to: null}
+    params: []
+
+  - id: SA-BASIS-01
+    title: Tax year basis of assessment
+    question: Which profits are taxed in the tax year?
+    applies: computation
+    certainty: rule
+    authority: ["ITTOIA 2005 s7A", "ITTOIA 2005 s209A"]
+    guidance: ["BIM81000"]
+    entity_types: [sole_trader]
+    effective: {from: "2024-04-06", to: null}
+    params: []
+    notes: >-
+      From 2024-25 the profits of the tax year are taxed, apportioned by days from overlapping accounting
+      periods. An accounting date of 31 March to 4 April is treated as 5 April (s209A - section reference
+      to be confirmed). Non-aligned year ends need the next period's figures or an estimate.
+
+  - id: SA-BASIS-02
+    title: 2023-24 transition year
+    question: Does the business have a non-aligned accounting date for 2023-24, giving transition profit and overlap relief?
+    applies: computation
+    certainty: judgment
+    authority: ["Finance Act 2022 Sch 1 Part 3"]
+    guidance: ["BIM81100"]
+    entity_types: [sole_trader]
+    effective: {from: "2023-04-06", to: "2024-04-05"}
+    params: []
+    factors:
+      - Accounting date - aligned (31 March to 5 April) businesses have no transition profit
+      - Overlap profit brought forward from commencement
+      - Transition profit spread over five years unless an election accelerates it
+    authorities:
+      - "Finance Act 2022 Sch 1 para 56-62"
+    default: {transition_profit: 0}
+    reasoning: Transition profits are not computed in v1. Provide overlap profit figures to review by hand.
+
+  - id: SA-IT-01
+    title: Income tax on self-employment profits
+    question: What income tax is due on the year's profits and other income?
+    applies: computation
+    certainty: rule
+    authority: ["ITA 2007 s6", "ITA 2007 s10", "ITA 2007 s23", "ITA 2007 s35"]
+    guidance: ["SAIM1000"]
+    entity_types: [sole_trader]
+    effective: {from: "2007-04-06", to: null}
+    params: ["it.personal_allowance", "it.pa_taper_threshold", "it.ruk.bands"]
+
+  - id: SA-C4-01
+    title: Class 4 NIC
+    question: What Class 4 NIC is due on profits between the limits?
+    applies: computation
+    certainty: rule
+    authority: ["SSCBA 1992 s15"]
+    guidance: ["NIM24000"]
+    entity_types: [sole_trader]
+    effective: {from: "1992-07-01", to: null}
+    params: ["nic.class4.lower_profits_limit", "nic.class4.upper_profits_limit", "nic.class4.main_rate", "nic.class4.additional_rate"]
+
+  - id: SA-C2-01
+    title: Class 2 NIC status
+    question: Is Class 2 payable, credited, or voluntary for the year?
+    applies: computation
+    certainty: rule
+    authority: ["SSCBA 1992 s11", "NICs (Reduction in Rates) (No. 2) Act 2024"]
+    guidance: ["NIM20000"]
+    entity_types: [sole_trader]
+    effective: {from: "2022-04-06", to: null}
+    params: ["nic.class2.weekly_rate", "nic.class2.small_profits_threshold", "nic.class2.compulsory", "nic.class4.lower_profits_limit"]
+    notes: >-
+      2023-24: payable on profits at or above the lower profits limit; credited between the small profits
+      threshold and that limit. From 2024-25: nothing payable; credited at or above the threshold; voluntary
+      below it (the engine shows the voluntary cost as an option, not a liability).
+
+  - id: SA-POA-01
+    title: Payments on account
+    question: Are payments on account due for the next year?
+    applies: computation
+    certainty: rule
+    authority: ["TMA 1970 s59A", "SI 1996/1654 reg 3"]
+    guidance: ["SAM80000"]
+    entity_types: [sole_trader]
+    effective: {from: "1996-04-06", to: null}
+    params: ["sa.poa_threshold", "sa.poa_at_source_pct"]
+    notes: Each payment is half the year's income tax and Class 4 (not Class 2 or CGT), unless the liability is below the threshold or 80%+ was deducted at source.
+
+  - id: SA-POA-02
+    title: Reducing payments on account
+    question: Should payments on account be reduced because the next year's liability is expected to be lower?
+    applies: computation
+    certainty: election
+    authority: ["TMA 1970 s59A(3)"]
+    guidance: ["SAM80000"]
+    entity_types: [sole_trader]
+    effective: {from: "1996-04-06", to: null}
+    params: []
+    notes: Interest is charged if the reduction proves excessive.
+
+  - id: SA-MTD-01
+    title: Making Tax Digital for Income Tax
+    question: Is qualifying income (gross self-employment and property income) for the reference year above the threshold?
+    applies: computation
+    certainty: rule
+    authority: ["TMA 1970 Sch A1", "SI 2021/1076"]
+    guidance: ["GOV.UK MTD for Income Tax eligibility"]
+    entity_types: [sole_trader]
+    effective: {from: "2026-04-06", to: null}
+    params: ["mtd_itsa.schedule"]
+    notes: Qualifying income is turnover, not profit. Mandation starts in the tax year shown in the schedule, based on the return for the reference year two years earlier.
+
+  - id: SA-SIMP-01
+    title: Simplified expenses
+    question: Should flat-rate vehicle and use-of-home amounts be used instead of actual costs?
+    applies: computation
+    certainty: election
+    authority: ["ITTOIA 2005 s94B", "ITTOIA 2005 s94D", "ITTOIA 2005 s94H"]
+    guidance: ["BIM75000"]
+    entity_types: [sole_trader]
+    effective: {from: "2013-04-06", to: null}
+    params: ["exp.amap_car_first_rate", "exp.home_flat_rates"]
+
+  - id: SA-TA-01
+    title: Trading allowance
+    question: Should the trading allowance be deducted instead of actual expenses?
+    applies: computation
+    certainty: election
+    authority: ["ITTOIA 2005 s783A", "ITTOIA 2005 s783AC"]
+    guidance: ["BIM86000"]
+    entity_types: [sole_trader]
+    effective: {from: "2017-04-06", to: null}
+    params: ["it.trading_allowance"]
+
+  - id: SA-BADGES-01
+    title: Is there a trade?
+    question: Is the activity a trade (rather than a hobby, investment or one-off)?
+    applies: computation
+    certainty: judgment
+    authority: ["ITTOIA 2005 s5", "ITA 2007 s989"]
+    guidance: ["BIM20205"]
+    entity_types: [sole_trader]
+    effective: {from: "2005-04-06", to: null}
+    params: []
+    factors:
+      - Profit-seeking motive
+      - Number and frequency of transactions
+      - Modification of assets to make them more saleable
+      - Nature of the asset, manner of acquisition, interval between purchase and sale
+      - Existence of similar trading transactions, and the method of finance
+    authorities:
+      - "Marson v Morton [1986] 1 WLR 1343"
+      - "Ransom v Higgs [1974] 1 WLR 1594"
+      - "Royal Commission on the Taxation of Profits and Income (1955) - badges of trade"
+    default: {trade: true}
+    reasoning: The profile records trading status as uncertain; computed as a trade pending review.
+
+  - id: SA-INC-01
+    title: Sole trader vs limited company comparison
+    question: At this profit level, how do total tax and net income compare if the business is run through a company?
+    applies: computation
+    certainty: election
+    authority: ["ITA 2007 s6", "CTA 2010 s3", "TCGA 1992 s162"]
+    guidance: ["CG65700"]
+    entity_types: [sole_trader]
+    effective: {from: "2023-04-06", to: null}
+    params: ["ct.main_rate", "ct.small_profits_rate", "nic.class1.secondary_rate"]
+    notes: >-
+      Illustrative only. Excludes incorporation costs, CGT on goodwill (incorporation relief s162 or
+      s162A election), restrictions on relief for goodwill acquired from related individuals (CTA 2009
+      s849B), stamp duty, and the extra admin cost (taken from policy.json). Not a recommendation to incorporate.

@@ -1,0 +1,7 @@
+id,description,date_acquired,cost,asset_class,new_unused,co2_gkm,private_use_pct,brought_into_use,qualifying_cost,disposal_date,disposal_proceeds,pool_bf,claimed_fe,txn_ref
+A1,CNC router (new),2025-06-12,120000.00,plant,yes,,,,,,,,,
+A2,Forklift (used),2025-08-19,18000.00,plant,no,,,,,,,,,
+A3,Workshop electrical installation,2025-09-08,10000.00,integral_feature,yes,,,,,,,,,
+A4,Company car (95g/km),2025-07-01,32000.00,car,yes,95,,,,,,,,
+A5,Workshop extension,2025-09-30,200000.00,building,,,,2025-10-01,200000.00,,,,,
+A0,Old van,2019-05-01,15000.00,van,no,,,,,2025-11-15,3000.00,yes,,

@@ -1,0 +1,31 @@
+{
+  "id": "c06-hargreaves",
+  "name": "Tom Hargreaves Plumbing & Heating",
+  "entity_type": "sole_trader",
+  "package": "quickbooks",
+  "region": "wales",
+  "periods": [
+    {
+      "start": "2025-04-01",
+      "end": "2026-03-31"
+    }
+  ],
+  "vat": {
+    "registered": true,
+    "registration_date": "2016-07-01",
+    "scheme": "standard",
+    "stagger": "1",
+    "frs_sector": "General building or construction services"
+  },
+  "sole_trader": {
+    "trading_start": "2014-04-01",
+    "other_income": 0,
+    "prior_year_liability": 16000,
+    "poas_paid_for_year": 16000,
+    "turnover_by_tax_year": {
+      "2024-25": 138000
+    },
+    "mtd_software": false
+  },
+  "notes": "Synthetic. Welsh taxpayer; van with private use in a single-asset pool; MTD for Income Tax mandated from 2026-27; FRS comparison."
+}

@@ -1,0 +1,183 @@
+# Corporation tax computation rules (applies: computation). The CT engine (engine/ct.py) cites these
+# ids on each computation line. Rates and limits come from the parameter files by financial year.
+domain: corporation_tax
+citations_checked: false
+rules:
+
+  - id: CT-PROFIT-01
+    title: Trading profits computed on GAAP, adjusted for tax
+    question: Start from the accounting profit and adjust for items the tax rules treat differently.
+    applies: computation
+    certainty: rule
+    authority: ["CTA 2009 s35", "CTA 2009 s46"]
+    guidance: ["CTM01500", "BIM31000"]
+    entity_types: [company]
+    effective: {from: "2009-04-01", to: null}
+    params: []
+
+  - id: CT-FY-01
+    title: Accounting periods straddling 31 March
+    question: Does the accounting period fall into more than one financial year?
+    applies: computation
+    certainty: rule
+    authority: ["CTA 2010 s8(3)", "CTA 2010 s8(5)"]
+    guidance: ["CTM01405"]
+    entity_types: [company]
+    effective: {from: "2010-04-01", to: null}
+    params: []
+    notes: Profits are apportioned to each financial year by days and each part is charged at that year's rates.
+
+  - id: CT-RATE-01
+    title: Main rate
+    question: Are augmented profits at or above the upper limit for the period?
+    applies: computation
+    certainty: rule
+    authority: ["CTA 2010 s3", "Finance Act 2021 s6"]
+    guidance: ["CTM01400"]
+    entity_types: [company]
+    effective: {from: "2023-04-01", to: null}
+    params: ["ct.main_rate", "ct.upper_limit"]
+
+  - id: CT-SPR-01
+    title: Small profits rate
+    question: Are augmented profits at or below the lower limit for the period?
+    applies: computation
+    certainty: rule
+    authority: ["CTA 2010 s18A", "CTA 2010 s18B"]
+    guidance: ["CTM03510"]
+    entity_types: [company]
+    effective: {from: "2023-04-01", to: null}
+    params: ["ct.small_profits_rate", "ct.lower_limit"]
+    notes: Close investment-holding companies cannot use the small profits rate (CTA 2010 s18N) - flag a CIC in the profile notes.
+
+  - id: CT-MR-01
+    title: Marginal relief
+    question: Are augmented profits between the lower and upper limits?
+    applies: computation
+    certainty: rule
+    authority: ["CTA 2010 s18B", "CTA 2010 s18C"]
+    guidance: ["CTM03515", "CTM03520"]
+    entity_types: [company]
+    effective: {from: "2023-04-01", to: null}
+    params: ["ct.upper_limit", "ct.lower_limit", "ct.mr_fraction", "ct.main_rate"]
+    notes: >-
+      Relief = (U - A) x N/A x standard fraction, where U is the upper limit, A augmented profits and
+      N taxable total profits. Augmented profits include exempt distributions from non-group companies.
+
+  - id: CT-ASSOC-01
+    title: Limits divided between associated companies
+    question: How many companies were associated with this company at any time in the accounting period?
+    applies: computation
+    certainty: rule
+    authority: ["CTA 2010 s18D", "CTA 2010 s18E"]
+    guidance: ["CTM03545", "CTM03550"]
+    entity_types: [company]
+    effective: {from: "2023-04-01", to: null}
+    params: ["ct.upper_limit", "ct.lower_limit"]
+    notes: Dormant companies and passive holding companies are disregarded (s18E(4)-(5)). The count must be recorded in the client profile; a missing count fails the data health check.
+
+  - id: CT-ASSOC-02
+    title: Whether companies are associated
+    question: Does one company control the other, or are both under the control of the same person(s), taking account of attribution of associates' rights?
+    applies: computation
+    certainty: judgment
+    authority: ["CTA 2010 s18E", "CTA 2010 s18F", "CTA 2010 s450", "CTA 2010 s451"]
+    guidance: ["CTM03700", "CTM03760"]
+    entity_types: [company]
+    effective: {from: "2023-04-01", to: null}
+    params: []
+    factors:
+      - Direct control (more than 50% of share capital, voting power, income or assets on a winding up)
+      - Rights of associates attributed only where there is substantial commercial interdependence (s18F; CTM03770)
+      - Financial, economic and organisational links between the companies
+      - Whether the other company was dormant or a passive holding company for the whole period
+    authorities:
+      - "CTA 2010 s18F (substantial commercial interdependence)"
+    default: {associated_companies: profile}
+    reasoning: The profile records the basis as uncertain. The count in the profile is used provisionally.
+
+  - id: CT-SHORT-01
+    title: Limits reduced for short accounting periods
+    question: Is the accounting period shorter than 12 months?
+    applies: computation
+    certainty: rule
+    authority: ["CTA 2010 s18D(2)"]
+    guidance: ["CTM03540"]
+    entity_types: [company]
+    effective: {from: "2023-04-01", to: null}
+    params: ["ct.upper_limit", "ct.lower_limit"]
+    notes: >-
+      Engine convention: limits x days in period / 365, rounded to the penny, then allocated to each
+      financial year by days with the remainder in the last slice. A period of 365 or 366 days is a full
+      year (no reduction). Matches the HMRC marginal relief calculator for non-leap periods; check leap-day
+      periods by hand.
+
+  - id: CT-LOSS-01
+    title: Trading losses brought forward
+    question: Are there trading losses carried forward from earlier periods?
+    applies: computation
+    certainty: rule
+    authority: ["CTA 2010 s45", "CTA 2010 s45B", "CTA 2010 s269ZB"]
+    guidance: ["CTM04100", "CTM05000"]
+    entity_types: [company]
+    effective: {from: "2017-04-01", to: null}
+    params: []
+    notes: >-
+      Applied against profits of the same trade (s45B) to the extent needed. The deductions allowance
+      (£5m) restriction is not modelled - irrelevant for SME clients below it. Post-April 2017 losses can
+      instead be set against total profits by claim (s45A) - shown as an election.
+
+  - id: CT-LOSS-02
+    title: Current-year and carry-back loss relief
+    question: Should a trading loss be set against total profits of this period and carried back 12 months?
+    applies: computation
+    certainty: election
+    authority: ["CTA 2010 s37(3)(a)", "CTA 2010 s37(3)(b)"]
+    guidance: ["CTM04500"]
+    entity_types: [company]
+    effective: {from: "2010-04-01", to: null}
+    params: []
+    notes: Claim within two years of the end of the loss-making period.
+
+  - id: CT-QCD-01
+    title: Qualifying charitable donations
+    question: Did the company make donations to charity in the period?
+    applies: computation
+    certainty: rule
+    authority: ["CTA 2010 s189", "CTA 2010 s190"]
+    guidance: ["CTM10000"]
+    entity_types: [company]
+    effective: {from: "2010-04-01", to: null}
+    params: []
+    notes: Deducted from total profits (after other reliefs), limited to the profits available.
+
+  - id: CT-PAY-01
+    title: Payment date (non-large companies)
+    question: When is corporation tax due?
+    applies: computation
+    certainty: rule
+    authority: ["TMA 1970 s59D"]
+    guidance: ["CTM92000"]
+    entity_types: [company]
+    effective: {from: "1999-07-01", to: null}
+    params: []
+    notes: Nine months and one day after the end of the accounting period. Quarterly instalments for large companies (profits over £1.5m divided by associates) are out of scope - flagged.
+
+  - id: CT-RD-01
+    title: R&D relief (out of scope for automated computation)
+    question: Is a claim to R&D expenditure credit or enhanced R&D intensive support available?
+    applies: computation
+    certainty: judgment
+    authority: ["CTA 2009 Part 13", "CTA 2009 s1042"]
+    guidance: ["CIRD80000"]
+    entity_types: [company]
+    effective: {from: "2024-04-01", to: null}
+    params: []
+    factors:
+      - Detected from transactions coded research_development or descriptions mentioning prototypes or development
+      - Claim notification within six months of period end for first-time claimants (FA 2022 Sch 1)
+      - Additional information form required before the CT600 claim
+    authorities:
+      - "Get Onbord Ltd v HMRC [2023] UKFTT 00189 (TC)"
+    default: {claim: none}
+    reasoning: No relief is computed. A reviewer must decide whether to scope a claim.
