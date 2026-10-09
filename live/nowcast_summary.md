@@ -1,6 +1,6 @@
 # Global Freight Activity Tracker — as of 2026-10-09
 
-Live data, fetched 2026-10-09T10:39:29+00:00.
+Live data, fetched 2026-10-09T18:24:12+00:00.
 
 **Composite real-economy momentum: -0.15 z** in 2026-09 (provisional: month-to-date or incomplete coverage), rising over 3 months → **Recovery** (conviction: low).
 
@@ -12,7 +12,7 @@ Live data, fetched 2026-10-09T10:39:29+00:00.
 
 **Where.** The world is moving at different speeds. Germany is the strongest (+1.2 z) and Arabia (GCC) the weakest (-2.3 z), a gap of 3.4 standard deviations. By region: Germany +1.2 z (expansion); Eurozone +0.1 z (expansion); United States -0.3 z (contraction); World sea trade -1.0 z (contraction); Arabia (GCC) -2.3 z (contraction).
 
-**Costs vs volumes.** Shipping is getting dearer while less cargo moves: Dry-bulk freight (Breakwave BDRY, BDI futures) +78% y/y (+0.7 z) against Port calls, world (IMF PortWatch, AIS) -6.2% y/y (-1.8 z). Rising rates on falling volumes point to a supply squeeze (lost capacity, rerouting, longer voyages), not a demand boom.
+**Costs vs volumes.** Shipping is getting dearer while less cargo moves: Dry-bulk freight (Breakwave BDRY, BDI futures) +77% y/y (+0.7 z) against Port calls, world (IMF PortWatch, AIS) -6.2% y/y (-1.8 z). Rising rates on falling volumes point to a supply squeeze (lost capacity, rerouting, longer voyages), not a demand boom.
 
 **Chokepoints.** Traffic through the Strait of Hormuz is down 96% on a year ago (-94% against the three months before). The fall began in March 2026 and has lasted 7 months. The Strait of Hormuz normally carries about a fifth of the world's oil and much of its LNG. Bab el-Mandeb transits are down 22% y/y.
 
@@ -55,7 +55,7 @@ What to watch:
 | Port calls, Germany (IMF PortWatch, AIS) | DE | sea | 2026-10-02 | +3.67 % (yoy) | +1.14 |
 | Port calls, Eurozone ports (IMF PortWatch, AIS) | EA | sea | 2026-10-02 | -0.56 % (yoy) | +0.13 |
 | Port calls, world (IMF PortWatch, AIS) | WORLD | sea | 2026-10-02 | -6.18 % (yoy) | -1.82 |
-| Dry-bulk freight (Breakwave BDRY, BDI futures) | WORLD | sea | 2026-10-08 | +77.67 % (yoy) | +0.73 |
+| Dry-bulk freight (Breakwave BDRY, BDI futures) | WORLD | sea | 2026-10-09 | +77.13 % (yoy) | +0.72 |
 | Freight Transportation Services Index (BTS) | US | road/rail | 2026-07-01 | -7.75 % (3m3m) | -2.00 |
 | Cass Freight Index, shipments | US | road | 2026-08-01 | +2.06 % (yoy) | +1.28 |
 | Rail freight carloads | US | rail | 2026-07-01 | -0.42 % (3m3m) | -0.12 |
@@ -121,26 +121,26 @@ Phase **Recovery**, conviction low; cyclicals minus defensives +0.61.
 
 | Series | Role | Last observation | Fetched | Origin |
 |---|---|---|---|---|
-| Truck toll mileage index (sa) | indicator | 2026-09-01 | 2026-10-09T10:39:12+00:00 | destatis:daily-toll-xlsx |
-| Port calls, Germany (IMF PortWatch, AIS) | indicator | 2026-10-02 | 2026-10-09T10:39:17+00:00 | imf:portwatch |
-| Port calls, Eurozone ports (IMF PortWatch, AIS) | indicator | 2026-10-02 | 2026-10-09T10:39:17+00:00 | imf:portwatch |
-| Port calls, world (IMF PortWatch, AIS) | indicator | 2026-10-02 | 2026-10-09T10:39:19+00:00 | imf:portwatch |
-| Dry-bulk freight (Breakwave BDRY, BDI futures) | indicator | 2026-10-08 | 2026-10-09T10:39:19+00:00 | yahoo:BDRY |
-| Freight Transportation Services Index (BTS) | indicator | 2026-07-01 | 2026-10-09T10:39:19+00:00 | fred:TSIFRGHT |
-| Cass Freight Index, shipments | indicator | 2026-08-01 | 2026-10-09T10:39:20+00:00 | fred:FRGSHPUSM649NCIS |
-| Rail freight carloads | indicator | 2026-07-01 | 2026-10-09T10:39:20+00:00 | fred:RAILFRTCARLOADSD11 |
-| Port calls, United States (IMF PortWatch, AIS) | indicator | 2026-10-02 | 2026-10-09T10:39:20+00:00 | imf:portwatch |
-| Port calls, Gulf states (IMF PortWatch, AIS) | indicator | 2026-10-02 | 2026-10-09T10:39:20+00:00 | imf:portwatch |
-| Strait of Hormuz transits (IMF PortWatch) | indicator | 2026-10-04 | 2026-10-09T10:39:20+00:00 | imf:portwatch |
-| Bab el-Mandeb transits (IMF PortWatch) | indicator | 2026-10-04 | 2026-10-09T10:39:20+00:00 | imf:portwatch |
-| Manufacturing production, Germany (sca) | target | 2026-08-01 | 2026-10-09T10:39:21+00:00 | sdmx:eurostat |
-| Manufacturing production, euro area (sca) | target | 2026-07-01 | 2026-10-09T10:39:21+00:00 | sdmx:eurostat |
-| Exports, Germany (foreign trade statistics) | target | 2026-06-01 | 2026-10-09T10:39:22+00:00 | eurostat:jsonstat |
-| World trade volume (CPB World Trade Monitor) | target | 2026-07-01 | 2026-10-09T10:39:24+00:00 | cpb:world-trade-monitor |
-| Manufacturing production, United States | target | 2026-08-01 | 2026-10-09T10:39:27+00:00 | fred:IPMAN |
-| Goods imports, United States (BOP basis) | target | 2026-08-01 | 2026-10-09T10:39:27+00:00 | fred:BOPGIMP |
-| Extra-EU export volume, sa (Eurozone proxy) | target | 2026-06-01 | 2026-10-09T10:39:28+00:00 | eurostat:jsonstat |
-| Merchandise exports, Saudi Arabia (IMF IMTS) | target | 2026-06-01 | 2026-10-09T10:39:28+00:00 | sdmx:imf |
+| Truck toll mileage index (sa) | indicator | 2026-09-01 | 2026-10-09T18:23:55+00:00 | destatis:daily-toll-xlsx |
+| Port calls, Germany (IMF PortWatch, AIS) | indicator | 2026-10-02 | 2026-10-09T18:24:01+00:00 | imf:portwatch |
+| Port calls, Eurozone ports (IMF PortWatch, AIS) | indicator | 2026-10-02 | 2026-10-09T18:24:01+00:00 | imf:portwatch |
+| Port calls, world (IMF PortWatch, AIS) | indicator | 2026-10-02 | 2026-10-09T18:24:02+00:00 | imf:portwatch |
+| Dry-bulk freight (Breakwave BDRY, BDI futures) | indicator | 2026-10-09 | 2026-10-09T18:24:02+00:00 | yahoo:BDRY |
+| Freight Transportation Services Index (BTS) | indicator | 2026-07-01 | 2026-10-09T18:24:03+00:00 | fred:TSIFRGHT |
+| Cass Freight Index, shipments | indicator | 2026-08-01 | 2026-10-09T18:24:03+00:00 | fred:FRGSHPUSM649NCIS |
+| Rail freight carloads | indicator | 2026-07-01 | 2026-10-09T18:24:03+00:00 | fred:RAILFRTCARLOADSD11 |
+| Port calls, United States (IMF PortWatch, AIS) | indicator | 2026-10-02 | 2026-10-09T18:24:03+00:00 | imf:portwatch |
+| Port calls, Gulf states (IMF PortWatch, AIS) | indicator | 2026-10-02 | 2026-10-09T18:24:03+00:00 | imf:portwatch |
+| Strait of Hormuz transits (IMF PortWatch) | indicator | 2026-10-04 | 2026-10-09T18:24:04+00:00 | imf:portwatch |
+| Bab el-Mandeb transits (IMF PortWatch) | indicator | 2026-10-04 | 2026-10-09T18:24:04+00:00 | imf:portwatch |
+| Manufacturing production, Germany (sca) | target | 2026-08-01 | 2026-10-09T18:24:04+00:00 | sdmx:eurostat |
+| Manufacturing production, euro area (sca) | target | 2026-07-01 | 2026-10-09T18:24:05+00:00 | sdmx:eurostat |
+| Exports, Germany (foreign trade statistics) | target | 2026-06-01 | 2026-10-09T18:24:05+00:00 | eurostat:jsonstat |
+| World trade volume (CPB World Trade Monitor) | target | 2026-07-01 | 2026-10-09T18:24:07+00:00 | cpb:world-trade-monitor |
+| Manufacturing production, United States | target | 2026-08-01 | 2026-10-09T18:24:11+00:00 | fred:IPMAN |
+| Goods imports, United States (BOP basis) | target | 2026-08-01 | 2026-10-09T18:24:11+00:00 | fred:BOPGIMP |
+| Extra-EU export volume, sa (Eurozone proxy) | target | 2026-06-01 | 2026-10-09T18:24:11+00:00 | eurostat:jsonstat |
+| Merchandise exports, Saudi Arabia (IMF IMTS) | target | 2026-06-01 | 2026-10-09T18:24:11+00:00 | sdmx:imf |
 
 ## Data warnings
 
